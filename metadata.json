@@ -1,0 +1,8 @@
+{
+  "name": "Mybaiki - Asset & Service Management (Mobile)",
+  "description": "A comprehensive mobile UI for hospital staff and service providers to manage medical device and ambulance maintenance.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
