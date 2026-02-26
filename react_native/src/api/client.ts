@@ -39,6 +39,12 @@ class ApiClient {
       ...options,
       headers
     };
+    const body = config.body;
+    let bodyPayload: unknown = undefined;
+    if (body && typeof body === 'string') {
+      try { bodyPayload = JSON.parse(body); } catch { bodyPayload = body; }
+    }
+    console.log(`API ${config.method || 'GET'} ${url}`, bodyPayload !== undefined ? { body: bodyPayload } : '');
     try {
       const res = await fetch(url, config);
       const json = await res.json().catch(() => ({}));

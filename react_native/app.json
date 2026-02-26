@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react_native",
-    "slug": "react_native",
+    "name": "AssetHub",
+    "slug": "AssetHub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.syukrandevamast.react_native"
+      "package": "com.syukrandevamast.AssetHub"
     },
     "web": {
       "favicon": "./assets/favicon.png"

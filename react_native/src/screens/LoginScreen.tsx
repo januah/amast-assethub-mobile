@@ -86,6 +86,14 @@ export function LoginScreen({ onGoToRegister }: LoginScreenProps) {
 
   const handleLogin = async () => {
     setError('');
+    if (!userId.trim()) {
+      setError('Username or email is required');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
     setLoading(true);
     const res = await login(userId.trim(), password);
     setLoading(false);

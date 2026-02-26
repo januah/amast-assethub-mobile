@@ -103,7 +103,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (usernameOrEmail: string, password: string) => {
-      setState((s) => ({ ...s, isLoading: true }));
       const isEmail = usernameOrEmail.includes('@');
       const params = isEmail
         ? { email: usernameOrEmail, password }
@@ -118,8 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         return { success: true };
       }
-      setState((s) => ({ ...s, isLoading: false }));
-      return { success: false, message: res.message || 'Login failed' };
+      const apiMsg = res.message || (res.errors && res.errors.length ? res.errors.join('. ') : null);
+      return { success: false, message: apiMsg || 'Login failed' };
     },
     [persistAndSet]
   );
