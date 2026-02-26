@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabBar, TabId } from './BottomTabBar';
 import {
   ProfileScreen,
@@ -58,6 +59,7 @@ export function MainLayout({
 
   return (
     <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.content}>
         {showAddStaff && (
           <AddStaffScreen
@@ -118,6 +120,7 @@ export function MainLayout({
           unreadCount={unreadCount}
         />
       )}
+      </SafeAreaView>
     </View>
   );
 }
@@ -126,6 +129,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white
+  },
+  safeArea: {
+    flex: 1
   },
   content: {
     flex: 1
