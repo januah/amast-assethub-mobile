@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvironment } from '../context/EnvironmentContext';
 import { COLORS } from '../constants/theme';
@@ -33,7 +34,7 @@ export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={24} color={COLORS.slate[600]} />
@@ -85,7 +86,7 @@ export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

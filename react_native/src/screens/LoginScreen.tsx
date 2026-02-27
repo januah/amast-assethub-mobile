@@ -12,8 +12,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/theme';
+
+const appConfig = require('../../app.json');
+const APP_VERSION = `v${appConfig?.expo?.version ?? '1.0.0'}`;
 import { useAuth } from '../context/AuthContext';
 
 const DEMO_PASSWORD = 'P@ssw0rd123!';
@@ -77,6 +81,7 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showDemoRoles, setShowDemoRoles] = useState(false);
 
   const handleDemoSelect = (username: string) => {
     setUserId(username);
@@ -103,15 +108,10 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {onOpenSettings && (
-        <TouchableOpacity
-          style={styles.settingsBtn}
-          onPress={onOpenSettings}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Ionicons name="settings-outline" size={24} color={COLORS.slate[600]} />
-        </TouchableOpacity>
-      )}
+      <LinearGradient
+        colors={[COLORS.sky[50], COLORS.white]}
+        style={styles.bgGradient}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
@@ -167,41 +167,70 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
               </View>
             ) : null}
 
-            <TouchableOpacity
-              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-              onPress={handleLogin}
-              activeOpacity={0.8}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={COLORS.white} size="small" />
-              ) : (
-                <Text style={styles.loginButtonText}>Login</Text>
+            <View style={styles.loginRow}>
+              <TouchableOpacity
+                style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                activeOpacity={0.8}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={COLORS.white} size="small" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Login</Text>
+                )}
+              </TouchableOpacity>
+              {onOpenSettings && (
+                <TouchableOpacity
+                  style={styles.settingsBtn}
+                  onPress={onOpenSettings}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="settings-outline" size={22} color={COLORS.slate[600]} />
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.footer}>AMAST SDN BHD | {APP_VERSION}</Text>
           </View>
 
           <View style={styles.demoSection}>
-            <View style={styles.demoDivider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.demoLabel}>DEMO ROLE SELECTION</Text>
-              <View style={styles.dividerLine} />
-            </View>
-            <DemoUserSection
-              title="Hospital Staff"
-              users={DEMO_USERS.hospital}
-              onSelect={handleDemoSelect}
-            />
-            <DemoUserSection
-              title="Service & Engineering"
-              users={DEMO_USERS.service}
-              onSelect={handleDemoSelect}
-            />
-            <DemoUserSection
-              title="System & Support"
-              users={DEMO_USERS.system}
-              onSelect={handleDemoSelect}
-            />
+            <Pressable
+              style={({ pressed }) => [styles.demoHeader, pressed && styles.demoHeaderPressed]}
+              onPress={() => setShowDemoRoles((v) => !v)}
+            >
+              <View style={styles.demoDivider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.demoLabel}>DEMO ROLE SELECTION</Text>
+                <View style={styles.dividerLine} />
+              </View>
+              <View style={styles.demoChevronWrap}>
+                <Ionicons
+                  name={showDemoRoles ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color={COLORS.slate[400]}
+                />
+              </View>
+            </Pressable>
+            {showDemoRoles && (
+              <View style={styles.demoContent}>
+                <DemoUserSection
+                  title="Hospital Staff"
+                  users={DEMO_USERS.hospital}
+                  onSelect={handleDemoSelect}
+                />
+                <DemoUserSection
+                  title="Service & Engineering"
+                  users={DEMO_USERS.service}
+                  onSelect={handleDemoSelect}
+                />
+                <DemoUserSection
+                  title="System & Support"
+                  users={DEMO_USERS.system}
+                  onSelect={handleDemoSelect}
+                />
+              </View>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -214,11 +243,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
   },
+  bgGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  loginRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 16,
+  },
   settingsBtn: {
-    position: 'absolute',
-    top: 48,
-    right: 24,
-    zIndex: 10,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.slate[100],
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   keyboardView: {
     flex: 1
@@ -229,7 +269,13 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 32,
     paddingTop: 48,
-    paddingBottom: 48
+    paddingBottom: 48,
+  },
+  footer: {
+    marginTop: 16,
+    fontSize: 12,
+    color: COLORS.slate[400],
+    textAlign: 'center',
   },
   header: {
     marginBottom: 40
@@ -295,11 +341,11 @@ const styles = StyleSheet.create({
     color: COLORS.primary
   },
   loginButton: {
+    flex: 1,
     backgroundColor: COLORS.primary,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
-    marginTop: 16
   },
   loginButtonDisabled: {
     opacity: 0.7
@@ -314,12 +360,25 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     borderTopWidth: 1,
     borderTopColor: COLORS.slate[100],
-    gap: 24
+  },
+  demoHeader: {
+    paddingVertical: 4,
+  },
+  demoHeaderPressed: {
+    opacity: 0.7,
+  },
+  demoContent: {
+    marginTop: 20,
+    gap: 24,
+  },
+  demoChevronWrap: {
+    alignItems: 'center',
+    marginTop: 8,
   },
   demoDivider: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12
+    gap: 12,
   },
   dividerLine: {
     flex: 1,
