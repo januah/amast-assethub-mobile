@@ -9,6 +9,7 @@ import { getAdminDashboardSummary } from '../../api/dashboardApi';
 interface AdminHospitalDashboardProps {
   onAction: (flow: string) => void;
   onLogout?: () => void;
+  unreadCount?: number;
 }
 
 function formatTimeAgo(dateStr: string): string {
@@ -25,7 +26,7 @@ function formatTimeAgo(dateStr: string): string {
   return d.toLocaleDateString();
 }
 
-export function AdminHospitalDashboard({ onAction, onLogout }: AdminHospitalDashboardProps) {
+export function AdminHospitalDashboard({ onAction, onLogout, unreadCount = 0 }: AdminHospitalDashboardProps) {
   const [data, setData] = useState<{
     hospitalUsers: number;
     totalAssets: number;
@@ -70,7 +71,13 @@ export function AdminHospitalDashboard({ onAction, onLogout }: AdminHospitalDash
 
   return (
     <View style={styles.container}>
-      <Header title="Admin Hospital" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
+      <Header
+        title="Admin Hospital"
+        showRightIcons
+        unreadCount={unreadCount}
+        onNotificationClick={() => onAction('notifications')}
+        onAvatarPress={() => onAction('profile')}
+      />
       <View style={styles.bar}>
         <Ionicons name="navigate-outline" size={16} color={COLORS.primary} />
         <Text style={styles.barText}>{summary.hospitalName || 'HQ'}</Text>
@@ -155,7 +162,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
   loading: { padding: 48, alignItems: 'center', justifyContent: 'center' },
-  kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
+  kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12,  },
   kpiCard: { width: '47%', padding: 16, borderRadius: 16, alignItems: 'center' },
   kpiPrimary: { backgroundColor: COLORS.primary },
   kpiDark: { backgroundColor: COLORS.slate[900] },

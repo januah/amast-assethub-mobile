@@ -7,6 +7,7 @@ interface HeaderProps {
   title: string;
   showBack?: boolean;
   onBack?: () => void;
+  showRightIcons?: boolean;
   onNotificationClick?: () => void;
   onAvatarPress?: () => void;
   unreadCount?: number;
@@ -16,6 +17,7 @@ export function Header({
   title,
   showBack,
   onBack,
+  showRightIcons = false,
   onNotificationClick,
   onAvatarPress,
   unreadCount = 0
@@ -32,21 +34,25 @@ export function Header({
           {title}
         </Text>
       </View>
-      <View style={styles.right}>
-        {onNotificationClick && (
-          <TouchableOpacity onPress={onNotificationClick} style={styles.iconBtn}>
-            <Ionicons name="notifications-outline" size={22} color={COLORS.slate[500]} />
-            {unreadCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity style={styles.avatar} onPress={onAvatarPress} activeOpacity={0.8}>
-          <Ionicons name="person-outline" size={20} color={COLORS.slate[500]} />
-        </TouchableOpacity>
-      </View>
+      {showRightIcons && (
+        <View style={styles.right}>
+          {onNotificationClick && (
+            <TouchableOpacity onPress={onNotificationClick} style={styles.iconBtn}>
+              <Ionicons name="notifications-outline" size={22} color={COLORS.slate[500]} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          )}
+          {onAvatarPress && (
+            <TouchableOpacity style={styles.avatar} onPress={onAvatarPress} activeOpacity={0.8}>
+              <Ionicons name="person-outline" size={20} color={COLORS.slate[500]} />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </View>
   );
 }

@@ -14,7 +14,6 @@ function roleLabel(role: UserRole): string {
 interface ProfileScreenProps {
   onAction?: (flow: string) => void;
   onEditProfile?: () => void;
-  onNotificationSettings?: () => void;
   onChangePassword?: () => void;
   onLogout?: () => void;
   unreadCount?: number;
@@ -23,7 +22,6 @@ interface ProfileScreenProps {
 export function ProfileScreen({
   onAction,
   onEditProfile,
-  onNotificationSettings,
   onChangePassword,
   onLogout,
   unreadCount = 0
@@ -57,16 +55,6 @@ export function ProfileScreen({
           >
             <Ionicons name="person-outline" size={20} color={COLORS.slate[400]} />
             <Text style={styles.menuLabel}>Edit Profile</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={onNotificationSettings}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="notifications-outline" size={20} color={COLORS.slate[400]} />
-            <Text style={styles.menuLabel}>Notification Settings</Text>
             <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
           </TouchableOpacity>
 

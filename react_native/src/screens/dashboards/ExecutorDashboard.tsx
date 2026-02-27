@@ -19,7 +19,13 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
 
   return (
     <View style={styles.container}>
-      <Header title={`${roleLabel} Portal`} onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} unreadCount={unreadCount} />
+      <Header
+        title={`${roleLabel} Portal`}
+        showRightIcons
+        onNotificationClick={() => onAction('notifications')}
+        onAvatarPress={() => onAction('profile')}
+        unreadCount={unreadCount}
+      />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
           <View style={styles.heroTop}>

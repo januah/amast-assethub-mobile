@@ -1,6 +1,16 @@
 import { apiClient } from './client';
 
-export type ServiceRequestStatus = 'OPEN' | 'IN_PROGRESS' | 'WAITING' | 'COMPLETED' | 'CANCELLED';
+export type ServiceRequestStatus =
+  | 'OPEN'
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'IN_PROGRESS'
+  | 'WAITING'
+  | 'AWAITING_QUOTATION'
+  | 'AWAITING_PAYMENT'
+  | 'COMPLETED'
+  | 'REJECTED'
+  | 'CANCELLED';
 
 export interface StatusHistoryItem {
   history_id: number;

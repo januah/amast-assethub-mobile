@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Header } from '../../components/Header';
 import { SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { getProfile, updateProfile } from '../../api/profileApi';
 
 interface ToggleRowProps {
   label: string;
@@ -34,6 +35,8 @@ interface NotificationSettingsScreenProps {
 }
 
 export function NotificationSettingsScreen({ onBack }: NotificationSettingsScreenProps) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     breakdown: true,
     ppm: true,
@@ -43,9 +46,29 @@ export function NotificationSettingsScreen({ onBack }: NotificationSettingsScree
     push: true
   });
 
+  useEffect(() => {
+    getProfile().then((res) => {
+      setLoading(false);
+      if (res.success && res.data?.settings?.push_notifications_enabled !== undefined) {
+        setSettings((s) => ({ ...s, push: !!res.data?.settings?.push_notifications_enabled }));
+      }
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const updatePush = (value: boolean) => {
+    setSettings((s) => ({ ...s, push: value }));
+    setSaving(true);
+    updateProfile({ settings: { push_notifications_enabled: value } }).finally(() => setSaving(false));
+  };
+
   return (
     <View style={styles.container}>
       <Header title="Notifications" showBack onBack={onBack} />
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <SectionHeader title="Alert Preferences" />
         <View style={styles.toggleGroup}>
@@ -75,7 +98,7 @@ export function NotificationSettingsScreen({ onBack }: NotificationSettingsScree
             label="Push Notifications"
             desc="Receive alerts on your mobile device even when app is closed."
             active={settings.push}
-            onToggle={() => setSettings({ ...settings, push: !settings.push })}
+            onToggle={() => !saving && updatePush(!settings.push)}
           />
           <ToggleRow
             label="Email Reports"
@@ -85,6 +108,7 @@ export function NotificationSettingsScreen({ onBack }: NotificationSettingsScree
           />
         </View>
       </ScrollView>
+      )}
     </View>
   );
 }
@@ -94,6 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.slate[50]
   },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scroll: { flex: 1 },
   content: {
     padding: 16,

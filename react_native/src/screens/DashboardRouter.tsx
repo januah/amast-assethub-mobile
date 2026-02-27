@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { UserRole } from '../types';
 import { MainLayout } from '../components/MainLayout';
+import { getUnreadCount } from '../api/notificationApi';
 import { RequesterDashboard } from './dashboards/RequesterDashboard';
 import { AmbulanceDashboard } from './dashboards/AmbulanceDashboard';
 import { ExecutorDashboard } from './dashboards/ExecutorDashboard';
@@ -30,6 +31,7 @@ function wrapWithLayout(
     onFlowComplete: () => void;
     breakdownInitialAsset: { id: string; name: string } | null;
     handleAction: (flow: string, payload?: { asset?: { id: string; name: string } }) => void;
+    onNotificationListClose?: () => void;
   }
 ) {
   return (
@@ -40,6 +42,7 @@ function wrapWithLayout(
       currentFlow={flowProps.currentFlow}
       onFlowComplete={flowProps.onFlowComplete}
       breakdownInitialAsset={flowProps.breakdownInitialAsset}
+      onNotificationListClose={flowProps.onNotificationListClose}
     >
       {children}
     </MainLayout>
@@ -56,6 +59,17 @@ export function DashboardRouter({
 }: DashboardRouterProps) {
   const [currentFlow, setCurrentFlow] = useState<FlowState>(null);
   const [breakdownInitialAsset, setBreakdownInitialAsset] = useState<{ id: string; name: string } | null>(null);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(unreadCount ?? 0);
+
+  const fetchUnread = useCallback(() => {
+    getUnreadCount().then((res) => {
+      if (res.success && res.data) setUnreadNotificationCount(res.data.count ?? 0);
+    }).catch(() => setUnreadNotificationCount(0));
+  }, []);
+
+  useEffect(() => {
+    fetchUnread();
+  }, [fetchUnread]);
 
   const handleAction = (flow: string, payload?: { asset?: { id: string; name: string } }) => {
     if (flow === 'breakdown_flow') {
@@ -75,41 +89,44 @@ export function DashboardRouter({
     currentFlow,
     onFlowComplete: handleFlowComplete,
     breakdownInitialAsset,
-    handleAction
+    handleAction,
+    onNotificationListClose: fetchUnread
   };
+
+  const count = unreadNotificationCount;
 
   if (role === UserRole.MEDICAL_OFFICER || role === UserRole.VIEWER) {
     return wrapWithLayout(
-      <RequesterDashboard onAction={handleAction} onLogout={onLogout} unreadCount={unreadCount} />,
-      unreadCount,
+      <RequesterDashboard onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
+      count,
       onAction,
       onLogout,
       flowProps
     );
   }
   if (role === UserRole.AMBULANCE_DRIVER) {
-    return wrapWithLayout(<AmbulanceDashboard onAction={handleAction} onLogout={onLogout} />, unreadCount, onAction, onLogout, flowProps);
+    return wrapWithLayout(<AmbulanceDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.BIOMEDICAL_ENGINEER || role === UserRole.TOW_TRUCK) {
     return wrapWithLayout(
-      <ExecutorDashboard role={role} onAction={handleAction} onLogout={onLogout} unreadCount={unreadCount} />,
-      unreadCount,
+      <ExecutorDashboard role={role} onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
+      count,
       onAction,
       onLogout,
       flowProps
     );
   }
   if (role === UserRole.HOSPITAL_APPROVER) {
-    return wrapWithLayout(<ApproverDashboard onAction={handleAction} onLogout={onLogout} />, unreadCount, onAction, onLogout, flowProps);
+    return wrapWithLayout(<ApproverDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.ADMIN_HOSPITAL || role === UserRole.SUPERADMIN) {
-    return wrapWithLayout(<AdminHospitalDashboard onAction={handleAction} onLogout={onLogout} />, unreadCount, onAction, onLogout, flowProps);
+    return wrapWithLayout(<AdminHospitalDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC) {
-    return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, unreadCount, onAction, onLogout, flowProps);
+    return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.INSTALLER) {
-    return wrapWithLayout(<InstallerDashboard onSelect={onSelectInstallation || (() => {})} onLogout={onLogout} />, unreadCount, onAction, onLogout, flowProps);
+    return wrapWithLayout(<InstallerDashboard onSelect={onSelectInstallation || (() => {})} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
   }
 
   return null;

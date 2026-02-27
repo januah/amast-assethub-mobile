@@ -1,5 +1,9 @@
 import { apiClient } from './client';
 
+export interface ProfileSettings {
+  push_notifications_enabled?: boolean;
+}
+
 export interface Profile {
   user_id: string;
   username: string;
@@ -10,6 +14,7 @@ export interface Profile {
   hospital_name?: string;
   assigned_department_id?: number | null;
   assigned_department_name?: string | null;
+  settings?: ProfileSettings;
 }
 
 export interface UpdateProfileParams {
@@ -17,6 +22,7 @@ export interface UpdateProfileParams {
   email?: string;
   phone?: string;
   department_id?: number | null;
+  settings?: ProfileSettings;
 }
 
 export async function getProfile() {

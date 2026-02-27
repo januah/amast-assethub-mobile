@@ -7,15 +7,15 @@ import {
   StaffManagementScreen,
   AddStaffScreen,
   EditProfileScreen,
-  NotificationSettingsScreen,
   ChangePasswordScreen
 } from '../screens/users';
+import { NotificationDrawer } from './NotificationDrawer';
 import { InventoryScreen } from '../screens/inventory';
 import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
 import { COLORS } from '../constants/theme';
 
-type ProfileSubPage = 'edit_profile' | 'notifications' | 'password' | null;
+type ProfileSubPage = 'edit_profile' | 'password' | null;
 type CurrentFlow = 'breakdown_flow' | null;
 
 interface MainLayoutProps {
@@ -26,6 +26,7 @@ interface MainLayoutProps {
   currentFlow?: CurrentFlow;
   onFlowComplete?: () => void;
   breakdownInitialAsset?: { id: string; name: string } | null;
+  onNotificationListClose?: () => void;
 }
 
 export function MainLayout({
@@ -35,13 +36,19 @@ export function MainLayout({
   unreadCount = 0,
   currentFlow = null,
   onFlowComplete,
-  breakdownInitialAsset = null
+  breakdownInitialAsset = null,
+  onNotificationListClose
 }: MainLayoutProps) {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [profileSubPage, setProfileSubPage] = useState<ProfileSubPage>(null);
   const [showAddStaff, setShowAddStaff] = useState(false);
+  const [showNotificationList, setShowNotificationList] = useState(false);
 
   const handleAction = (flow: string, payload?: { asset?: { id: string; name: string } }) => {
+    if (flow === 'notifications') {
+      setShowNotificationList(true);
+      return;
+    }
     if (flow === 'add_staff') {
       setShowAddStaff(true);
     } else if (flow === 'manage_users') {
@@ -53,6 +60,9 @@ export function MainLayout({
     } else if (flow === 'admin_reports' || flow === 'records') {
       setProfileSubPage(null);
       setActiveTab('history');
+    } else if (flow === 'profile') {
+      setProfileSubPage(null);
+      setActiveTab('profile');
     } else {
       onAction?.(flow, payload);
     }
@@ -85,13 +95,10 @@ export function MainLayout({
         {!currentFlow && profileSubPage === 'edit_profile' && (
           <EditProfileScreen onBack={() => setProfileSubPage(null)} />
         )}
-        {profileSubPage === 'notifications' && (
-          <NotificationSettingsScreen onBack={() => setProfileSubPage(null)} />
-        )}
         {profileSubPage === 'password' && (
           <ChangePasswordScreen onBack={() => setProfileSubPage(null)} />
         )}
-        {!currentFlow && !profileSubPage && activeTab === 'dashboard' && (isValidElement(children) ? cloneElement(children as React.ReactElement<{ onAction?: (flow: string, payload?: unknown) => void }>, { onAction: handleAction }) : children)}
+        {!currentFlow && !profileSubPage && activeTab === 'dashboard' && (isValidElement(children) ? cloneElement(children as React.ReactElement<{ onAction?: (flow: string, payload?: unknown) => void; unreadCount?: number }>, { onAction: handleAction, unreadCount }) : children)}
         {!currentFlow && !profileSubPage && !showAddStaff && activeTab === 'users' && (
           <StaffManagementScreen
             onBack={() => setActiveTab('dashboard')}
@@ -115,13 +122,19 @@ export function MainLayout({
           <ProfileScreen
             onAction={onAction}
             onEditProfile={() => setProfileSubPage('edit_profile')}
-            onNotificationSettings={() => setProfileSubPage('notifications')}
             onChangePassword={() => setProfileSubPage('password')}
             onLogout={onLogout}
             unreadCount={unreadCount}
           />
         )}
       </View>
+      <NotificationDrawer
+        visible={showNotificationList}
+        onClose={() => {
+          onNotificationListClose?.();
+          setShowNotificationList(false);
+        }}
+      />
       {showBottomBar && (
         <BottomTabBar
           activeTab={activeTab}

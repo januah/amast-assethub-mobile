@@ -20,7 +20,13 @@ const recentRequests = [
 export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: RequesterDashboardProps) {
   return (
     <View style={styles.container}>
-      <Header title="Mybaiki Dashboard" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} unreadCount={unreadCount} />
+      <Header
+        title="Mybaiki Dashboard"
+        showRightIcons
+        onNotificationClick={() => onAction('notifications')}
+        onAvatarPress={() => onAction('profile')}
+        unreadCount={unreadCount}
+      />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcome}>
           <Text style={styles.welcomeTitle}>Hello, Dr. Sarah</Text>

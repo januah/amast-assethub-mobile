@@ -13,7 +13,12 @@ interface AmbulanceDashboardProps {
 export function AmbulanceDashboard({ onAction, onLogout }: AmbulanceDashboardProps) {
   return (
     <View style={styles.container}>
-      <Header title="Ambulance Hub" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
+      <Header
+        title="Ambulance Hub"
+        showRightIcons
+        onNotificationClick={() => onAction('notifications')}
+        onAvatarPress={() => onAction('profile')}
+      />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcome}>
           <Text style={styles.welcomeTitle}>Driver Ahmad</Text>

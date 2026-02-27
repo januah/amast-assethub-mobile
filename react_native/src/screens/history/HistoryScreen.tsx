@@ -17,17 +17,27 @@ const ITEMS_PER_PAGE = 10;
 const STATUS_OPTIONS: { value: ServiceRequestStatus | ''; label: string }[] = [
   { value: '', label: 'All' },
   { value: 'OPEN', label: 'Open' },
+  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
+  { value: 'APPROVED', label: 'Approved' },
   { value: 'IN_PROGRESS', label: 'In Progress' },
   { value: 'WAITING', label: 'Waiting' },
+  { value: 'AWAITING_QUOTATION', label: 'Awaiting Quotation' },
+  { value: 'AWAITING_PAYMENT', label: 'Awaiting Payment' },
   { value: 'COMPLETED', label: 'Completed' },
+  { value: 'REJECTED', label: 'Rejected' },
   { value: 'CANCELLED', label: 'Cancelled' }
 ];
 
 const STATUS_TO_BADGE: Record<string, 'Pending' | 'In Progress' | 'Completed' | 'Rejected' | 'Approved'> = {
   OPEN: 'Pending',
+  PENDING_APPROVAL: 'Pending',
+  APPROVED: 'Approved',
   IN_PROGRESS: 'In Progress',
   WAITING: 'Pending',
+  AWAITING_QUOTATION: 'Pending',
+  AWAITING_PAYMENT: 'Pending',
   COMPLETED: 'Completed',
+  REJECTED: 'Rejected',
   CANCELLED: 'Rejected'
 };
 
@@ -61,10 +71,15 @@ interface HistoryScreenProps {
 
 const STATUS_TO_LABEL: Record<string, string> = {
   CREATED: 'Request Logged',
-  OPEN: 'Request Logged',
-  IN_PROGRESS: 'Work in Progress',
+  OPEN: 'Open',
+  PENDING_APPROVAL: 'Pending Approval',
+  APPROVED: 'Approved',
+  IN_PROGRESS: 'In Progress',
   WAITING: 'Waiting',
+  AWAITING_QUOTATION: 'Awaiting Quotation',
+  AWAITING_PAYMENT: 'Awaiting Payment',
   COMPLETED: 'Completed',
+  REJECTED: 'Rejected',
   CANCELLED: 'Cancelled'
 };
 
