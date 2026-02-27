@@ -20,7 +20,7 @@ interface DashboardRouterProps {
   unreadCount?: number;
 }
 
-type FlowState = 'breakdown_flow' | null;
+type FlowState = 'breakdown_flow' | 'replacement_list' | null;
 
 function wrapWithLayout(
   children: React.ReactNode,
@@ -79,6 +79,8 @@ export function DashboardRouter({
     if (flow === 'breakdown_flow') {
       setBreakdownInitialAsset(payload?.asset ?? null);
       setCurrentFlow('breakdown_flow');
+    } else if (flow === 'replacement_list') {
+      setCurrentFlow('replacement_list');
     } else {
       onAction(flow);
     }

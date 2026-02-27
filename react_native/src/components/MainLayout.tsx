@@ -15,10 +15,11 @@ import { PendingApprovalsScreen } from '../screens/approval/PendingApprovalsScre
 import { InventoryScreen } from '../screens/inventory';
 import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
+import { ReplacementsScreen } from '../screens/ReplacementsScreen';
 import { COLORS } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
-type CurrentFlow = 'breakdown_flow' | null;
+type CurrentFlow = 'breakdown_flow' | 'replacement_list' | null;
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -106,6 +107,9 @@ export function MainLayout({
             onCancel={onFlowComplete ?? (() => {})}
             initialAsset={breakdownInitialAsset}
           />
+        )}
+        {currentFlow === 'replacement_list' && (
+          <ReplacementsScreen onBack={onFlowComplete ?? (() => {})} />
         )}
         {!currentFlow && profileSubPage === 'edit_profile' && (
           <EditProfileScreen onBack={() => setProfileSubPage(null)} />

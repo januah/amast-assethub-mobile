@@ -61,6 +61,21 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Cancelled: { bg: '#f1f5f9', text: '#64748b' }
 };
 
+export const REPLACEMENT_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  'Issued': { bg: '#dbeafe', text: '#1d4ed8' },
+  'IN USE': { bg: '#e0f2fe', text: '#0284c7' },
+  'In Use': { bg: '#e0f2fe', text: '#0284c7' },
+  'Original Returned': { bg: '#fef3c7', text: '#b45309' },
+  'ORIGINAL RETURNED': { bg: '#fef3c7', text: '#b45309' },
+  'Loaner Returned': { bg: '#d1fae5', text: '#047857' },
+  'Closed': { bg: '#f1f5f9', text: '#475569' },
+  'CLOSED': { bg: '#f1f5f9', text: '#475569' },
+  'Cancelled': { bg: '#fee2e2', text: '#dc2626' },
+  'CANCELLED': { bg: '#fee2e2', text: '#dc2626' },
+  'Overdue': { bg: '#ffe4e6', text: '#e11d48' },
+  'OVERDUE': { bg: '#ffe4e6', text: '#e11d48' },
+};
+
 export const INSTALL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   'assigned': { bg: '#dbeafe', text: '#1d4ed8' },
   'in_progress': { bg: '#fef3c7', text: '#b45309' },

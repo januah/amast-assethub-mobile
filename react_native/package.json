@@ -1,9 +1,10 @@
 {
   "name": "assethub-mobile",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "bump": "npm version patch",
     "android": "expo run:android",
     "android:prebuild": "expo prebuild --platform android --clean",
     "android:release": "expo run:android --variant release",

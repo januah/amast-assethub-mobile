@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, STATUS_COLORS } from '../constants/theme';
+import { COLORS, STATUS_COLORS, REPLACEMENT_STATUS_COLORS } from '../constants/theme';
 
 const ICON_MAP: Record<string, string> = {
   Breakdown: 'warning-outline',
@@ -24,6 +24,15 @@ type Status = 'Pending' | 'In Progress' | 'Approved' | 'Completed' | 'Rejected' 
 
 export function StatusBadge({ status }: { status: Status | string }) {
   const style = STATUS_COLORS[status] || { bg: COLORS.slate[100], text: COLORS.slate[600] };
+  return (
+    <View style={[styles.badge, { backgroundColor: style.bg }]}>
+      <Text style={[styles.badgeText, { color: style.text }]}>{status}</Text>
+    </View>
+  );
+}
+
+export function ReplacementStatusBadge({ status }: { status: string }) {
+  const style = REPLACEMENT_STATUS_COLORS[status] || REPLACEMENT_STATUS_COLORS['In Use'] || { bg: COLORS.sky[100], text: COLORS.sky[600] };
   return (
     <View style={[styles.badge, { backgroundColor: style.bg }]}>
       <Text style={[styles.badgeText, { color: style.text }]}>{status}</Text>

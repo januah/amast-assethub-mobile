@@ -1,4 +1,5 @@
-import { API_BASE_URL, API_MOBILE_PREFIX } from '../config/api';
+import { DEFAULT_BASE_URL, API_MOBILE_PREFIX } from '../config/api';
+import { addRequestLog } from '../store/requestLogStore';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -12,7 +13,11 @@ class ApiClient {
   private accessToken: string | null = null;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}${API_MOBILE_PREFIX}`;
+    this.baseUrl = `${DEFAULT_BASE_URL}${API_MOBILE_PREFIX}`;
+  }
+
+  setBaseUrl(baseUrl: string) {
+    this.baseUrl = `${baseUrl.replace(/\/$/, '')}${API_MOBILE_PREFIX}`;
   }
 
   setAccessToken(token: string | null) {
@@ -48,6 +53,13 @@ class ApiClient {
     try {
       const res = await fetch(url, config);
       const json = await res.json().catch(() => ({}));
+      addRequestLog({
+        method: config.method || 'GET',
+        path,
+        url,
+        status: res.status,
+        response: json,
+      });
       if (!res.ok) {
         return {
           success: false,
@@ -57,6 +69,12 @@ class ApiClient {
       }
       return json;
     } catch (err: any) {
+      addRequestLog({
+        method: config.method || 'GET',
+        path,
+        url,
+        error: err?.message || 'Network error',
+      });
       return {
         success: false,
         message: err?.message || 'Network error'

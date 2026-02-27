@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -67,7 +67,11 @@ function DemoUserSection({
   );
 }
 
-export function LoginScreen() {
+interface LoginScreenProps {
+  onOpenSettings?: () => void;
+}
+
+export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
   const { login } = useAuth();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -99,6 +103,15 @@ export function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      {onOpenSettings && (
+        <TouchableOpacity
+          style={styles.settingsBtn}
+          onPress={onOpenSettings}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <Ionicons name="settings-outline" size={24} color={COLORS.slate[600]} />
+        </TouchableOpacity>
+      )}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
@@ -199,7 +212,13 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
+  },
+  settingsBtn: {
+    position: 'absolute',
+    top: 48,
+    right: 24,
+    zIndex: 10,
   },
   keyboardView: {
     flex: 1
