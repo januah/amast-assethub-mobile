@@ -8,6 +8,14 @@ import { getAssets, getAssetById, ApiAsset, GetAssetsResponse } from '../../api/
 
 const ITEMS_PER_PAGE = 10;
 
+const ASSET_STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'All' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'MAINTENANCE', label: 'Maintenance' },
+  { value: 'CALIBRATION', label: 'Calibration' },
+  { value: 'DECOMMISSIONED', label: 'Decommissioned' }
+];
+
 function formatDate(s: string | undefined) {
   if (!s) return '-';
   try {
@@ -28,6 +36,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   const [selectedAsset, setSelectedAsset] = useState<ApiAsset | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
   const [assets, setAssets] = useState<ApiAsset[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -36,10 +45,10 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchAssets = useCallback(async (page: number, search?: string) => {
+  const fetchAssets = useCallback(async (page: number, search?: string, status?: string) => {
     setLoading(true);
     setError('');
-    const res = await getAssets({ page, limit: ITEMS_PER_PAGE, search: search || undefined });
+    const res = await getAssets({ page, limit: ITEMS_PER_PAGE, search: search || undefined, status: status || undefined });
     setLoading(false);
     if ((res as { success?: boolean }).success === false) {
       setAssets([]);
@@ -55,8 +64,8 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   }, []);
 
   useEffect(() => {
-    fetchAssets(currentPage, appliedSearch || undefined);
-  }, [fetchAssets, currentPage, appliedSearch]);
+    fetchAssets(currentPage, appliedSearch || undefined, statusFilter || undefined);
+  }, [fetchAssets, currentPage, appliedSearch, statusFilter]);
 
   const handleSearch = useCallback(() => {
     setAppliedSearch(searchQuery.trim());
@@ -98,7 +107,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
                 <View style={styles.detailIcon}>
                   <Ionicons name="medkit-outline" size={32} color={COLORS.primary} />
                 </View>
-                <StatusBadge status={selectedAsset.status as 'Pending' | 'In Progress' | 'Completed'} />
+                <StatusBadge status={selectedAsset.status as 'ACTIVE' | 'MAINTENANCE' | 'CALIBRATION' | 'DECOMMISSIONED'} />
               </View>
               <Text style={styles.detailName}>{selectedAsset.name}</Text>
               <Text style={styles.detailId}>{selectedAsset.asset_id}</Text>
@@ -151,6 +160,17 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   return (
     <View style={styles.container}>
       <Header title="Asset Management" showBack onBack={onBack} />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterScrollContent}>
+        {ASSET_STATUS_OPTIONS.map((opt) => (
+          <TouchableOpacity
+            key={opt.value || 'all'}
+            onPress={() => { setStatusFilter(opt.value); setCurrentPage(1); }}
+            style={[styles.filterChip, statusFilter === opt.value && styles.filterChipActive]}
+          >
+            <Text style={[styles.filterChipText, statusFilter === opt.value && styles.filterChipTextActive]}>{opt.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       <View style={styles.searchWrap}>
         <Ionicons name="search" size={18} color={COLORS.slate[400]} />
         <TextInput
@@ -192,7 +212,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
               <View style={styles.assetInfo}>
                 <View style={styles.assetRow}>
                   <Text style={styles.assetId}>{asset.asset_id}</Text>
-                  <StatusBadge status={asset.status as 'Pending' | 'In Progress' | 'Completed'} />
+                  <StatusBadge status={asset.status as 'ACTIVE' | 'MAINTENANCE' | 'CALIBRATION' | 'DECOMMISSIONED'} />
                 </View>
                 <Text style={styles.assetName}>{asset.name}</Text>
                 <View style={styles.assetMeta}>
@@ -239,6 +259,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.slate[50]
+  },
+  filterScroll: { maxHeight: 50, marginBottom: 4 },
+  filterScrollContent: { 
+    paddingHorizontal: 16, 
+    gap: 4, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingVertical: 8 
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.slate[200]
+  },
+  filterChipActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.slate[600]
+  },
+  filterChipTextActive: {
+    color: COLORS.white
   },
   searchWrap: {
     flexDirection: 'row',

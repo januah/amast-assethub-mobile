@@ -20,9 +20,9 @@ const ICON_MAP: Record<string, string> = {
   Phone: 'call-outline'
 };
 
-type Status = 'Pending' | 'In Progress' | 'Approved' | 'Completed' | 'Rejected' | 'Sent to Office';
+type Status = 'Pending' | 'In Progress' | 'Approved' | 'Completed' | 'Rejected' | 'Sent to Office' | 'ACTIVE' | 'MAINTENANCE' | 'CALIBRATION' | 'DECOMMISSIONED';
 
-export function StatusBadge({ status }: { status: Status }) {
+export function StatusBadge({ status }: { status: Status | string }) {
   const style = STATUS_COLORS[status] || { bg: COLORS.slate[100], text: COLORS.slate[600] };
   return (
     <View style={[styles.badge, { backgroundColor: style.bg }]}>

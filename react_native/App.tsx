@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+
+SplashScreen.preventAutoHideAsync();
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { DashboardRouter } from './src/screens/DashboardRouter';
@@ -20,7 +24,7 @@ function AppContent() {
 
   if (!isAuthenticated) {
     return (
-      <LoginScreen onGoToRegister={() => {}} />
+      <LoginScreen />
     );
   }
 
@@ -37,6 +41,20 @@ function AppContent() {
 }
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    NotoSerif_400Regular: require('./assets/fonts/NotoSerif/NotoSerif_400Regular.ttf')
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <AuthProvider>

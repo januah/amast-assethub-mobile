@@ -67,11 +67,7 @@ function DemoUserSection({
   );
 }
 
-interface LoginScreenProps {
-  onGoToRegister: () => void;
-}
-
-export function LoginScreen({ onGoToRegister }: LoginScreenProps) {
+export function LoginScreen() {
   const { login } = useAuth();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -169,14 +165,6 @@ export function LoginScreen({ onGoToRegister }: LoginScreenProps) {
               ) : (
                 <Text style={styles.loginButtonText}>Login</Text>
               )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.registerButton, loading && styles.registerButtonDisabled]}
-              onPress={onGoToRegister}
-              activeOpacity={0.8}
-              disabled={loading}
-            >
-              <Text style={styles.registerButtonText}>Create Account</Text>
             </TouchableOpacity>
           </View>
 
@@ -299,22 +287,6 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '700'
-  },
-  registerButton: {
-    backgroundColor: COLORS.white,
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.slate[200]
-  },
-  registerButtonDisabled: {
-    opacity: 0.7
-  },
-  registerButtonText: {
-    color: COLORS.slate[600],
     fontSize: 16,
     fontWeight: '700'
   },

@@ -1,28 +1,86 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
+import { getProfile, updateProfile } from '../../api/profileApi';
 
 interface EditProfileScreenProps {
   onBack: () => void;
 }
 
 export function EditProfileScreen({ onBack }: EditProfileScreenProps) {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [data, setData] = useState({
-    name: user?.full_name || 'Dr. Sarah Jones',
-    email: user?.email || 'sarah.jones@hospital.com',
-    phone: user?.phone || '+60 12-345 6789',
-    staffId: 'STAFF-9921',
-    workplace: 'General Hospital KL',
-    dept: 'Ward 4B (Cardiology)'
+    name: user?.full_name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    staffId: user?.id || user?.username || '',
+    workplace: '',
+    dept: ''
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    onBack();
+  useEffect(() => {
+    getProfile().then((res: { success?: boolean; data?: { full_name?: string; email?: string; phone?: string; user_id?: string; hospital_name?: string; assigned_department_name?: string } }) => {
+      setLoading(false);
+      if (res?.success && res?.data) {
+        const d = res.data;
+        setData({
+          name: d.full_name || '',
+          email: d.email || '',
+          phone: d.phone || '',
+          staffId: d.user_id || user?.id || user?.username || '',
+          workplace: d.hospital_name || '',
+          dept: d.assigned_department_name || ''
+        });
+      } else {
+        setData((prev) => ({
+          ...prev,
+          name: user?.full_name || prev.name,
+          email: user?.email || prev.email,
+          phone: user?.phone || prev.phone,
+          staffId: user?.id || user?.username || prev.staffId
+        }));
+      }
+    }).catch(() => setLoading(false));
+  }, [user]);
+
+  const handleSave = async () => {
+    setError(null);
+    setSaving(true);
+    const res = await updateProfile({
+      full_name: data.name.trim(),
+      email: data.email.trim(),
+      phone: data.phone.trim() || undefined
+    });
+    setSaving(false);
+    const r = res as { success?: boolean; data?: { full_name?: string; email?: string; phone?: string }; message?: string };
+    if (r?.success) {
+      updateUser({
+        full_name: r.data?.full_name ?? data.name,
+        email: r.data?.email ?? data.email,
+        phone: r.data?.phone ?? data.phone
+      });
+      onBack();
+    } else {
+      setError(r?.message || 'Failed to update profile');
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Header title="Edit Profile" showBack onBack={onBack} />
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -63,6 +121,8 @@ export function EditProfileScreen({ onBack }: EditProfileScreenProps) {
             keyboardType="phone-pad"
           />
 
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
           <View style={styles.row}>
             <View style={[styles.half, { marginRight: 8 }]}>
               <Text style={styles.label}>Staff ID</Text>
@@ -75,27 +135,30 @@ export function EditProfileScreen({ onBack }: EditProfileScreenProps) {
             <View style={styles.half}>
               <Text style={styles.label}>Workplace</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, styles.inputDisabled]}
                 value={data.workplace}
-                onChangeText={(t) => setData({ ...data, workplace: t })}
-                placeholder="Workplace"
+                editable={false}
               />
             </View>
           </View>
 
           <Text style={styles.label}>Department / Ward</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, styles.inputDisabled]}
             value={data.dept}
-            onChangeText={(t) => setData({ ...data, dept: t })}
-            placeholder="Department"
+            editable={false}
           />
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave} activeOpacity={0.8}>
-          <Text style={styles.saveButtonText}>Save Changes</Text>
+        <TouchableOpacity
+          style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          activeOpacity={0.8}
+          disabled={saving}
+        >
+          <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -174,5 +237,18 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '700'
+  },
+  saveButtonDisabled: {
+    opacity: 0.6
+  },
+  loadingWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  errorText: {
+    fontSize: 12,
+    color: COLORS.danger,
+    marginTop: 4
   }
 });

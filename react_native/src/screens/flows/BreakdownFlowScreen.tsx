@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { Stepper, Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { createBreakdownRequest } from '../../api/serviceRequestApi';
+import { getAssets } from '../../api/assetsApi';
 
 interface AssetOption {
   id: string;
@@ -44,12 +46,27 @@ const HOSPITAL_LOCATIONS = [
 export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: BreakdownFlowScreenProps) {
   const [step, setStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedRequestId, setSubmittedRequestId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<AssetOption | null>(null);
+  const [assetOptions, setAssetOptions] = useState<AssetOption[]>(ASSET_OPTIONS);
+  const [loadingAssets, setLoadingAssets] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
   const [problemDescription, setProblemDescription] = useState('');
   const [location, setLocation] = useState('Ward 4B (Current)');
   const [priority, setPriority] = useState<'Normal' | 'Urgent' | 'Critical'>('Normal');
+
+  useEffect(() => {
+    getAssets({ limit: 100 }).then((r: { success?: boolean; assets?: { asset_id: string; name: string }[] }) => {
+      setLoadingAssets(false);
+      const list = (r as { assets?: { asset_id: string; name: string }[] }).assets;
+      if (list?.length) {
+        setAssetOptions(list.map((a) => ({ id: a.asset_id, name: a.name })));
+      }
+    }).catch(() => setLoadingAssets(false));
+  }, []);
 
   useEffect(() => {
     if (initialAsset) {
@@ -58,7 +75,7 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
     }
   }, [initialAsset]);
 
-  const filteredAssets = ASSET_OPTIONS.filter(
+  const filteredAssets = assetOptions.filter(
     (a) =>
       a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -68,11 +85,28 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
     loc.toLowerCase().includes(locationSearchQuery.toLowerCase())
   );
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < STEPS.length - 1) {
       setStep(step + 1);
     } else {
-      setIsSubmitted(true);
+      if (!selectedAsset) return;
+      setSubmitError(null);
+      setSubmitting(true);
+      const res = await createBreakdownRequest({
+        asset_id: selectedAsset.id,
+        description: problemDescription || 'No description provided',
+        location,
+        priority
+      });
+      setSubmitting(false);
+      const reqId = (res as { data?: { request_id?: string }; request_id?: string }).request_id
+        ?? (res as { data?: { request_id?: string } }).data?.request_id;
+      if (res.success && reqId) {
+        setSubmittedRequestId(reqId);
+        setIsSubmitted(true);
+      } else {
+        setSubmitError(res.message || 'Failed to submit request');
+      }
     }
   };
 
@@ -103,7 +137,7 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
         </Text>
         <View style={styles.refBox}>
           <Text style={styles.refLabel}>Reference Number</Text>
-          <Text style={styles.refValue}>REQ-{Math.floor(Math.random() * 9000) + 1000}</Text>
+          <Text style={styles.refValue}>{submittedRequestId || 'N/A'}</Text>
         </View>
         <TouchableOpacity style={styles.doneButton} onPress={onComplete} activeOpacity={0.8}>
           <Text style={styles.doneButtonText}>Return to Dashboard</Text>
@@ -130,7 +164,11 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
                 onChangeText={setSearchQuery}
               />
             </View>
-            {filteredAssets.length > 0 ? (
+            {loadingAssets ? (
+              <View style={styles.loadingAssets}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              </View>
+            ) : filteredAssets.length > 0 ? (
               filteredAssets.map((asset) => (
                 <TouchableOpacity
                   key={asset.id}
@@ -275,6 +313,12 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
                 <Text style={styles.summaryDesc}>{problemDescription || 'No description provided.'}</Text>
               </View>
             </View>
+            {submitError ? (
+              <View style={[styles.tipBox, { backgroundColor: '#fef2f2', borderColor: COLORS.danger + '40' }]}>
+                <Ionicons name="alert-circle" size={20} color={COLORS.danger} />
+                <Text style={[styles.tipText, { color: COLORS.danger }]}>{submitError}</Text>
+              </View>
+            ) : null}
             <View style={styles.tipBox}>
               <Ionicons name="warning-outline" size={20} color={COLORS.amber[600]} />
               <Text style={styles.tipText}>
@@ -288,15 +332,21 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.nextButton, step === 0 && !selectedAsset && styles.nextButtonDisabled]}
+          style={[styles.nextButton, (step === 0 && !selectedAsset) || submitting ? styles.nextButtonDisabled : undefined]}
           onPress={handleNext}
           activeOpacity={0.8}
-          disabled={step === 0 && !selectedAsset}
+          disabled={(step === 0 && !selectedAsset) || submitting}
         >
-          <Text style={[styles.nextButtonText, step === 0 && !selectedAsset && styles.nextButtonTextDisabled]}>
-            {step === STEPS.length - 1 ? 'Submit Request' : 'Continue'}
-          </Text>
-          <Ionicons name="chevron-forward" size={18} color={step === 0 && !selectedAsset ? COLORS.slate[400] : COLORS.white} />
+          {submitting ? (
+            <ActivityIndicator color={COLORS.white} size="small" />
+          ) : (
+            <>
+              <Text style={[styles.nextButtonText, (step === 0 && !selectedAsset) || submitting ? styles.nextButtonTextDisabled : undefined]}>
+                {step === STEPS.length - 1 ? 'Submit Request' : 'Continue'}
+              </Text>
+              <Ionicons name="chevron-forward" size={18} color={(step === 0 && !selectedAsset) || submitting ? COLORS.slate[400] : COLORS.white} />
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -346,6 +396,7 @@ const styles = StyleSheet.create({
   assetOptionText: { flex: 1 },
   assetOptionName: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
   assetOptionId: { fontSize: 10, color: COLORS.slate[400], textTransform: 'uppercase', marginTop: 2 },
+  loadingAssets: { paddingVertical: 32, alignItems: 'center' },
   emptyText: { textAlign: 'center', paddingVertical: 32, color: COLORS.slate[400], fontSize: 14, fontStyle: 'italic' },
   scanButton: {
     padding: 24,

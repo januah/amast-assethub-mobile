@@ -32,7 +32,11 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   'Rejected': { bg: '#fee2e2', text: '#dc2626' },
   'Sent to Office': { bg: '#ede9fe', text: '#6d28d9' },
   'active': { bg: '#d1fae5', text: '#047857' },
-  'inactive': { bg: '#f1f5f9', text: '#475569' }
+  'inactive': { bg: '#f1f5f9', text: '#475569' },
+  'ACTIVE': { bg: '#d1fae5', text: '#047857' },
+  'MAINTENANCE': { bg: '#fef3c7', text: '#b45309' },
+  'CALIBRATION': { bg: '#dbeafe', text: '#1d4ed8' },
+  'DECOMMISSIONED': { bg: '#f1f5f9', text: '#64748b' }
 };
 
 export const INSTALL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {

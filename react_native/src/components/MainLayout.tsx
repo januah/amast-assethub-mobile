@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, cloneElement, isValidElement } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabBar, TabId } from './BottomTabBar';
@@ -11,6 +11,7 @@ import {
   ChangePasswordScreen
 } from '../screens/users';
 import { InventoryScreen } from '../screens/inventory';
+import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
 import { COLORS } from '../constants/theme';
 
@@ -43,6 +44,15 @@ export function MainLayout({
   const handleAction = (flow: string, payload?: { asset?: { id: string; name: string } }) => {
     if (flow === 'add_staff') {
       setShowAddStaff(true);
+    } else if (flow === 'manage_users') {
+      setProfileSubPage(null);
+      setActiveTab('users');
+    } else if (flow === 'assets') {
+      setProfileSubPage(null);
+      setActiveTab('inventory');
+    } else if (flow === 'admin_reports' || flow === 'records') {
+      setProfileSubPage(null);
+      setActiveTab('history');
     } else {
       onAction?.(flow, payload);
     }
@@ -51,8 +61,6 @@ export function MainLayout({
   const handleTabPress = (tabId: TabId) => {
     setProfileSubPage(null);
     setActiveTab(tabId);
-    if (tabId === 'inventory' && onAction) onAction('assets');
-    if (tabId === 'history' && onAction) onAction('records');
   };
 
   const showBottomBar = !profileSubPage && !currentFlow && !showAddStaff;
@@ -83,7 +91,7 @@ export function MainLayout({
         {profileSubPage === 'password' && (
           <ChangePasswordScreen onBack={() => setProfileSubPage(null)} />
         )}
-        {!currentFlow && !profileSubPage && activeTab === 'dashboard' && children}
+        {!currentFlow && !profileSubPage && activeTab === 'dashboard' && (isValidElement(children) ? cloneElement(children as React.ReactElement<{ onAction?: (flow: string, payload?: unknown) => void }>, { onAction: handleAction }) : children)}
         {!currentFlow && !profileSubPage && !showAddStaff && activeTab === 'users' && (
           <StaffManagementScreen
             onBack={() => setActiveTab('dashboard')}
@@ -98,9 +106,10 @@ export function MainLayout({
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'history' && (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>History</Text>
-          </View>
+          <HistoryScreen
+            onBack={() => setActiveTab('dashboard')}
+            onOpenChecklist={onAction ? () => onAction('checklist_flow') : undefined}
+          />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'profile' && (
           <ProfileScreen

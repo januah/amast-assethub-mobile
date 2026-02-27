@@ -86,7 +86,7 @@ export function StaffManagementScreen({
                 <Text style={styles.staffName}>{staff.name}</Text>
                 <Text style={styles.staffScore}>{staff.score}</Text>
               </View>
-              <Text style={styles.staffMeta}>{staff.role} - {staff.tasks}</Text>
+              <Text style={styles.staffMeta}>{'Role: ' + staff.role} - {'Tasks: ' + staff.tasks}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
           </Card>
