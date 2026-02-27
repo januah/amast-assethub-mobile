@@ -34,9 +34,31 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   'active': { bg: '#d1fae5', text: '#047857' },
   'inactive': { bg: '#f1f5f9', text: '#475569' },
   'ACTIVE': { bg: '#d1fae5', text: '#047857' },
+  'AVAILABLE': { bg: '#d1fae5', text: '#047857' },
   'MAINTENANCE': { bg: '#fef3c7', text: '#b45309' },
   'CALIBRATION': { bg: '#dbeafe', text: '#1d4ed8' },
-  'DECOMMISSIONED': { bg: '#f1f5f9', text: '#64748b' }
+  'LOANED': { bg: '#e0e7ff', text: '#4338ca' },
+  'DECOMMISSIONED': { bg: '#f1f5f9', text: '#64748b' },
+  OPEN: { bg: '#dbeafe', text: '#1d4ed8' },
+  IN_PROGRESS: { bg: '#fef3c7', text: '#b45309' },
+  WAITING: { bg: '#dbeafe', text: '#1d4ed8' },
+  PENDING_APPROVAL: { bg: '#ede9fe', text: '#6d28d9' },
+  APPROVED: { bg: '#d1fae5', text: '#047857' },
+  AWAITING_QUOTATION: { bg: '#fef3c7', text: '#b45309' },
+  AWAITING_PAYMENT: { bg: '#fef3c7', text: '#b45309' },
+  COMPLETED: { bg: '#f1f5f9', text: '#475569' },
+  REJECTED: { bg: '#fee2e2', text: '#dc2626' },
+  CANCELLED: { bg: '#f1f5f9', text: '#64748b' },
+  'IN PROGRESS': { bg: '#fef3c7', text: '#b45309' },
+  'PENDING APPROVAL': { bg: '#ede9fe', text: '#6d28d9' },
+  'AWAITING QUOTATION': { bg: '#fef3c7', text: '#b45309' },
+  'AWAITING PAYMENT': { bg: '#fef3c7', text: '#b45309' },
+  Open: { bg: '#dbeafe', text: '#1d4ed8' },
+  Waiting: { bg: '#dbeafe', text: '#1d4ed8' },
+  'Pending Approval': { bg: '#ede9fe', text: '#6d28d9' },
+  'Awaiting Quotation': { bg: '#fef3c7', text: '#b45309' },
+  'Awaiting Payment': { bg: '#fef3c7', text: '#b45309' },
+  Cancelled: { bg: '#f1f5f9', text: '#64748b' }
 };
 
 export const INSTALL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {

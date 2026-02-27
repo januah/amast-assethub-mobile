@@ -28,18 +28,6 @@ const STATUS_OPTIONS: { value: ServiceRequestStatus | ''; label: string }[] = [
   { value: 'CANCELLED', label: 'Cancelled' }
 ];
 
-const STATUS_TO_BADGE: Record<string, 'Pending' | 'In Progress' | 'Completed' | 'Rejected' | 'Approved'> = {
-  OPEN: 'Pending',
-  PENDING_APPROVAL: 'Pending',
-  APPROVED: 'Approved',
-  IN_PROGRESS: 'In Progress',
-  WAITING: 'Pending',
-  AWAITING_QUOTATION: 'Pending',
-  AWAITING_PAYMENT: 'Pending',
-  COMPLETED: 'Completed',
-  REJECTED: 'Rejected',
-  CANCELLED: 'Rejected'
-};
 
 const SERVICE_MODE_LABEL: Record<string, string> = {
   REPAIR: 'Breakdown',
@@ -155,7 +143,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
             <View style={styles.detailCard}>
               <View style={styles.detailHeader}>
                 <Text style={styles.detailId}>{selectedRequest.request_id}</Text>
-                <StatusBadge status={STATUS_TO_BADGE[selectedRequest.status] || 'Pending'} />
+                <StatusBadge status={(selectedRequest.status ?? 'OPEN').replace(/_/g, ' ')} />
               </View>
               <Text style={styles.detailAsset}>{selectedRequest.Asset?.name || selectedRequest.asset_id || '-'}</Text>
               <Text style={styles.detailMeta}>
@@ -179,31 +167,31 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
 
             <SectionHeader title="Timeline" />
             <View style={styles.timelineCard}>
-              {(selectedRequest.ServiceRequestStatusHistories && selectedRequest.ServiceRequestStatusHistories.length > 0
-                ? selectedRequest.ServiceRequestStatusHistories
-                : [{ to_status: 'OPEN', changed_at: selectedRequest.created_at }]
-              ).map((step, i) => {
-                const label = STATUS_TO_LABEL[step.to_status] || step.to_status;
-                const completed = true;
-                const steps = selectedRequest.ServiceRequestStatusHistories || [];
-                const isLast = (steps.length > 0 ? steps : [{ to_status: 'OPEN' }]).length - 1 === i;
-                return (
-                  <View key={`${step.to_status}-${i}`} style={styles.timelineRowWrap}>
-                    <View style={styles.timelineRow}>
-                      <View style={styles.timelineDotWrap}>
-                        <View style={[styles.timelineDot, completed && styles.timelineDotDone]}>
-                          {completed && <Ionicons name="checkmark" size={12} color={COLORS.white} />}
+              {selectedRequest.ServiceRequestStatusHistories && selectedRequest.ServiceRequestStatusHistories.length > 0 ? (
+                selectedRequest.ServiceRequestStatusHistories.map((step, i) => {
+                  const label = STATUS_TO_LABEL[step.to_status] || step.to_status;
+                  const steps = selectedRequest.ServiceRequestStatusHistories;
+                  const isLast = i === steps.length - 1;
+                  return (
+                    <View key={`${step.to_status}-${i}`} style={styles.timelineRowWrap}>
+                      <View style={styles.timelineRow}>
+                        <View style={styles.timelineDotWrap}>
+                          <View style={[styles.timelineDot, styles.timelineDotDone]}>
+                            <Ionicons name="checkmark" size={12} color={COLORS.white} />
+                          </View>
+                          {!isLast && <View style={[styles.timelineLine, styles.timelineLineDone]} />}
                         </View>
-                        {!isLast && <View style={[styles.timelineLine, styles.timelineLineDone]} />}
-                      </View>
-                      <View style={styles.timelineContent}>
-                        <Text style={styles.timelineLabel}>{label}</Text>
-                        <Text style={styles.timelineTime}>{formatTime(step.changed_at)}</Text>
+                        <View style={styles.timelineContent}>
+                          <Text style={styles.timelineLabel}>{label}</Text>
+                          <Text style={styles.timelineTime}>{formatTime(step.changed_at)}</Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <Text style={styles.timelineNotFound}>Not found</Text>
+              )}
             </View>
 
             <SectionHeader title="Information" />
@@ -297,7 +285,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
                 <Card key={item.request_id} style={styles.card}>
                   <View style={styles.cardTop}>
                     <Text style={styles.cardId}>{item.request_id} - {getTypeLabel(item)}</Text>
-                    <StatusBadge status={STATUS_TO_BADGE[item.status] || 'Pending'} />
+                    <StatusBadge status={(item.status ?? 'OPEN').replace(/_/g, ' ')} />
                   </View>
                   <Text style={styles.cardAsset}>{item.Asset?.name || item.asset_id || '-'}</Text>
                   <View style={styles.cardActions}>
@@ -436,6 +424,7 @@ const styles = StyleSheet.create({
   timelineDotDone: { backgroundColor: COLORS.emerald[500], borderColor: COLORS.emerald[500] },
   timelineContent: { marginLeft: 16 },
   timelineLabel: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  timelineNotFound: { fontSize: 14, color: COLORS.slate[500], fontStyle: 'italic', paddingVertical: 16 },
   timelineLabelMuted: { color: COLORS.slate[400] },
   timelineTime: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
 

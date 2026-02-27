@@ -6,6 +6,7 @@ import { Stepper, Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { createBreakdownRequest } from '../../api/serviceRequestApi';
 import { getAssets } from '../../api/assetsApi';
+import { getPriorities } from '../../api/priorityApi';
 
 interface AssetOption {
   id: string;
@@ -57,6 +58,20 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
   const [problemDescription, setProblemDescription] = useState('');
   const [location, setLocation] = useState('Ward 4B (Current)');
   const [priority, setPriority] = useState<'Normal' | 'Urgent' | 'Critical'>('Normal');
+  const [priorityResponseMap, setPriorityResponseMap] = useState<Record<string, number>>({});
+
+  const UI_TO_DB_PRIORITY: Record<string, string> = { Normal: 'low', Urgent: 'med', Critical: 'high' };
+
+  const responseTimeMinutes = priorityResponseMap[UI_TO_DB_PRIORITY[priority] || 'low'] ?? null;
+
+  function formatResponseTime(min: number | null): string {
+    if (min == null || min <= 0) return '—';
+    if (min < 60) return `${min} minutes`;
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    if (m === 0) return `${h} ${h === 1 ? 'hour' : 'hours'}`;
+    return `${h}h ${m}m`;
+  }
 
   useEffect(() => {
     getAssets({ limit: 100 }).then((r: { success?: boolean; assets?: { asset_id: string; name: string }[] }) => {
@@ -74,6 +89,20 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
       setStep(1);
     }
   }, [initialAsset]);
+
+  useEffect(() => {
+    getPriorities().then((res) => {
+      if (!res.success || !res.data) return;
+      const list = Array.isArray(res.data) ? res.data : [];
+      const map: Record<string, number> = {};
+      list.forEach((p) => {
+        const code = String(p.code || '').toLowerCase();
+        const mins = p.default_response_minutes;
+        if (code && mins != null) map[code] = Number(mins);
+      });
+      setPriorityResponseMap(map);
+    });
+  }, []);
 
   const filteredAssets = assetOptions.filter(
     (a) =>
@@ -308,9 +337,12 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
                   </Text>
                 </View>
               </View>
-              <View>
-                <Text style={styles.summaryMetaLabel}>Problem Description</Text>
-                <Text style={styles.summaryDesc}>{problemDescription || 'No description provided.'}</Text>
+              <View style={styles.problemSection}>
+                <View style={styles.problemTitleRow}>
+                  <Ionicons name="alert-circle-outline" size={18} color={COLORS.slate[600]} />
+                  <Text style={styles.problemTitle}>Problem Description</Text>
+                </View>
+                <Text style={styles.problemDesc}>{problemDescription || 'No description provided.'}</Text>
               </View>
             </View>
             {submitError ? (
@@ -322,8 +354,8 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
             <View style={styles.tipBox}>
               <Ionicons name="warning-outline" size={20} color={COLORS.amber[600]} />
               <Text style={styles.tipText}>
-                Heads up! Average response time for {location} is 15 minutes. A biomedical technician will be notified
-                once you submit.
+                Target response time for <Text style={styles.tipTextBold}>{priority}</Text> priority is <Text style={styles.tipTextBold}>{formatResponseTime(responseTimeMinutes)}</Text>.{'\n'}A biomedical
+                technician will be notified once you submit.
               </Text>
             </View>
           </View>
@@ -487,7 +519,18 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', gap: 24, padding: 16 },
   summaryMetaLabel: { fontSize: 10, color: COLORS.slate[400], fontWeight: '700', textTransform: 'uppercase', marginBottom: 4 },
   summaryMetaValue: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
-  summaryDesc: { fontSize: 12, color: COLORS.slate[700], fontStyle: 'italic', backgroundColor: COLORS.slate[50], padding: 12, borderRadius: 12, marginTop: 8 },
+  problemSection: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: COLORS.slate[50],
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.amber[500]
+  },
+  problemTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  problemTitle: { fontSize: 13, fontWeight: '800', color: COLORS.slate[800], textTransform: 'uppercase', letterSpacing: 0.5 },
+  problemDesc: { fontSize: 14, color: COLORS.slate[700], lineHeight: 22 },
   tipBox: {
     flexDirection: 'row',
     gap: 12,
@@ -498,6 +541,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.amber[100]
   },
   tipText: { flex: 1, fontSize: 10, color: COLORS.amber[800], lineHeight: 16 },
+  tipTextBold: { fontWeight: '800' },
   footer: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   nextButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.primary, paddingVertical: 16, borderRadius: 16 },
   nextButtonDisabled: { backgroundColor: COLORS.slate[200] },

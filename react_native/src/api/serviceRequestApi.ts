@@ -49,7 +49,7 @@ export async function getServiceRequests(params?: GetServiceRequestsParams) {
   const q = new URLSearchParams();
   if (params?.page) q.set('page', String(params.page));
   if (params?.limit) q.set('limit', String(params.limit));
-  if (params?.status) q.set('status', params.status);
+  if (params?.status) q.set('status', params.status.toUpperCase());
   if (params?.q) q.set('q', params.q);
   const query = q.toString();
   return apiClient.get<GetServiceRequestsResponse>(`/service-requests${query ? `?${query}` : ''}`);

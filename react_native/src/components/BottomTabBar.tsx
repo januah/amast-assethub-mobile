@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/theme';
 
-export type TabId = 'dashboard' | 'users' | 'inventory' | 'history' | 'profile';
+export type TabId = 'dashboard' | 'users' | 'inventory' | 'history' | 'profile' | 'pending' | 'alerts';
 
 export interface TabItem {
   id: TabId;

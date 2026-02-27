@@ -28,3 +28,7 @@ export async function getUnreadCount() {
 export async function markNotificationAsRead(id: string) {
   return apiClient.patch<{ success: boolean }>(`/notifications/${id}/read`, {});
 }
+
+export async function markAllNotificationsAsRead() {
+  return apiClient.patch<{ success: boolean }>('/notifications/read-all', {});
+}

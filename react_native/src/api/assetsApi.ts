@@ -50,7 +50,7 @@ export async function getAssets(params?: {
   if (params?.page) q.set('page', String(params.page));
   if (params?.limit) q.set('limit', String(params.limit));
   if (params?.search) q.set('search', params.search);
-  if (params?.status) q.set('status', params.status);
+  if (params?.status) q.set('status', params.status.toUpperCase());
   const query = q.toString();
   return apiClient.get<GetAssetsResponse>(`/assets${query ? `?${query}` : ''}`);
 }

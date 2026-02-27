@@ -11,8 +11,10 @@ const ITEMS_PER_PAGE = 10;
 const ASSET_STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: '', label: 'All' },
   { value: 'ACTIVE', label: 'Active' },
+  { value: 'AVAILABLE', label: 'Available' },
   { value: 'MAINTENANCE', label: 'Maintenance' },
   { value: 'CALIBRATION', label: 'Calibration' },
+  { value: 'LOANED', label: 'Loaned' },
   { value: 'DECOMMISSIONED', label: 'Decommissioned' }
 ];
 
@@ -107,7 +109,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
                 <View style={styles.detailIcon}>
                   <Ionicons name="medkit-outline" size={32} color={COLORS.primary} />
                 </View>
-                <StatusBadge status={selectedAsset.status as 'ACTIVE' | 'MAINTENANCE' | 'CALIBRATION' | 'DECOMMISSIONED'} />
+                <StatusBadge status={(selectedAsset.status ?? 'ACTIVE').toUpperCase()} />
               </View>
               <Text style={styles.detailName}>{selectedAsset.name}</Text>
               <Text style={styles.detailId}>{selectedAsset.asset_id}</Text>
@@ -212,7 +214,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
               <View style={styles.assetInfo}>
                 <View style={styles.assetRow}>
                   <Text style={styles.assetId}>{asset.asset_id}</Text>
-                  <StatusBadge status={asset.status as 'ACTIVE' | 'MAINTENANCE' | 'CALIBRATION' | 'DECOMMISSIONED'} />
+                  <StatusBadge status={(asset.status ?? 'ACTIVE').toUpperCase()} />
                 </View>
                 <Text style={styles.assetName}>{asset.name}</Text>
                 <View style={styles.assetMeta}>

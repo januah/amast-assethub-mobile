@@ -21,9 +21,10 @@ function formatTimeAgo(dateStr: string): string {
 
 interface NotificationListScreenProps {
   onBack: () => void;
+  showBack?: boolean;
 }
 
-export function NotificationListScreen({ onBack }: NotificationListScreenProps) {
+export function NotificationListScreen({ onBack, showBack = true }: NotificationListScreenProps) {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +51,7 @@ export function NotificationListScreen({ onBack }: NotificationListScreenProps) 
 
   return (
     <View style={styles.container}>
-      <Header title="Notifications" showBack onBack={onBack} />
+      <Header title="Notifications" showBack={showBack} onBack={onBack} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={styles.loading}>

@@ -20,20 +20,20 @@ const DEMO_PASSWORD = 'P@ssw0rd123!';
 
 const DEMO_USERS = {
   hospital: [
-    { username: 'medoff', label: 'Medical Officer' },
-    { username: 'staff1', label: 'Staff One' },
-    { username: 'approver', label: 'Duty Approver' },
-    { username: 'admin', label: 'Hospital Admin' }
+    { username: 'medoff', role: 'medical_officer' },
+    { username: 'staff1', role: 'viewer' },
+    { username: 'approver', role: 'approver' },
+    { username: 'admin', role: 'admin_hospital' }
   ],
   service: [
-    { username: 'biomed', label: 'Biomed Engineer' },
-    { username: 'mechanic', label: 'Mechanic One' },
-    { username: 'head_mechanic', label: 'Head Mechanic' },
-    { username: 'tow', label: 'Tow Truck Driver' },
-    { username: 'driver', label: 'Ambulance Driver' }
+    { username: 'biomed', role: 'biomedical_engineer' },
+    { username: 'mechanic', role: 'mechanic' },
+    { username: 'head_mechanic', role: 'head_of_mechanic' },
+    { username: 'tow', role: 'tow_truck' },
+    { username: 'driver', role: 'driver_ambulance' }
   ],
   system: [
-    { username: 'superadmin', label: 'Super Admin' }
+    { username: 'superadmin', role: 'superadmin' }
   ]
 };
 
@@ -43,7 +43,7 @@ function DemoUserSection({
   onSelect
 }: {
   title: string;
-  users: { username: string; label: string }[];
+  users: { username: string; role: string }[];
   onSelect: (username: string) => void;
 }) {
   return (
@@ -59,7 +59,7 @@ function DemoUserSection({
               pressed && styles.roleChipPressed
             ]}
           >
-            <Text style={styles.roleChipText}>{u.username}</Text>
+            <Text style={styles.roleChipText}>{u.role}</Text>
           </Pressable>
         ))}
       </View>
@@ -342,10 +342,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f9ff'
   },
   roleChipText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.slate[600],
-    textTransform: 'uppercase',
-    letterSpacing: 0.5
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.slate[700]
   }
 });

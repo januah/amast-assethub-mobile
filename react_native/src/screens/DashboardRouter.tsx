@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UserRole } from '../types';
 import { MainLayout } from '../components/MainLayout';
+import { getTabsForRole } from '../config/tabsByRole';
 import { getUnreadCount } from '../api/notificationApi';
 import { RequesterDashboard } from './dashboards/RequesterDashboard';
 import { AmbulanceDashboard } from './dashboards/AmbulanceDashboard';
@@ -23,6 +24,7 @@ type FlowState = 'breakdown_flow' | null;
 
 function wrapWithLayout(
   children: React.ReactNode,
+  role: UserRole,
   unreadCount: number,
   onAction: (flow: string) => void,
   onLogout: (() => void) | undefined,
@@ -34,6 +36,7 @@ function wrapWithLayout(
     onNotificationListClose?: () => void;
   }
 ) {
+  const tabs = getTabsForRole(role, unreadCount);
   return (
     <MainLayout
       unreadCount={unreadCount}
@@ -43,6 +46,7 @@ function wrapWithLayout(
       onFlowComplete={flowProps.onFlowComplete}
       breakdownInitialAsset={flowProps.breakdownInitialAsset}
       onNotificationListClose={flowProps.onNotificationListClose}
+      tabs={tabs}
     >
       {children}
     </MainLayout>
@@ -98,6 +102,7 @@ export function DashboardRouter({
   if (role === UserRole.MEDICAL_OFFICER || role === UserRole.VIEWER) {
     return wrapWithLayout(
       <RequesterDashboard onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
+      role,
       count,
       onAction,
       onLogout,
@@ -105,11 +110,12 @@ export function DashboardRouter({
     );
   }
   if (role === UserRole.AMBULANCE_DRIVER) {
-    return wrapWithLayout(<AmbulanceDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
+    return wrapWithLayout(<AmbulanceDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.BIOMEDICAL_ENGINEER || role === UserRole.TOW_TRUCK) {
     return wrapWithLayout(
       <ExecutorDashboard role={role} onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
+      role,
       count,
       onAction,
       onLogout,
@@ -117,16 +123,16 @@ export function DashboardRouter({
     );
   }
   if (role === UserRole.HOSPITAL_APPROVER) {
-    return wrapWithLayout(<ApproverDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
+    return wrapWithLayout(<ApproverDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.ADMIN_HOSPITAL || role === UserRole.SUPERADMIN) {
-    return wrapWithLayout(<AdminHospitalDashboard onAction={handleAction} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
+    return wrapWithLayout(<AdminHospitalDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC) {
-    return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
+    return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.INSTALLER) {
-    return wrapWithLayout(<InstallerDashboard onSelect={onSelectInstallation || (() => {})} onLogout={onLogout} />, count, onAction, onLogout, flowProps);
+    return wrapWithLayout(<InstallerDashboard onSelect={onSelectInstallation || (() => {})} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
 
   return null;

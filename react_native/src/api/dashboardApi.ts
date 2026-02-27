@@ -15,6 +15,24 @@ export interface AdminDashboardSummary {
   }[];
 }
 
+export interface RequesterDashboardSummary {
+  fullName: string;
+  hospitalName: string;
+  departmentName: string;
+  totalAssets: number;
+  activeJobsCount: number;
+  recentRequests: {
+    id: string;
+    asset: string;
+    status: string;
+    date: string;
+  }[];
+}
+
 export async function getAdminDashboardSummary() {
   return apiClient.get<AdminDashboardSummary>('/dashboard/admin-summary');
+}
+
+export async function getRequesterDashboardSummary() {
+  return apiClient.get<RequesterDashboardSummary>('/dashboard/requester-summary');
 }

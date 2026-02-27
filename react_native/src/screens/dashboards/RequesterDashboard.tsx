@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { ActionButton, Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { getRequesterDashboardSummary } from '../../api/dashboardApi';
 
 interface RequesterDashboardProps {
   onAction: (flow: string) => void;
@@ -11,13 +12,61 @@ interface RequesterDashboardProps {
   unreadCount?: number;
 }
 
-const recentRequests = [
-  { id: 'REQ-0982', asset: 'Defibrillator Phillips X3', status: 'In Progress' as const, date: '24 Oct 2023' },
-  { id: 'REQ-0975', asset: 'Vital Signs Monitor B40', status: 'Pending' as const, date: '23 Oct 2023' },
-  { id: 'REQ-0961', asset: 'Ventilator Hamilton-C6', status: 'Completed' as const, date: '21 Oct 2023' }
-];
+function formatDate(s: string | null | undefined): string {
+  if (!s) return '';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || String(s);
+}
+
+function badgeStatus(status: string): string {
+  if (!status) return 'Open';
+  return status;
+}
 
 export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: RequesterDashboardProps) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    fullName: string;
+    hospitalName: string;
+    departmentName: string;
+    totalAssets: number;
+    activeJobsCount: number;
+    recentRequests: { id: string; asset: string; status: string; date: string }[];
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getRequesterDashboardSummary()
+      .then((res) => {
+        if (cancelled) return;
+        setData(res.success && res.data ? res.data : null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setData(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Header title="Dashboard" showRightIcons onNotificationClick={() => onAction('notifications')} onAvatarPress={() => onAction('profile')} unreadCount={unreadCount} />
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </View>
+    );
+  }
+
+  const welcomeName = data?.fullName ? `Hello, ${data.fullName}` : 'Hello';
+  const welcomeSub = [data?.hospitalName, data?.departmentName].filter(Boolean).join(data?.hospitalName && data?.departmentName ? ', ' : '') || '';
+  const totalAssets = data?.totalAssets ?? 0;
+  const activeJobs = data?.activeJobsCount ?? 0;
+  const recentRequests = data?.recentRequests ?? [];
+
   return (
     <View style={styles.container}>
       <Header
@@ -29,8 +78,8 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
       />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcome}>
-          <Text style={styles.welcomeTitle}>Hello, Dr. Sarah</Text>
-          <Text style={styles.welcomeSub}>General Hospital, Ward 4B</Text>
+          <Text style={styles.welcomeTitle}>{welcomeName}</Text>
+          {welcomeSub ? <Text style={styles.welcomeSub}>{welcomeSub}</Text> : null}
         </View>
 
         <View style={styles.actionsRow}>
@@ -44,35 +93,39 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
 
         <View style={styles.statsRow}>
           <TouchableOpacity style={[styles.statCard, styles.statSky]} onPress={() => onAction('assets')}>
-            <Text style={[styles.statValue, styles.statValueSky]}>12</Text>
+            <Text style={[styles.statValue, styles.statValueSky]}>{totalAssets}</Text>
             <Text style={styles.statLabel}>Total Assets</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.statCard, styles.statAmber]} onPress={() => onAction('records')}>
-            <Text style={[styles.statValue, styles.statValueAmber]}>3</Text>
+            <Text style={[styles.statValue, styles.statValueAmber]}>{activeJobs}</Text>
             <Text style={styles.statLabel}>Active Jobs</Text>
           </TouchableOpacity>
           <View style={[styles.statCard, styles.statEmerald]}>
-            <Text style={[styles.statValue, styles.statValueEmerald]}>95%</Text>
+            <Text style={[styles.statValue, styles.statValueEmerald]}>-</Text>
             <Text style={styles.statLabel}>Uptime</Text>
           </View>
         </View>
 
         <SectionHeader title="Recent Requests" onSeeAll={() => onAction('records')} />
-        {recentRequests.map((req) => (
-          <Card key={req.id} onPress={() => onAction('records')} style={styles.requestCard}>
-            <View style={styles.requestRow}>
-              <View>
-                <Text style={styles.requestId}>{req.id}</Text>
-                <Text style={styles.requestAsset}>{req.asset}</Text>
+        {recentRequests.length === 0 ? (
+          <Text style={styles.emptyText}>No recent requests</Text>
+        ) : (
+          recentRequests.map((req) => (
+            <Card key={req.id} onPress={() => onAction('records')} style={styles.requestCard}>
+              <View style={styles.requestRow}>
+                <View>
+                  <Text style={styles.requestId}>{req.id}</Text>
+                  <Text style={styles.requestAsset}>{req.asset}</Text>
+                </View>
+                <StatusBadge status={badgeStatus(req.status)} />
               </View>
-              <StatusBadge status={req.status} />
-            </View>
-            <View style={styles.requestMeta}>
-              <Ionicons name="time-outline" size={12} color={COLORS.slate[400]} />
-              <Text style={styles.requestDate}>Requested on {req.date}</Text>
-            </View>
-          </Card>
-        ))}
+              <View style={styles.requestMeta}>
+                <Ionicons name="time-outline" size={12} color={COLORS.slate[400]} />
+                <Text style={styles.requestDate}>Requested on {formatDate(req.date)}</Text>
+              </View>
+            </Card>
+          ))
+        )}
 
         <SectionHeader title="What's New" />
         <View style={styles.banner}>
@@ -117,6 +170,8 @@ const styles = StyleSheet.create({
   requestAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
   requestMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   requestDate: { fontSize: 10, color: COLORS.slate[400] },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
+  emptyText: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 16 },
   banner: {
     flexDirection: 'row',
     backgroundColor: COLORS.primary,

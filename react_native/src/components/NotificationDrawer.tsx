@@ -10,8 +10,10 @@ import {
   ScrollView,
   Dimensions
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Ionicons } from '@expo/vector-icons';
-import { getNotifications, markNotificationAsRead, type Notification } from '../api/notificationApi';
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead, type Notification } from '../api/notificationApi';
 import { COLORS } from '../constants/theme';
 
 const DRAWER_HEIGHT = Dimensions.get('window').height * 0.5;
@@ -33,9 +35,10 @@ function formatTimeAgo(dateStr: string): string {
 interface NotificationDrawerProps {
   visible: boolean;
   onClose: () => void;
+  onUnreadChanged?: (count: number) => void;
 }
 
-export function NotificationDrawer({ visible, onClose }: NotificationDrawerProps) {
+export function NotificationDrawer({ visible, onClose, onUnreadChanged }: NotificationDrawerProps) {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +56,30 @@ export function NotificationDrawer({ visible, onClose }: NotificationDrawerProps
     }
   }, [visible]);
 
+  const unreadItems = items.filter((n) => !n.read_at);
+  const hasUnread = unreadItems.length > 0;
+
   const handleMarkRead = (id: number) => {
     markNotificationAsRead(String(id)).then(() => {
       const now = new Date().toISOString();
       setItems((prev) => prev.map((n) => (n.notification_id === id ? { ...n, read_at: now } : n)));
+      onUnreadChanged?.(Math.max(0, unreadItems.length - 1));
+    });
+  };
+
+  const renderRightActions = (id: number) => (
+    <View style={styles.swipeAction}>
+      <Ionicons name="checkmark-done" size={20} color={COLORS.white} />
+      <Text style={styles.swipeActionText}>Read</Text>
+    </View>
+  );
+
+  const handleReadAll = () => {
+    if (!hasUnread) return;
+    markAllNotificationsAsRead().then(() => {
+      const now = new Date().toISOString();
+      setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at || now })));
+      onUnreadChanged?.(0);
     });
   };
 
@@ -67,15 +90,22 @@ export function NotificationDrawer({ visible, onClose }: NotificationDrawerProps
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
+      <GestureHandlerRootView style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <View style={styles.drawer}>
               <View style={styles.handle} />
               <View style={styles.header}>
                 <Text style={styles.title}>Notifications</Text>
-                <TouchableOpacity onPress={onClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-                  <Ionicons name="close" size={24} color={COLORS.slate[600]} />
-                </TouchableOpacity>
+                <View style={styles.headerActions}>
+                  {hasUnread && (
+                    <TouchableOpacity style={styles.readAllBtn} onPress={handleReadAll} activeOpacity={0.8}>
+                      <Text style={styles.readAllText}>Read All</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity onPress={onClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+                    <Ionicons name="close" size={24} color={COLORS.slate[600]} />
+                  </TouchableOpacity>
+                </View>
               </View>
               <ScrollView
                 style={styles.scroll}
@@ -86,39 +116,40 @@ export function NotificationDrawer({ visible, onClose }: NotificationDrawerProps
                   <View style={styles.loading}>
                     <ActivityIndicator size="large" color={COLORS.primary} />
                   </View>
-                ) : items.length === 0 ? (
+                ) : unreadItems.length === 0 ? (
                   <View style={styles.empty}>
                     <Ionicons name="notifications-off-outline" size={40} color={COLORS.slate[300]} />
-                    <Text style={styles.emptyText}>No notifications yet</Text>
+                    <Text style={styles.emptyText}>No unread notifications</Text>
                   </View>
                 ) : (
-                  items.map((n) => {
-                    const isRead = !!n.read_at;
-                    return (
-                    <TouchableOpacity
+                  unreadItems.map((n) => (
+                    <Swipeable
                       key={n.notification_id}
-                      style={[styles.card, !isRead && styles.cardUnread]}
-                      onPress={() => !isRead && handleMarkRead(n.notification_id)}
-                      activeOpacity={0.8}
+                      renderRightActions={() => renderRightActions(n.notification_id)}
+                      onSwipeableRightOpen={() => handleMarkRead(n.notification_id)}
+                      overshootRight={false}
+                      friction={2}
                     >
-                      <View style={styles.iconWrap}>
-                        <Ionicons
-                          name={n.channel === 'alert' ? 'warning-outline' : 'information-circle-outline'}
-                          size={18}
-                          color={isRead ? COLORS.slate[400] : COLORS.primary}
-                        />
+                      <View style={[styles.card, styles.cardUnread]}>
+                        <View style={styles.iconWrap}>
+                          <Ionicons
+                            name={n.channel === 'alert' ? 'warning-outline' : 'information-circle-outline'}
+                            size={18}
+                            color={COLORS.primary}
+                          />
+                        </View>
+                        <View style={styles.body}>
+                          <Text style={styles.message} numberOfLines={2}>{n.message}</Text>
+                          <Text style={styles.time}>{formatTimeAgo(n.created_at)}</Text>
+                        </View>
+                        <View style={styles.dot} />
                       </View>
-                      <View style={styles.body}>
-                        <Text style={styles.message} numberOfLines={2}>{n.message}</Text>
-                        <Text style={styles.time}>{formatTimeAgo(n.created_at)}</Text>
-                      </View>
-                      {!isRead && <View style={styles.dot} />}
-                    </TouchableOpacity>
-                  ); })
+                    </Swipeable>
+                  ))
                 )}
               </ScrollView>
         </View>
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
@@ -152,6 +183,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 8
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  },
+  readAllBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8
+  },
+  readAllText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.white
   },
   title: {
     fontSize: 18,
@@ -211,5 +258,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: COLORS.primary,
     marginLeft: 8
+  },
+  swipeAction: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    backgroundColor: COLORS.emerald[600],
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    marginBottom: 8
+  },
+  swipeActionText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.white,
+    marginTop: 4
   }
 });

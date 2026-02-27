@@ -1,7 +1,7 @@
-import React, { useState, cloneElement, isValidElement } from 'react';
+import React, { useState, useEffect, cloneElement, isValidElement } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BottomTabBar, TabId } from './BottomTabBar';
+import { BottomTabBar, TabId, TabItem } from './BottomTabBar';
 import {
   ProfileScreen,
   StaffManagementScreen,
@@ -10,6 +10,8 @@ import {
   ChangePasswordScreen
 } from '../screens/users';
 import { NotificationDrawer } from './NotificationDrawer';
+import { NotificationListScreen } from '../screens/users/NotificationListScreen';
+import { PendingApprovalsScreen } from '../screens/approval/PendingApprovalsScreen';
 import { InventoryScreen } from '../screens/inventory';
 import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
@@ -27,6 +29,7 @@ interface MainLayoutProps {
   onFlowComplete?: () => void;
   breakdownInitialAsset?: { id: string; name: string } | null;
   onNotificationListClose?: () => void;
+  tabs?: TabItem[];
 }
 
 export function MainLayout({
@@ -37,10 +40,19 @@ export function MainLayout({
   currentFlow = null,
   onFlowComplete,
   breakdownInitialAsset = null,
-  onNotificationListClose
+  onNotificationListClose,
+  tabs = []
 }: MainLayoutProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const defaultTab = (tabs[0]?.id ?? 'dashboard') as TabId;
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
   const [profileSubPage, setProfileSubPage] = useState<ProfileSubPage>(null);
+
+  useEffect(() => {
+    const validIds = tabs.map((t) => t.id);
+    if (tabs.length > 0 && !validIds.includes(activeTab)) {
+      setActiveTab((tabs[0].id ?? 'dashboard') as TabId);
+    }
+  }, [tabs, activeTab]);
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [showNotificationList, setShowNotificationList] = useState(false);
 
@@ -54,6 +66,9 @@ export function MainLayout({
     } else if (flow === 'manage_users') {
       setProfileSubPage(null);
       setActiveTab('users');
+    } else if (flow === 'pending_tab' || flow === 'admin_approval_list') {
+      setProfileSubPage(null);
+      setActiveTab('pending');
     } else if (flow === 'assets') {
       setProfileSubPage(null);
       setActiveTab('inventory');
@@ -101,21 +116,32 @@ export function MainLayout({
         {!currentFlow && !profileSubPage && activeTab === 'dashboard' && (isValidElement(children) ? cloneElement(children as React.ReactElement<{ onAction?: (flow: string, payload?: unknown) => void; unreadCount?: number }>, { onAction: handleAction, unreadCount }) : children)}
         {!currentFlow && !profileSubPage && !showAddStaff && activeTab === 'users' && (
           <StaffManagementScreen
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
             onAddStaff={() => handleAction('add_staff')}
             onSelectStaff={(id) => onAction?.('staff_detail')}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'inventory' && (
           <InventoryScreen
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
             onReportIssue={(asset) => onAction?.('breakdown_flow', { asset })}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'history' && (
           <HistoryScreen
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
             onOpenChecklist={onAction ? () => onAction('checklist_flow') : undefined}
+          />
+        )}
+        {!currentFlow && !profileSubPage && activeTab === 'pending' && (
+          <PendingApprovalsScreen onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)} />
+        )}
+        {!currentFlow && !profileSubPage && activeTab === 'alerts' && (
+          <NotificationListScreen
+            onBack={() => {
+              onNotificationListClose?.();
+              setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
+            }}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'profile' && (
@@ -135,11 +161,11 @@ export function MainLayout({
           setShowNotificationList(false);
         }}
       />
-      {showBottomBar && (
+      {showBottomBar && tabs.length > 0 && (
         <BottomTabBar
           activeTab={activeTab}
           onTabPress={handleTabPress}
-          unreadCount={unreadCount}
+          tabs={tabs}
         />
       )}
       </SafeAreaView>
