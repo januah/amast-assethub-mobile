@@ -65,7 +65,21 @@ export function StaffManagementScreen({
               </View>
             </View>
 
-            <SectionHeader title="Staff Performance" />
+            <View style={styles.sectionHeaderWrap}>
+              <SectionHeader title="Staff Performance" />
+            </View>
+            <TouchableOpacity
+              style={[styles.staffCard, styles.addButton]}
+              onPress={onAddStaff}
+              activeOpacity={0.7}
+            >
+              <View style={styles.staffAvatar}>
+                <Ionicons name="add" size={24} color={COLORS.slate[400]} />
+              </View>
+              <View style={styles.staffInfo}>
+                <Text style={styles.addButtonText}>Add New Staff Member</Text>
+              </View>
+            </TouchableOpacity>
             {summary.staff.length > 0 ? summary.staff.map((staff) => (
           <Card
             key={staff.id}
@@ -84,14 +98,17 @@ export function StaffManagementScreen({
             <View style={styles.staffInfo}>
               <View style={styles.staffRow}>
                 <Text style={styles.staffName}>{staff.name}</Text>
-                <Text style={styles.staffScore}>{staff.score}</Text>
               </View>
               <Text style={styles.staffMeta}>
                 Username: {staff.username ?? staff.name}
-                {' • '}{'Role: ' + staff.role} - {'Tasks: ' + staff.tasks}
+                {' • '}{'Role: ' + staff.role}
               </Text>
+              <Text style={styles.staffMeta}>{'Tasks: ' + staff.tasks}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
+            <View style={styles.staffScoreRow}>
+              <Ionicons name="ribbon-outline" size={14} color={COLORS.primary} style={styles.staffScoreIcon} />
+              <Text style={styles.staffScore}>{staff.score}</Text>
+            </View>
           </Card>
         )) : (
           <View style={styles.staffCard}>
@@ -104,14 +121,6 @@ export function StaffManagementScreen({
             </View>
           </View>
         )}
-
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={onAddStaff}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.addButtonText}>Add New Staff Member</Text>
-        </TouchableOpacity>
           </>
         )}
       </ScrollView>
@@ -133,7 +142,10 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 24
+    marginBottom: 12
+  },
+  sectionHeaderWrap: {
+    marginTop: -12
   },
   statCard: {
     flex: 1,
@@ -198,6 +210,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.slate[800]
   },
+  staffScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  staffScoreIcon: {
+    marginRight: 4
+  },
   staffScore: {
     fontSize: 10,
     fontWeight: '800',
@@ -209,13 +228,13 @@ const styles = StyleSheet.create({
     marginTop: 2
   },
   addButton: {
-    marginTop: 16,
-    paddingVertical: 16,
+    marginBottom: 12,
+    padding: 16,
     borderWidth: 2,
     borderStyle: 'dashed',
     borderColor: COLORS.slate[300],
     borderRadius: 16,
-    alignItems: 'center'
+    backgroundColor: COLORS.white
   },
   addButtonText: {
     fontSize: 12,
