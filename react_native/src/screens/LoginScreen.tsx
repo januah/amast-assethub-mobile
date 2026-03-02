@@ -10,6 +10,7 @@ import {
   Platform,
   Pressable,
   ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -106,6 +107,7 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ImageBackground source={require('../../assets/bg_blue_2.png')} style={styles.bgImage} resizeMode="cover">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
@@ -118,10 +120,17 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
         >
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Ionicons name="close" size={40} color={COLORS.white} style={{ transform: [{ rotate: '45deg' }] }} />
+              <View style={styles.logoIconWrap}>
+                <Ionicons name="cube-outline" size={32} color={COLORS.primary} />
+                <View style={styles.logoBadge}>
+                  <Ionicons name="checkmark-done" size={14} color={COLORS.white} />
+                </View>
+              </View>
             </View>
-            <Text style={styles.title}>Mybaiki</Text>
-            <Text style={styles.subtitle}>Asset maintenance, simplified.</Text>
+            <View style={styles.headerText}>
+              <Text style={styles.title}>Mybaiki</Text>
+              <Text style={styles.subtitle}>Asset maintenance, simplified.</Text>
+            </View>
           </View>
 
           <View style={styles.form}>
@@ -228,6 +237,7 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -236,6 +246,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.white,
+  },
+  bgImage: {
+    flex: 1,
   },
   loginRow: {
     flexDirection: 'row',
@@ -258,9 +271,11 @@ const styles = StyleSheet.create({
     flex: 1
   },
   scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: 32,
-    paddingTop: 48,
-    paddingBottom: 48,
+    paddingVertical: 48,
+    alignItems: 'center',
   },
   footer: {
     marginTop: 16,
@@ -269,29 +284,61 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   header: {
-    marginBottom: 40
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 40,
+    width: '100%',
+    maxWidth: 380,
+    alignSelf: 'center',
+  },
+  headerText: {
+    flex: 1
   },
   logoContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24
+    shadowColor: COLORS.slate[900],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6
+  },
+  logoIconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  logoBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -8,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.emerald[500],
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   title: {
     fontSize: 28,
     fontWeight: '900',
-    color: COLORS.slate[900],
-    marginBottom: 8
+    color: COLORS.white,
+    marginBottom: 4
   },
   subtitle: {
-    fontSize: 16,
-    color: COLORS.slate[500]
+    fontSize: 14,
+    color: COLORS.white
   },
   form: {
-    gap: 16
+    gap: 16,
+    width: '100%',
+    maxWidth: 380,
+    alignSelf: 'center',
   },
   inputGroup: {
     gap: 8
@@ -351,6 +398,9 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     borderTopWidth: 1,
     borderTopColor: COLORS.slate[100],
+    width: '100%',
+    maxWidth: 380,
+    alignSelf: 'center',
   },
   demoHeader: {
     paddingVertical: 4,
