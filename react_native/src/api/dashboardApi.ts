@@ -59,3 +59,46 @@ export interface ApproverDashboardSummary {
 export async function getApproverDashboardSummary() {
   return apiClient.get<ApproverDashboardSummary>('/dashboard/approver-summary');
 }
+
+export interface ExecutorDashboardSummary {
+  fullName: string;
+  roleLabel: string;
+  jobsTodayCount: number;
+  pendingJobsCount: number;
+  ppmTasksThisWeek: number;
+  avgRating: number | null;
+  activeJob: {
+    id: string;
+    title: string;
+    location: string;
+    status: string;
+  } | null;
+  recentActivity: {
+    id: string;
+    title: string;
+    meta: string;
+    time: string;
+  }[];
+}
+
+export async function getExecutorDashboardSummary() {
+  return apiClient.get<ExecutorDashboardSummary>('/dashboard/executor-summary');
+}
+
+export interface ExecutorAssignedTask {
+  id: string;
+  title: string;
+  asset: string;
+  type: 'PPM' | 'Breakdown';
+  location: string;
+  requester: string;
+  priority: string;
+  status: string;
+  time: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getExecutorAssignedTasks() {
+  return apiClient.get<ExecutorAssignedTask[]>('/dashboard/executor-assigned-tasks');
+}

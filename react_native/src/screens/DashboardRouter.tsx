@@ -18,7 +18,9 @@ interface DashboardRouterProps {
   unreadCount?: number;
 }
 
-type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | null;
+type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | null;
+
+type ActionPayload = { asset?: { id: string; name: string }; jobId?: string };
 
 function wrapWithLayout(
   children: React.ReactNode,
@@ -30,7 +32,8 @@ function wrapWithLayout(
     currentFlow: FlowState;
     onFlowComplete: () => void;
     breakdownInitialAsset: { id: string; name: string } | null;
-    handleAction: (flow: string, payload?: { asset?: { id: string; name: string } }) => void;
+    jobDetailRequestId: string | null;
+    handleAction: (flow: string, payload?: ActionPayload) => void;
     onNotificationListClose?: () => void;
   }
 ) {
@@ -43,6 +46,7 @@ function wrapWithLayout(
       currentFlow={flowProps.currentFlow}
       onFlowComplete={flowProps.onFlowComplete}
       breakdownInitialAsset={flowProps.breakdownInitialAsset}
+      jobDetailRequestId={flowProps.jobDetailRequestId}
       onNotificationListClose={flowProps.onNotificationListClose}
       tabs={tabs}
     >
@@ -60,6 +64,7 @@ export function DashboardRouter({
 }: DashboardRouterProps) {
   const [currentFlow, setCurrentFlow] = useState<FlowState>(null);
   const [breakdownInitialAsset, setBreakdownInitialAsset] = useState<{ id: string; name: string } | null>(null);
+  const [jobDetailRequestId, setJobDetailRequestId] = useState<string | null>(null);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(unreadCount ?? 0);
 
   const fetchUnread = useCallback(() => {
@@ -72,7 +77,7 @@ export function DashboardRouter({
     fetchUnread();
   }, [fetchUnread]);
 
-  const handleAction = (flow: string, payload?: { asset?: { id: string; name: string } }) => {
+  const handleAction = (flow: string, payload?: ActionPayload) => {
     if (flow === 'breakdown_flow') {
       setBreakdownInitialAsset(payload?.asset ?? null);
       setCurrentFlow('breakdown_flow');
@@ -80,6 +85,11 @@ export function DashboardRouter({
       setCurrentFlow('replacement_list');
     } else if (flow === 'ppm_list') {
       setCurrentFlow('ppm_list');
+    } else if (flow === 'task_list') {
+      setCurrentFlow('task_list');
+    } else if (flow === 'job_detail' && payload?.jobId) {
+      setJobDetailRequestId(payload.jobId);
+      setCurrentFlow('job_detail');
     } else {
       onAction(flow);
     }
@@ -88,12 +98,14 @@ export function DashboardRouter({
   const handleFlowComplete = () => {
     setCurrentFlow(null);
     setBreakdownInitialAsset(null);
+    setJobDetailRequestId(null);
   };
 
   const flowProps = {
     currentFlow,
     onFlowComplete: handleFlowComplete,
     breakdownInitialAsset,
+    jobDetailRequestId,
     handleAction,
     onNotificationListClose: fetchUnread
   };
@@ -130,7 +142,11 @@ export function DashboardRouter({
     return wrapWithLayout(<AdminHospitalDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC) {
-    return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
+    const handleMechanicSelectJob = (id: string) => {
+      handleAction('job_detail', { jobId: id });
+      onSelectJob?.(id);
+    };
+    return wrapWithLayout(<MechanicDashboard onSelectJob={handleMechanicSelectJob} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
 
   return null;

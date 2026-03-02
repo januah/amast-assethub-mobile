@@ -9,7 +9,6 @@ import {
   EditProfileScreen,
   ChangePasswordScreen
 } from '../screens/users';
-import { NotificationDrawer } from './NotificationDrawer';
 import { NotificationListScreen } from '../screens/users/NotificationListScreen';
 import { PendingApprovalsScreen } from '../screens/approval/PendingApprovalsScreen';
 import { InventoryScreen } from '../screens/inventory';
@@ -17,19 +16,22 @@ import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
 import { ReplacementsScreen } from '../screens/ReplacementsScreen';
 import { PPMListScreen } from '../screens/PPMListScreen';
+import { AssignedTasksScreen } from '../screens/AssignedTasksScreen';
+import { JobExecutionScreen } from '../screens/JobExecutionScreen';
 import { COLORS } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
-type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | null;
+type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | null;
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  onAction?: (flow: string, payload?: { asset?: { id: string; name: string } }) => void;
+  onAction?: (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string }) => void;
   onLogout?: () => void;
   unreadCount?: number;
   currentFlow?: CurrentFlow;
   onFlowComplete?: () => void;
   breakdownInitialAsset?: { id: string; name: string } | null;
+  jobDetailRequestId?: string | null;
   onNotificationListClose?: () => void;
   tabs?: TabItem[];
 }
@@ -42,6 +44,7 @@ export function MainLayout({
   currentFlow = null,
   onFlowComplete,
   breakdownInitialAsset = null,
+  jobDetailRequestId = null,
   onNotificationListClose,
   tabs = []
 }: MainLayoutProps) {
@@ -58,9 +61,10 @@ export function MainLayout({
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [showNotificationList, setShowNotificationList] = useState(false);
 
-  const handleAction = (flow: string, payload?: { asset?: { id: string; name: string } }) => {
+  const handleAction = (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string }) => {
     if (flow === 'notifications') {
       setShowNotificationList(true);
+      setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
       return;
     }
     if (flow === 'add_staff') {
@@ -90,12 +94,23 @@ export function MainLayout({
     setActiveTab(tabId);
   };
 
-  const showBottomBar = !profileSubPage && !currentFlow && !showAddStaff;
+  const showBottomBar = !profileSubPage && !currentFlow && !showAddStaff && !showNotificationList;
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.content}>
+        {showNotificationList ? (
+          <NotificationListScreen
+            onBack={() => {
+              onNotificationListClose?.();
+              setShowNotificationList(false);
+              setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
+            }}
+            onUnreadChanged={onNotificationListClose}
+          />
+        ) : (
+        <>
         {showAddStaff && (
           <AddStaffScreen
             onBack={() => setShowAddStaff(false)}
@@ -114,6 +129,16 @@ export function MainLayout({
         )}
         {currentFlow === 'ppm_list' && (
           <PPMListScreen onBack={onFlowComplete ?? (() => {})} />
+        )}
+        {currentFlow === 'task_list' && (
+          <AssignedTasksScreen onBack={onFlowComplete ?? (() => {})} onSelectTask={(id) => onAction?.('job_detail', { jobId: id })} />
+        )}
+        {currentFlow === 'job_detail' && jobDetailRequestId && (
+          <JobExecutionScreen
+            requestId={jobDetailRequestId}
+            onBack={onFlowComplete ?? (() => {})}
+            onComplete={onFlowComplete}
+          />
         )}
         {!currentFlow && profileSubPage === 'edit_profile' && (
           <EditProfileScreen onBack={() => setProfileSubPage(null)} />
@@ -150,6 +175,7 @@ export function MainLayout({
               onNotificationListClose?.();
               setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
             }}
+            onUnreadChanged={onNotificationListClose}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'profile' && (
@@ -161,14 +187,9 @@ export function MainLayout({
             unreadCount={unreadCount}
           />
         )}
+        </>
+        )}
       </View>
-      <NotificationDrawer
-        visible={showNotificationList}
-        onClose={() => {
-          onNotificationListClose?.();
-          setShowNotificationList(false);
-        }}
-      />
       {showBottomBar && tabs.length > 0 && (
         <BottomTabBar
           activeTab={activeTab}

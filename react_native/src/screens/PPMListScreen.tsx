@@ -17,12 +17,14 @@ import { Card, SectionHeader, PPMStatusBadge } from '../components/Shared';
 import { COLORS } from '../constants/theme';
 import {
   getPpmAppointments,
-  getPpmProposedDates,
   getPpmAppointmentById,
   confirmPpmSchedule,
   requestNewPpmDates,
   type PPMAppointment,
 } from '../api/ppmApi';
+
+const PPM_FILTER_STATUSES = ['All', 'CONFIRMED', 'RESCHEDULE_REQUESTED', 'SCHEDULED'] as const;
+type PPMFilterTab = (typeof PPM_FILTER_STATUSES)[number];
 
 const PENDING_STATUSES = ['PROPOSED', 'SCHEDULED', 'PENDING_CONFIRMATION', 'ACTIVE', 'OPEN', 'open', 'proposed', 'scheduled', 'pending_confirmation', 'active'];
 
@@ -48,7 +50,7 @@ interface PPMListScreenProps {
 
 export function PPMListScreen({ onBack }: PPMListScreenProps) {
   const [view, setView] = useState<'list' | 'detail' | 'request_dates'>('list');
-  const [activeTab, setActiveTab] = useState<'Pending' | 'Confirmed' | 'All'>('Pending');
+  const [activeTab, setActiveTab] = useState<PPMFilterTab>('All');
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<PPMAppointment[]>([]);
   const [selected, setSelected] = useState<PPMAppointment | null>(null);
@@ -72,43 +74,23 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
   const [timePickerMinute, setTimePickerMinute] = useState(0);
   const [timePickerAm, setTimePickerAm] = useState(true);
 
-  const fetchPending = useCallback(async () => {
-    const res = await getPpmProposedDates({ limit: 50 });
-    const data = (res as { data?: PPMAppointment[] }).data ?? [];
-    setItems(Array.isArray(data) ? data : []);
-    setTotalPages(1);
-  }, []);
-
-  const fetchConfirmed = useCallback(async (p = 1) => {
-    const res = await getPpmAppointments({ page: p, limit: 10, status: 'CONFIRMED' });
-    const data = (res as { data?: PPMAppointment[] }).data ?? [];
-    setItems(Array.isArray(data) ? data : []);
-    const pages = (res as { pages?: number }).pages ?? 1;
-    setTotalPages(pages);
-  }, []);
-
-  const fetchAll = useCallback(async (p = 1) => {
-    const res = await getPpmAppointments({ page: p, limit: 10 });
-    const data = (res as { data?: PPMAppointment[] }).data ?? [];
-    setItems(Array.isArray(data) ? data : []);
-    const pages = (res as { pages?: number }).pages ?? 1;
-    setTotalPages(pages);
-  }, []);
-
   const fetchList = useCallback(async (p = 1) => {
     setLoading(true);
     setError('');
     try {
-      if (activeTab === 'Pending') await fetchPending();
-      else if (activeTab === 'Confirmed') await fetchConfirmed(p);
-      else await fetchAll(p);
+      const status = activeTab === 'All' ? undefined : activeTab;
+      const res = await getPpmAppointments({ page: p, limit: 10, status });
+      const data = (res as { data?: PPMAppointment[] }).data ?? [];
+      setItems(Array.isArray(data) ? data : []);
+      const pages = (res as { pages?: number }).pages ?? 1;
+      setTotalPages(pages);
     } catch {
       setItems([]);
       setError('Failed to load PPM schedules');
     } finally {
       setLoading(false);
     }
-  }, [activeTab, fetchPending, fetchConfirmed, fetchAll]);
+  }, [activeTab]);
 
   useEffect(() => {
     fetchList(1);
@@ -145,16 +127,19 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
     setRefreshing(true);
     setError('');
     try {
-      if (activeTab === 'Pending') await fetchPending();
-      else if (activeTab === 'Confirmed') await fetchConfirmed(page);
-      else await fetchAll(page);
+      const status = activeTab === 'All' ? undefined : activeTab;
+      const res = await getPpmAppointments({ page, limit: 10, status });
+      const data = (res as { data?: PPMAppointment[] }).data ?? [];
+      setItems(Array.isArray(data) ? data : []);
+      const pages = (res as { pages?: number }).pages ?? 1;
+      setTotalPages(pages);
     } catch {
       setItems([]);
       setError('Failed to load PPM schedules');
     } finally {
       setRefreshing(false);
     }
-  }, [activeTab, page, fetchPending, fetchConfirmed, fetchAll]);
+  }, [activeTab, page]);
 
   const goBackToList = useCallback(() => {
     setView('list');
@@ -378,7 +363,7 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
                   <Text style={styles.gridValue}>{formatDate(selected.next_due_date)}</Text>
                 </View>
                 <View style={styles.gridCard}>
-                  <Text style={styles.gridLabel}>Technician</Text>
+                  <Text style={styles.gridLabel}>Assigned To</Text>
                   <Text style={styles.gridValue}>{tech}</Text>
                 </View>
               </View>
@@ -616,22 +601,26 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
   return (
     <View style={styles.container}>
       <Header title="PPM Schedules" showBack onBack={onBack} />
-      <View style={styles.tabs}>
-        {(['Pending', 'Confirmed', 'All'] as const).map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.tab, activeTab === t && styles.tabActive]}
-            onPress={() => setActiveTab(t)}
-          >
-            <Text style={[styles.tabText, activeTab === t && styles.tabTextActive]}>{t}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll}>
+        <View style={styles.tabs}>
+          {PPM_FILTER_STATUSES.map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.tab, activeTab === t && styles.tabActive]}
+              onPress={() => setActiveTab(t)}
+            >
+              <Text style={[styles.tabText, activeTab === t && styles.tabTextActive]}>
+                {t === 'All' ? 'All' : t.replace(/_/g, ' ')}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
       <View style={styles.searchWrap}>
         <Ionicons name="search-outline" size={16} color={COLORS.slate[400]} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by asset or technician..."
+          placeholder="Search by asset or person in charge..."
           placeholderTextColor={COLORS.slate[400]}
           value={search}
           onChangeText={setSearch}
@@ -682,7 +671,7 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
                     <Ionicons name="time-outline" size={12} color={COLORS.slate[400]} />
                     <Text style={styles.cardMetaText}>Due {formatDate(r.next_due_date)}</Text>
                   </View>
-                  <Text style={styles.cardTech}>{r.technician?.full_name || '-'}</Text>
+                  <Text style={styles.cardTech}>Assigned to: {r.technician?.full_name || '-'}</Text>
                 </View>
               </Card>
             );
@@ -720,8 +709,9 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32 },
   contentFlex: { flex: 1 },
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-  tabs: { flexDirection: 'row', padding: 4, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
-  tab: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  tabsScroll: { backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
+  tabs: { flexDirection: 'row', padding: 4, gap: 4 },
+  tab: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center' },
   tabActive: { backgroundColor: COLORS.sky[600], shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   tabText: { fontSize: 10, fontWeight: '700', letterSpacing: 2, color: COLORS.slate[400] },
   tabTextActive: { color: COLORS.white },

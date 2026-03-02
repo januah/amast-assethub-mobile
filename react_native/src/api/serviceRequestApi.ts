@@ -17,6 +17,7 @@ export interface StatusHistoryItem {
   from_status: string;
   to_status: string;
   changed_at: string;
+  comments?: string;
   changedBy?: { user_id: string; username?: string; full_name?: string };
 }
 
@@ -75,4 +76,17 @@ export interface CreateBreakdownResponse {
 
 export async function createBreakdownRequest(params: CreateBreakdownParams) {
   return apiClient.post<CreateBreakdownResponse>('/service-requests', params);
+}
+
+export interface UpdateStatusParams {
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'WAITING';
+  notes?: string;
+}
+
+export async function updateServiceRequestStatus(requestId: string, params: UpdateStatusParams) {
+  return apiClient.patch<ServiceRequestItem>(`/service-requests/${encodeURIComponent(requestId)}/status`, params);
+}
+
+export async function getServiceRequestStatusHistory(requestId: string) {
+  return apiClient.get<StatusHistoryItem[]>(`/service-requests/${encodeURIComponent(requestId)}/status-history`);
 }

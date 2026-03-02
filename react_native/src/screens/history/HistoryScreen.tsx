@@ -264,6 +264,15 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
         </ScrollView>
       )}
 
+      {tab === 'requests' && (
+        <View style={styles.auditNote}>
+          <View style={styles.auditNoteIconWrap}>
+            <Ionicons name="eye-outline" size={14} color={COLORS.slate[500]} />
+          </View>
+          <Text style={styles.auditNoteText}>Audit only. Read-only records. No user actions.</Text>
+        </View>
+      )}
+
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {tab === 'requests' ? (
           <>
@@ -336,6 +345,32 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.slate[50] },
+  auditNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate[200],
+    borderWidth: 1,
+    borderColor: COLORS.slate[200],
+    borderStyle: 'dashed',
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    borderRadius: 8
+  },
+  auditNoteIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.slate[100],
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  auditNoteText: { fontSize: 11, color: COLORS.slate[500], flex: 1, fontWeight: '500' },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 80 },
   loading: { paddingVertical: 48, alignItems: 'center' },

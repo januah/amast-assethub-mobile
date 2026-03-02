@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { getExecutorDashboardSummary, getExecutorAssignedTasks, ExecutorAssignedTask } from '../../api/dashboardApi';
 
 interface MechanicJob {
   id: string;
@@ -11,16 +12,26 @@ interface MechanicJob {
   asset: string;
   location: string;
   requester: string;
-  priority: 'Normal' | 'Urgent' | 'Critical';
+  priority: string;
   status: string;
+  statusRaw: string;
   dueTime: string;
 }
 
-const MOCK_JOBS: MechanicJob[] = [
-  { id: 'JOB-MECH-4821', type: 'Service & Repair', asset: 'Toyota Hiace Ambulance (WMX 4821)', location: 'Hospital Seri Botani - Workshop', requester: 'Driver Ahmad', priority: 'Urgent', status: 'Assigned', dueTime: '2h 15m left' },
-  { id: 'JOB-MECH-9902', type: 'Onsite Service', asset: 'Mercedes Sprinter (WVB 9902)', location: 'KL Sentral - Drop-off A', requester: 'Driver Sam', priority: 'Normal', status: 'En-route', dueTime: '4h 30m left' },
-  { id: 'JOB-MECH-4401', type: 'Breakdown', asset: 'Ambulance Unit 04', location: 'MRR2 Highway - KM 12.5', requester: 'Driver Kamal', priority: 'Critical', status: 'Completed', dueTime: 'Finished' }
-];
+function mapTaskToMechanicJob(t: ExecutorAssignedTask): MechanicJob {
+  const statusUpper = (t.status || '').toUpperCase();
+  return {
+    id: t.id,
+    type: t.type,
+    asset: t.asset || '-',
+    location: t.location || '-',
+    requester: t.requester || '-',
+    priority: t.priority || 'Normal',
+    status: t.status || '-',
+    statusRaw: statusUpper,
+    dueTime: t.time || '-'
+  };
+}
 
 interface MechanicDashboardProps {
   onSelectJob: (id: string) => void;
@@ -29,25 +40,72 @@ interface MechanicDashboardProps {
 
 export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardProps) {
   const [filter, setFilter] = useState<'New' | 'In Progress' | 'Completed'>('New');
+  const [jobs, setJobs] = useState<MechanicJob[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [summary, setSummary] = useState<{ pendingJobsCount: number; ppmTasksThisWeek: number } | null>(null);
 
-  const filteredJobs = MOCK_JOBS.filter((job) => {
-    if (filter === 'New') return job.status === 'Assigned';
-    if (filter === 'In Progress') return ['En-route', 'Arrived', 'Inspection', 'Work-in-progress'].includes(job.status);
-    return job.status === 'Completed';
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    try {
+      const [summaryRes, tasksRes] = await Promise.all([
+        getExecutorDashboardSummary(),
+        getExecutorAssignedTasks()
+      ]);
+      if (summaryRes.success && summaryRes.data) {
+        setSummary({
+          pendingJobsCount: summaryRes.data.pendingJobsCount ?? 0,
+          ppmTasksThisWeek: summaryRes.data.ppmTasksThisWeek ?? 0
+        });
+      }
+      if (tasksRes.success && Array.isArray(tasksRes.data)) {
+        setJobs(tasksRes.data.map(mapTaskToMechanicJob));
+      } else {
+        setJobs([]);
+      }
+    } catch {
+      setJobs([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const filteredJobs = jobs.filter((job) => {
+    if (filter === 'New') return job.statusRaw === 'OPEN';
+    if (filter === 'In Progress') return ['IN_PROGRESS', 'WAITING'].includes(job.statusRaw);
+    return job.statusRaw === 'COMPLETED';
   });
 
   const getPriorityColor = (p: string) => {
-    if (p === 'Critical') return COLORS.danger;
-    if (p === 'Urgent') return COLORS.amber[500];
+    const pUpper = (p || '').toUpperCase();
+    if (pUpper.includes('CRITICAL')) return COLORS.danger;
+    if (pUpper.includes('URGENT') || pUpper.includes('HIGH')) return COLORS.amber[500];
     return COLORS.primary;
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Header title="My Jobs" />
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Header title="My Jobs" />
       <View style={styles.bar}>
         <Ionicons name="briefcase-outline" size={16} color={COLORS.slate[400]} />
-        <Text style={styles.barText}>Central Workshop A</Text>
+        <Text style={styles.barText}>My Assigned Jobs</Text>
       </View>
 
       <View style={styles.tabs}>
@@ -62,13 +120,18 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
         ))}
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} colors={[COLORS.primary]} />}
+      >
         {filteredJobs.length > 0 ? (
           filteredJobs.map((job) => (
             <Card key={job.id} onPress={() => onSelectJob(job.id)} leftBorder={COLORS.primary} style={styles.jobCard}>
               <View style={styles.jobHeader}>
                 <Text style={styles.jobId}>{job.id} - {job.type}</Text>
-                <StatusBadge status={job.status === 'Completed' ? 'Completed' : 'In Progress'} />
+                <StatusBadge status={job.statusRaw === 'COMPLETED' ? 'Completed' : 'In Progress'} />
               </View>
               <Text style={styles.jobAsset}>{job.asset}</Text>
               <View style={styles.jobMeta}>
@@ -146,5 +209,6 @@ const styles = StyleSheet.create({
   },
   viewJobBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48 },
-  emptyText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[400], marginTop: 12 }
+  emptyText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[400], marginTop: 12 },
+  loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' }
 });

@@ -155,7 +155,21 @@ export function Card({
   leftBorder?: string;
 }) {
   const content = (
-    <View style={[styles.card, leftBorder ? { borderLeftWidth: 4, borderLeftColor: leftBorder } : undefined, style]}>
+    <View style={[styles.card, style, leftBorder ? { position: 'relative' as const } : undefined]}>
+      {leftBorder ? (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 6,
+            backgroundColor: leftBorder,
+            borderTopLeftRadius: 16,
+            borderBottomLeftRadius: 16
+          }}
+        />
+      ) : null}
       {children}
     </View>
   );

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput, Modal, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { Card, ReplacementStatusBadge, SectionHeader, Stepper } from '../components/Shared';
 import { COLORS } from '../constants/theme';
-import { getReplacements, getReplacementById, acknowledgeReplacement, type Replacement } from '../api/replacementApi';
+import { getReplacements, getReplacementById, acknowledgeReplacement, createReplacement, getEligibleServiceRequests, getAvailableLoanerAssets, type Replacement, type EligibleServiceRequest, type AvailableLoanerAsset } from '../api/replacementApi';
+import { getTeamSummary, type TeamStaffMember } from '../api/teamApi';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
 
@@ -66,6 +68,20 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
   const [ackSubmitting, setAckSubmitting] = useState(false);
   const [ackError, setAckError] = useState('');
 
+  const [eligibleRequests, setEligibleRequests] = useState<EligibleServiceRequest[]>([]);
+  const [availableLoaners, setAvailableLoaners] = useState<AvailableLoanerAsset[]>([]);
+  const [staff, setStaff] = useState<TeamStaffMember[]>([]);
+  const [wizardSelectedRequest, setWizardSelectedRequest] = useState<EligibleServiceRequest | null>(null);
+  const [wizardSelectedLoaner, setWizardSelectedLoaner] = useState<AvailableLoanerAsset | null>(null);
+  const [wizardSelectedPic, setWizardSelectedPic] = useState<TeamStaffMember | null>(null);
+  const [wizardExpectedDate, setWizardExpectedDate] = useState('');
+  const [wizardExpectedDateObj, setWizardExpectedDateObj] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [wizardNotes, setWizardNotes] = useState('');
+  const [wizardLoading, setWizardLoading] = useState(false);
+  const [wizardError, setWizardError] = useState('');
+  const [wizardSubmitting, setWizardSubmitting] = useState(false);
+
   const canManage = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMED_ENGINEER].includes(role);
   const isBiomed = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMED_ENGINEER].includes(role);
   const isMO = role === UserRole.MEDICAL_OFFICER;
@@ -116,8 +132,89 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
     setSelected(null);
   }, []);
 
-  const openWizard = useCallback(() => { setView('wizard'); setWizardStep(0); }, []);
-  const closeWizard = useCallback(() => { setView('list'); setWizardStep(0); fetchList(1); }, [fetchList]);
+  const openWizard = useCallback(() => {
+    setView('wizard');
+    setWizardStep(0);
+    setWizardSelectedRequest(null);
+    setWizardSelectedLoaner(null);
+    setWizardSelectedPic(null);
+    setWizardExpectedDate('');
+    setWizardExpectedDateObj(null);
+    setShowDatePicker(false);
+    setWizardNotes('');
+    setWizardError('');
+  }, []);
+
+  const closeWizard = useCallback(() => {
+    setView('list');
+    setWizardStep(0);
+    setWizardSelectedRequest(null);
+    setWizardSelectedLoaner(null);
+    setWizardSelectedPic(null);
+    fetchList(1);
+  }, [fetchList]);
+
+  const fetchEligibleRequests = useCallback(async () => {
+    setWizardLoading(true);
+    setWizardError('');
+    const res = await getEligibleServiceRequests({ limit: 50 });
+    setWizardLoading(false);
+    if (res.success && Array.isArray(res.data)) setEligibleRequests(res.data);
+    else setEligibleRequests([]);
+  }, []);
+
+  const fetchAvailableLoaners = useCallback(async () => {
+    setWizardLoading(true);
+    setWizardError('');
+    const res = await getAvailableLoanerAssets({ limit: 50 });
+    setWizardLoading(false);
+    if (res.success && Array.isArray(res.data)) setAvailableLoaners(res.data);
+    else setAvailableLoaners([]);
+  }, []);
+
+  const fetchStaff = useCallback(async () => {
+    setWizardLoading(true);
+    setWizardError('');
+    const res = await getTeamSummary();
+    setWizardLoading(false);
+    const data = (res as { success?: boolean; data?: { staff?: TeamStaffMember[] } })?.data;
+    if ((res as { success?: boolean })?.success && data?.staff) setStaff(data.staff);
+    else setStaff([]);
+  }, []);
+
+  useEffect(() => {
+    if (view === 'wizard') {
+      if (wizardStep === 0) fetchEligibleRequests();
+      else if (wizardStep === 1) fetchAvailableLoaners();
+      else if (wizardStep === 2) fetchStaff();
+    }
+  }, [view, wizardStep, fetchEligibleRequests, fetchAvailableLoaners, fetchStaff]);
+
+  const handleWizardSubmit = useCallback(async () => {
+    if (!wizardSelectedRequest || !wizardSelectedLoaner || !wizardSelectedPic) {
+      setWizardError('Please complete all required fields');
+      return;
+    }
+    if (!wizardExpectedDate || !wizardExpectedDate.trim()) {
+      setWizardError('Expected return date is required');
+      return;
+    }
+    setWizardSubmitting(true);
+    setWizardError('');
+    const res = await createReplacement({
+      service_request_id: wizardSelectedRequest.request_id,
+      loaner_asset_id: wizardSelectedLoaner.asset_id,
+      responsible_pic_id: wizardSelectedPic.id,
+      expected_return_date: wizardExpectedDate.trim(),
+      deployment_notes: wizardNotes.trim() || undefined,
+    });
+    setWizardSubmitting(false);
+    if (res.success) {
+      closeWizard();
+    } else {
+      setWizardError((res as { message?: string }).message || 'Failed to create replacement');
+    }
+  }, [wizardSelectedRequest, wizardSelectedLoaner, wizardSelectedPic, wizardExpectedDate, wizardNotes, closeWizard]);
 
   const handleAcknowledge = useCallback(async () => {
     if (!ackType || !selected) return;
@@ -323,18 +420,140 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
   }
 
   if (view === 'wizard') {
-    const steps = ['Context', 'Select Loaner', 'Issue To'];
+    const steps = ['Select Request', 'Select Loaner', 'Issue To'];
     return (
       <View style={styles.container}>
-        <Header title="Issue Loaner" showBack onBack={closeWizard} />
+        <Header title="Issue Replacement" showBack onBack={closeWizard} />
         <Stepper steps={steps} current={wizardStep} />
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <SectionHeader title={steps[wizardStep]} />
-          <Text style={styles.wizardPlaceholder}>Issue Replacement Wizard - Coming soon</Text>
+          {wizardError ? <Text style={styles.wizardError}>{wizardError}</Text> : null}
+
+          {wizardStep === 0 && (
+            <>
+              {wizardLoading ? (
+                <ActivityIndicator size="large" color={COLORS.primary} style={styles.wizardLoading} />
+              ) : eligibleRequests.length === 0 ? (
+                <Text style={styles.wizardEmpty}>No service requests eligible for replacement</Text>
+              ) : (
+                eligibleRequests.map((r) => (
+                  <TouchableOpacity
+                    key={r.request_id}
+                    style={[styles.wizardOption, wizardSelectedRequest?.request_id === r.request_id && styles.wizardOptionSelected]}
+                    onPress={() => setWizardSelectedRequest(r)}
+                  >
+                    <Text style={styles.wizardOptionId}>{r.request_id}</Text>
+                    <Text style={styles.wizardOptionName}>{r.Asset?.name || r.description || '-'}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </>
+          )}
+
+          {wizardStep === 1 && (
+            <>
+              {wizardLoading ? (
+                <ActivityIndicator size="large" color={COLORS.primary} style={styles.wizardLoading} />
+              ) : availableLoaners.length === 0 ? (
+                <Text style={styles.wizardEmpty}>No available loaner assets</Text>
+              ) : (
+                availableLoaners.map((a) => (
+                  <TouchableOpacity
+                    key={a.asset_id}
+                    style={[styles.wizardOption, wizardSelectedLoaner?.asset_id === a.asset_id && styles.wizardOptionSelected]}
+                    onPress={() => setWizardSelectedLoaner(a)}
+                  >
+                    <Text style={styles.wizardOptionId}>{a.asset_id}</Text>
+                    <Text style={styles.wizardOptionName}>{a.name || a.serial_number || '-'}</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </>
+          )}
+
+          {wizardStep === 2 && (
+            <>
+              {wizardLoading ? (
+                <ActivityIndicator size="large" color={COLORS.primary} style={styles.wizardLoading} />
+              ) : (
+                <>
+                  <Text style={styles.wizardLabel}>Responsible PIC</Text>
+                  {staff.length === 0 ? (
+                    <Text style={styles.wizardEmpty}>No staff members found</Text>
+                  ) : (
+                    staff.map((s) => (
+                      <TouchableOpacity
+                        key={s.id}
+                        style={[styles.wizardOption, wizardSelectedPic?.id === s.id && styles.wizardOptionSelected]}
+                        onPress={() => setWizardSelectedPic(s)}
+                      >
+                        <Text style={styles.wizardOptionName}>{s.name}</Text>
+                        <Text style={styles.wizardOptionSub}>Role: {s.role}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                  <Text style={styles.wizardLabel}>Expected Return Date</Text>
+                  <TouchableOpacity
+                    style={[styles.wizardInput, styles.wizardDateTouch]}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Text style={[styles.wizardInputText, !wizardExpectedDate && styles.wizardInputPlaceholder]}>
+                      {wizardExpectedDate || 'Select date'}
+                    </Text>
+                    <Ionicons name="calendar-outline" size={18} color={COLORS.slate[400]} />
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={wizardExpectedDateObj || new Date()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      minimumDate={new Date()}
+                      onChange={(_, selectedDate) => {
+                        setShowDatePicker(false);
+                        if (selectedDate) {
+                          setWizardExpectedDateObj(selectedDate);
+                          const y = selectedDate.getFullYear();
+                          const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                          const d = String(selectedDate.getDate()).padStart(2, '0');
+                          setWizardExpectedDate(`${y}-${m}-${d}`);
+                        }
+                      }}
+                    />
+                  )}
+                  <Text style={styles.wizardLabel}>Deployment Notes (optional)</Text>
+                  <TextInput
+                    style={[styles.wizardInput, styles.wizardTextArea]}
+                    placeholder="e.g. Temporary swap while original is under repair"
+                    placeholderTextColor={COLORS.slate[400]}
+                    value={wizardNotes}
+                    onChangeText={setWizardNotes}
+                    multiline
+                    numberOfLines={3}
+                  />
+                </>
+              )}
+            </>
+          )}
         </ScrollView>
         <View style={styles.wizardFooter}>
-          <TouchableOpacity style={styles.wizardNext} onPress={() => (wizardStep >= 2 ? closeWizard() : setWizardStep((s) => s + 1))}>
-            <Text style={styles.wizardNextText}>{wizardStep >= 2 ? 'Issue Loaner' : 'Continue'}</Text>
+          {wizardStep > 0 ? (
+            <TouchableOpacity style={styles.wizardBack} onPress={() => setWizardStep((s) => s - 1)}>
+              <Text style={styles.wizardBackText}>Back</Text>
+            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            style={[styles.wizardNext, wizardStep === 2 && styles.wizardNextFull]}
+            onPress={() => {
+              if (wizardStep >= 2) handleWizardSubmit();
+              else setWizardStep((s) => s + 1);
+            }}
+            disabled={wizardSubmitting || (wizardStep === 0 && !wizardSelectedRequest) || (wizardStep === 1 && !wizardSelectedLoaner) || (wizardStep === 2 && (!wizardSelectedPic || !wizardExpectedDate.trim()))}
+          >
+            {wizardSubmitting ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.wizardNextText}>{wizardStep >= 2 ? 'Issue Replacement' : 'Continue'}</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -534,7 +753,24 @@ const styles = StyleSheet.create({
   modalConfirmText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
   modalError: { fontSize: 12, color: COLORS.danger, marginBottom: 12 },
   wizardPlaceholder: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 24 },
-  wizardFooter: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
-  wizardNext: { paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
+  wizardFooter: { flexDirection: 'row', gap: 12, padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
+  wizardBack: { flex: 1, paddingVertical: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 16, alignItems: 'center' },
+  wizardBackText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[700] },
+  wizardNext: { flex: 1, paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
+  wizardNextFull: { flex: 2 },
   wizardNextText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  wizardOption: { padding: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12, marginBottom: 12 },
+  wizardOptionSelected: { borderColor: COLORS.sky[600], borderWidth: 2, backgroundColor: COLORS.sky[50] },
+  wizardOptionId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], marginBottom: 4 },
+  wizardOptionName: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
+  wizardOptionSub: { fontSize: 12, color: COLORS.slate[500], marginTop: 4 },
+  wizardLabel: { fontSize: 12, fontWeight: '700', color: COLORS.slate[600], marginBottom: 8, marginTop: 16 },
+  wizardInput: { padding: 14, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12, fontSize: 14, color: COLORS.slate[800] },
+  wizardDateTouch: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  wizardInputText: { fontSize: 14, color: COLORS.slate[800] },
+  wizardInputPlaceholder: { color: COLORS.slate[400] },
+  wizardTextArea: { minHeight: 80, textAlignVertical: 'top' },
+  wizardLoading: { paddingVertical: 32 },
+  wizardEmpty: { fontSize: 14, color: COLORS.slate[500], fontStyle: 'italic' },
+  wizardError: { fontSize: 12, color: COLORS.danger, marginBottom: 12 },
 });
