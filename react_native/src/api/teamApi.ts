@@ -8,6 +8,7 @@ export interface RoleOption {
 export interface TeamStaffMember {
   id: string;
   name: string;
+  username?: string;
   role: string;
   status: string;
   score: string;

@@ -23,7 +23,7 @@ export function StaffManagementScreen({
   onAddStaff,
   onSelectStaff
 }: StaffManagementScreenProps) {
-  const [data, setData] = useState<{ activeStaff: number; efficiency: number; staff: { id: string; name: string; role: string; status: string; score: string; tasks: string }[] } | null>(null);
+  const [data, setData] = useState<{ activeStaff: number; efficiency: number; staff: { id: string; name: string; username?: string; role: string; status: string; score: string; tasks: string }[] } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,7 +86,10 @@ export function StaffManagementScreen({
                 <Text style={styles.staffName}>{staff.name}</Text>
                 <Text style={styles.staffScore}>{staff.score}</Text>
               </View>
-              <Text style={styles.staffMeta}>{'Role: ' + staff.role} - {'Tasks: ' + staff.tasks}</Text>
+              <Text style={styles.staffMeta}>
+                Username: {staff.username ?? staff.name}
+                {' • '}{'Role: ' + staff.role} - {'Tasks: ' + staff.tasks}
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
           </Card>
