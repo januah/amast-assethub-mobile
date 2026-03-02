@@ -66,8 +66,8 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
   const [ackSubmitting, setAckSubmitting] = useState(false);
   const [ackError, setAckError] = useState('');
 
-  const canManage = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMEDICAL_ENGINEER].includes(role);
-  const isBiomed = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMEDICAL_ENGINEER].includes(role);
+  const canManage = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMED_ENGINEER].includes(role);
+  const isBiomed = [UserRole.ADMIN_HOSPITAL, UserRole.SUPERADMIN, UserRole.BIOMED_ENGINEER].includes(role);
   const isMO = role === UserRole.MEDICAL_OFFICER;
 
   const fetchList = useCallback(async (page = 1) => {

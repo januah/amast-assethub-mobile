@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { COLORS } from '../../constants/theme';
+import { changePassword } from '../../api/authApi';
 
 interface ChangePasswordScreenProps {
   onBack: () => void;
@@ -10,11 +11,41 @@ interface ChangePasswordScreenProps {
 
 export function ChangePasswordScreen({ onBack }: ChangePasswordScreenProps) {
   const [form, setForm] = useState({ current: '', new: '', confirm: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const isValid = form.current.length > 0 && form.new.length > 0 && form.new === form.confirm;
-
-  const handleUpdate = () => {
-    if (isValid) onBack();
+  const handleUpdate = async () => {
+    if (loading) return;
+    setError(null);
+    if (!form.current.trim()) {
+      setError('Current password is required');
+      return;
+    }
+    if (!form.new.trim()) {
+      setError('New password is required');
+      return;
+    }
+    if (!form.confirm.trim()) {
+      setError('Confirm password is required');
+      return;
+    }
+    if (form.new !== form.confirm) {
+      setError('New password and confirm password do not match');
+      return;
+    }
+    setLoading(true);
+    const res = await changePassword({
+      currentPassword: form.current,
+      newPassword: form.new,
+      confirmPassword: form.confirm
+    });
+    setLoading(false);
+    if (res.success) {
+      setForm({ current: '', new: '', confirm: '' });
+      onBack();
+      return;
+    }
+    setError(res.message || 'Failed to change password');
   };
 
   return (
@@ -28,46 +59,54 @@ export function ChangePasswordScreen({ onBack }: ChangePasswordScreenProps) {
           </Text>
         </View>
 
-        <Text style={styles.label}>Current Password</Text>
+        {error ? (
+          <View style={styles.errorBox}>
+            <Ionicons name="alert-circle-outline" size={18} color={COLORS.danger} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        <Text style={styles.label}>Current Password <Text style={styles.required}>*</Text></Text>
         <TextInput
           style={styles.input}
           value={form.current}
-          onChangeText={(t) => setForm({ ...form, current: t })}
-          placeholder="••••••••"
+          onChangeText={(t) => { setError(null); setForm({ ...form, current: t }); }}
           secureTextEntry
         />
 
         <View style={styles.divider} />
 
-        <Text style={styles.label}>New Password</Text>
+        <Text style={styles.label}>New Password <Text style={styles.required}>*</Text></Text>
         <TextInput
           style={styles.input}
           value={form.new}
-          onChangeText={(t) => setForm({ ...form, new: t })}
-          placeholder="••••••••"
+          onChangeText={(t) => { setError(null); setForm({ ...form, new: t }); }}
           secureTextEntry
         />
 
-        <Text style={styles.label}>Confirm New Password</Text>
+        <Text style={styles.label}>Confirm New Password <Text style={styles.required}>*</Text></Text>
         <TextInput
           style={styles.input}
           value={form.confirm}
-          onChangeText={(t) => setForm({ ...form, confirm: t })}
-          placeholder="••••••••"
+          onChangeText={(t) => { setError(null); setForm({ ...form, confirm: t }); }}
           secureTextEntry
         />
       </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.updateButton, !isValid && styles.updateButtonDisabled]}
+          style={[styles.updateButton, loading && styles.updateButtonDisabled]}
           onPress={handleUpdate}
           activeOpacity={0.8}
-          disabled={!isValid}
+          disabled={loading}
         >
-          <Text style={[styles.updateButtonText, !isValid && styles.updateButtonTextDisabled]}>
-            Update Password
-          </Text>
+          {loading ? (
+            <ActivityIndicator color={COLORS.white} size="small" />
+          ) : (
+            <Text style={styles.updateButtonText}>
+              Update Password
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -100,6 +139,22 @@ const styles = StyleSheet.create({
     color: COLORS.amber[800],
     lineHeight: 16
   },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+    backgroundColor: '#fef2f2',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    marginBottom: 16
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 12,
+    color: COLORS.danger
+  },
   label: {
     fontSize: 10,
     fontWeight: '700',
@@ -107,6 +162,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginLeft: 4,
     marginBottom: 4
+  },
+  required: {
+    color: COLORS.danger
   },
   input: {
     backgroundColor: COLORS.white,

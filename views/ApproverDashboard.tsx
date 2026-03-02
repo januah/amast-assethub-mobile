@@ -7,7 +7,7 @@ import { Icons } from '../constants';
 export const ApproverDashboard: React.FC<{ onAction: (flow: string) => void }> = ({ onAction }) => {
   return (
     <div className="flex flex-col h-full bg-slate-50">
-      <Header title="Hospital Approver" onNotificationClick={() => onAction('notifications')} />
+      <Header title="Approver" onNotificationClick={() => onAction('notifications')} />
       
       <div className="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-2">

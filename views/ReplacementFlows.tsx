@@ -101,13 +101,13 @@ export const TemporaryReplacementsList: React.FC<{
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
+              <div className="space-y-0.5">
                 <span className="text-xs text-slate-500">Original</span>
-                <span className="text-xs font-bold text-slate-800">{c.originalDeviceName}</span>
+                <p className="text-xs font-bold text-slate-800 break-words">{c.originalDeviceName}</p>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="space-y-0.5">
                 <span className="text-xs text-slate-500">Loaner</span>
-                <span className="text-xs font-bold text-sky-600">{c.loanerDeviceName}</span>
+                <p className="text-xs font-bold text-sky-600 break-words">{c.loanerDeviceName}</p>
               </div>
             </div>
 
@@ -221,7 +221,7 @@ export const ReplacementCaseDetail: React.FC<{
              <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 border border-slate-100 rounded-xl">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Loaner Device</div>
-                  <div className="text-xs font-bold text-slate-800">{currentCase.loanerDeviceName}</div>
+                  <div className="text-xs font-bold text-slate-800 break-words">{currentCase.loanerDeviceName}</div>
                   <div className="text-[8px] text-slate-400 font-bold">{currentCase.loanerDeviceId}</div>
                 </div>
                 <div className="p-3 border border-slate-100 rounded-xl">

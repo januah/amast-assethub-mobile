@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/theme';
 
@@ -25,14 +24,13 @@ const DEMO_PASSWORD = 'P@ssw0rd123!';
 const DEMO_USERS = {
   hospital: [
     { username: 'medoff', role: 'medical_officer' },
-    { username: 'staff1', role: 'viewer' },
     { username: 'approver', role: 'approver' },
     { username: 'admin', role: 'admin_hospital' }
   ],
   service: [
-    { username: 'biomed', role: 'biomedical_engineer' },
+    { username: 'biomed', role: 'biomed_engineer' },
     { username: 'mechanic', role: 'mechanic' },
-    { username: 'head_mechanic', role: 'head_of_mechanic' },
+    { username: 'head_mechanic', role: 'head_mechanic' },
     { username: 'tow', role: 'tow_truck' },
     { username: 'driver', role: 'driver_ambulance' }
   ],
@@ -108,10 +106,6 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <LinearGradient
-        colors={[COLORS.sky[50], COLORS.white]}
-        style={styles.bgGradient}
-      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardView}
@@ -242,9 +236,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.white,
-  },
-  bgGradient: {
-    ...StyleSheet.absoluteFillObject,
   },
   loginRow: {
     flexDirection: 'row',

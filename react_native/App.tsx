@@ -41,7 +41,6 @@ function AppContent() {
       onAction={() => {}}
       onLogout={logout}
       onSelectJob={() => {}}
-      onSelectInstallation={() => {}}
       unreadCount={3}
     />
   );

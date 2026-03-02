@@ -15,7 +15,7 @@ interface ExecutorDashboardProps {
 
 export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }: ExecutorDashboardProps) {
   const roleLabel = role.replace(/_/g, ' ');
-  const jobTitle = role === UserRole.TOW_TRUCK ? 'Towing Ambulance WMX' : 'Oxygen Concentrator Maintenance';
+  const jobTitle = role === UserRole.TOW_TRUCK ? 'Towing Ambulance WMX' : 'Biomedical / PPM';
 
   return (
     <View style={styles.container}>
@@ -57,7 +57,7 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
             <ActionButton label="PPM Schedule" icon="Calendar" sublabel="8 Tasks this week" onPress={() => onAction('ppm_list')} color={COLORS.white} />
           </View>
         </View>
-        {role === UserRole.BIOMEDICAL_ENGINEER && (
+        {role === UserRole.BIOMED_ENGINEER && (
           <View style={styles.actionsRow}>
             <View style={styles.actionHalf}>
               <ActionButton label="Replacements" icon="Replacement" sublabel="Manage loaners" onPress={() => onAction('replacement_list')} color={COLORS.white} />

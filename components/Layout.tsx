@@ -27,13 +27,13 @@ export const Header: React.FC<{
   unreadCount?: number;
 }> = ({ title, showBack, onBack, onNotificationClick, unreadCount = 0 }) => (
   <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
       {showBack && (
-        <button onClick={onBack} className="p-1 -ml-1 text-slate-500 hover:text-slate-900 transition-colors">
+        <button onClick={onBack} className="p-1 -ml-1 text-slate-500 hover:text-slate-900 transition-colors shrink-0">
           <Icons.ChevronRight className="w-6 h-6 rotate-180" />
         </button>
       )}
-      <h1 className="text-lg font-bold text-slate-900 truncate max-w-[200px]">{title}</h1>
+      <h1 className="text-lg font-bold text-slate-900">{title}</h1>
     </div>
     <div className="flex items-center gap-2">
       <button onClick={onNotificationClick} className="relative p-2 text-slate-500 hover:text-slate-900">

@@ -11,7 +11,7 @@ export const RequesterDashboard: React.FC<{
   return (
     <div className="flex flex-col h-full">
       <Header 
-        title="Mybaiki Dashboard" 
+        title="Dashboard" 
         onNotificationClick={() => onAction('notifications')} 
         unreadCount={unreadCount}
       />

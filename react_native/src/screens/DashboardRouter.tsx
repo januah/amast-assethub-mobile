@@ -9,18 +9,16 @@ import { ExecutorDashboard } from './dashboards/ExecutorDashboard';
 import { ApproverDashboard } from './dashboards/ApproverDashboard';
 import { AdminHospitalDashboard } from './dashboards/AdminHospitalDashboard';
 import { MechanicDashboard } from './dashboards/MechanicDashboard';
-import { InstallerDashboard } from './dashboards/InstallerDashboard';
 
 interface DashboardRouterProps {
   role: UserRole;
   onAction: (flow: string) => void;
   onLogout?: () => void;
   onSelectJob?: (id: string) => void;
-  onSelectInstallation?: (id: string) => void;
   unreadCount?: number;
 }
 
-type FlowState = 'breakdown_flow' | 'replacement_list' | null;
+type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | null;
 
 function wrapWithLayout(
   children: React.ReactNode,
@@ -58,7 +56,6 @@ export function DashboardRouter({
   onAction,
   onLogout,
   onSelectJob,
-  onSelectInstallation,
   unreadCount = 0
 }: DashboardRouterProps) {
   const [currentFlow, setCurrentFlow] = useState<FlowState>(null);
@@ -81,6 +78,8 @@ export function DashboardRouter({
       setCurrentFlow('breakdown_flow');
     } else if (flow === 'replacement_list') {
       setCurrentFlow('replacement_list');
+    } else if (flow === 'ppm_list') {
+      setCurrentFlow('ppm_list');
     } else {
       onAction(flow);
     }
@@ -101,7 +100,7 @@ export function DashboardRouter({
 
   const count = unreadNotificationCount;
 
-  if (role === UserRole.MEDICAL_OFFICER || role === UserRole.VIEWER) {
+  if (role === UserRole.MEDICAL_OFFICER) {
     return wrapWithLayout(
       <RequesterDashboard onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
       role,
@@ -111,10 +110,10 @@ export function DashboardRouter({
       flowProps
     );
   }
-  if (role === UserRole.AMBULANCE_DRIVER) {
+  if (role === UserRole.DRIVER_AMBULANCE) {
     return wrapWithLayout(<AmbulanceDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
-  if (role === UserRole.BIOMEDICAL_ENGINEER || role === UserRole.TOW_TRUCK) {
+  if (role === UserRole.BIOMED_ENGINEER || role === UserRole.TOW_TRUCK) {
     return wrapWithLayout(
       <ExecutorDashboard role={role} onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
       role,
@@ -124,7 +123,7 @@ export function DashboardRouter({
       flowProps
     );
   }
-  if (role === UserRole.HOSPITAL_APPROVER) {
+  if (role === UserRole.APPROVER) {
     return wrapWithLayout(<ApproverDashboard onAction={handleAction} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
   if (role === UserRole.ADMIN_HOSPITAL || role === UserRole.SUPERADMIN) {
@@ -132,9 +131,6 @@ export function DashboardRouter({
   }
   if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC) {
     return wrapWithLayout(<MechanicDashboard onSelectJob={onSelectJob || (() => {})} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
-  }
-  if (role === UserRole.INSTALLER) {
-    return wrapWithLayout(<InstallerDashboard onSelect={onSelectInstallation || (() => {})} onLogout={onLogout} />, role, count, onAction, onLogout, flowProps);
   }
 
   return null;

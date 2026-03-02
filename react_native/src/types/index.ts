@@ -1,14 +1,12 @@
 export enum UserRole {
-  MEDICAL_OFFICER = 'medical_officer',
-  AMBULANCE_DRIVER = 'driver_ambulance',
-  BIOMEDICAL_ENGINEER = 'biomedical_engineer',
-  HEAD_MECHANIC = 'head_of_mechanic',
+  SUPERADMIN = 'superadmin',
+  ADMIN_HOSPITAL = 'admin_hospital',
+  APPROVER = 'approver',
+  HEAD_MECHANIC = 'head_mechanic',
   MECHANIC = 'mechanic',
   TOW_TRUCK = 'tow_truck',
-  HOSPITAL_APPROVER = 'approver',
-  ADMIN_HOSPITAL = 'admin_hospital',
-  SUPERADMIN = 'superadmin',
-  INSTALLER = 'installer',
-  AUTH = 'auth',
-  VIEWER = 'viewer'
+  BIOMED_ENGINEER = 'biomed_engineer',
+  MEDICAL_OFFICER = 'medical_officer',
+  DRIVER_AMBULANCE = 'driver_ambulance',
+  AUTH = 'auth'
 }

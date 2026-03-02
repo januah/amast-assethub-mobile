@@ -62,3 +62,13 @@ export async function refreshToken(refreshToken: string) {
   }
   return res;
 }
+
+export interface ChangePasswordParams {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export async function changePassword(params: ChangePasswordParams) {
+  return apiClient.post<{ message: string }>('/auth/password/change', params);
+}

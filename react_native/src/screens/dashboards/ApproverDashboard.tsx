@@ -1,30 +1,73 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { getApproverDashboardSummary } from '../../api/dashboardApi';
 
 interface ApproverDashboardProps {
   onAction: (flow: string) => void;
   onLogout?: () => void;
 }
 
-const priorityItems = [
-  { id: 'REQ-1209', asset: 'Ambulance WMX 4821', desc: 'Engine Overhaul Quotation', cost: 'RM 2,500.00', priority: 'Critical' },
-  { id: 'REQ-1208', asset: 'Phillips X3 Monitor', desc: 'Mainboard Replacement', cost: 'RM 1,200.00', priority: 'Urgent' }
-];
-
 export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps) {
+  const [data, setData] = useState<{
+    hospitalName: string;
+    pendingCount: number;
+    priorityItems: { id: string; asset: string; desc: string; cost: string | null; priority: string; status: string }[];
+    approvalHistory: { id: string; title: string; meta: string; time: string }[];
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    const res = await getApproverDashboardSummary();
+    if (res.success && res.data) {
+      setData(res.data);
+    }
+    setLoading(false);
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading && !data) {
+    return (
+      <View style={styles.container}>
+        <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </View>
+    );
+  }
+
+  const hospitalName = data?.hospitalName || '';
+  const pendingCount = data?.pendingCount ?? 0;
+  const priorityItems = data?.priorityItems ?? [];
+  const approvalHistory = data?.approvalHistory ?? [];
+
   return (
     <View style={styles.container}>
-      <Header title="Hospital Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
+      <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
       <View style={styles.bar}>
         <Ionicons name="checkmark-circle" size={16} color={COLORS.emerald[600]} />
-        <Text style={styles.barText}>General Hospital KL</Text>
+        <Text style={styles.barText}>{hospitalName || 'Hospital'}</Text>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} colors={[COLORS.primary]} />
+        }
+      >
         <View style={styles.welcome}>
           <Text style={styles.welcomeTitle}>Pending Actions</Text>
           <Text style={styles.welcomeSub}>You have items requiring authorization</Text>
@@ -33,12 +76,14 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
         <View style={styles.kpi}>
           <View style={styles.kpiHeader}>
             <Text style={styles.kpiLabel}>Pending Approvals</Text>
-            <View style={styles.kpiBadge}>
-              <Text style={styles.kpiBadgeText}>Requires Action</Text>
-            </View>
+            {pendingCount > 0 && (
+              <View style={styles.kpiBadge}>
+                <Text style={styles.kpiBadgeText}>Requires Action</Text>
+              </View>
+            )}
           </View>
           <View style={styles.kpiRow}>
-            <Text style={styles.kpiValue}>14 Requests</Text>
+            <Text style={styles.kpiValue}>{pendingCount} Request{pendingCount !== 1 ? 's' : ''}</Text>
             <TouchableOpacity style={styles.reviewBtn} onPress={() => onAction('admin_approval_list')}>
               <Text style={styles.reviewBtnText}>Review All</Text>
             </TouchableOpacity>
@@ -49,38 +94,50 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
         </View>
 
         <SectionHeader title="Priority Review" onSeeAll={() => onAction('admin_approval_list')} />
-        {priorityItems.map((req) => (
-          <Card key={req.id} onPress={() => onAction('admin_review')} leftBorder={COLORS.danger} style={styles.priorityCard}>
-            <View style={styles.priorityHeader}>
-              <Text style={styles.priorityId}>{req.id} - {req.priority}</Text>
-              <StatusBadge status="Pending" />
-            </View>
-            <Text style={styles.priorityAsset}>{req.asset}</Text>
-            <Text style={styles.priorityDesc}>{req.desc}</Text>
-            <View style={styles.priorityFooter}>
-              <Text style={styles.priorityCost}>{req.cost}</Text>
-              <View style={styles.reviewLink}>
-                <Text style={styles.reviewLinkText}>Review</Text>
-                <Ionicons name="chevron-forward" size={12} color={COLORS.primary} />
+        {priorityItems.length === 0 ? (
+          <View style={styles.emptySection}>
+            <Text style={styles.emptyText}>No pending approvals</Text>
+          </View>
+        ) : (
+          priorityItems.map((req) => (
+            <Card key={req.id} onPress={() => onAction('admin_review')} leftBorder={COLORS.danger} style={styles.priorityCard}>
+              <View style={styles.priorityHeader}>
+                <Text style={styles.priorityId}>{req.id} - {req.priority}</Text>
+                <StatusBadge status="Pending" />
               </View>
-            </View>
-          </Card>
-        ))}
+              <Text style={styles.priorityAsset}>{req.asset}</Text>
+              <Text style={styles.priorityDesc}>{req.desc}</Text>
+              <View style={styles.priorityFooter}>
+                {req.cost ? <Text style={styles.priorityCost}>{req.cost}</Text> : <View />}
+                <View style={styles.reviewLink}>
+                  <Text style={styles.reviewLinkText}>Review</Text>
+                  <Ionicons name="chevron-forward" size={12} color={COLORS.primary} />
+                </View>
+              </View>
+            </Card>
+          ))
+        )}
 
         <SectionHeader title="Approval History" onSeeAll={() => onAction('records')} />
         <View style={styles.historyList}>
-          {[1, 2].map((i) => (
-            <TouchableOpacity key={i} style={styles.historyItem} activeOpacity={0.8}>
-              <View style={styles.historyIcon}>
-                <Ionicons name="checkmark-circle" size={18} color={COLORS.emerald[600]} />
-              </View>
-              <View style={styles.historyContent}>
-                <Text style={styles.historyTitle}>Approved REQ-{1020 + i}</Text>
-                <Text style={styles.historyMeta}>Yesterday - Medical Device Repair</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
-            </TouchableOpacity>
-          ))}
+          {approvalHistory.length === 0 ? (
+            <View style={styles.emptyHistory}>
+              <Text style={styles.emptyText}>No recent approvals</Text>
+            </View>
+          ) : (
+            approvalHistory.map((h) => (
+              <TouchableOpacity key={h.id} style={styles.historyItem} activeOpacity={0.8}>
+                <View style={styles.historyIcon}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.emerald[600]} />
+                </View>
+                <View style={styles.historyContent}>
+                  <Text style={styles.historyTitle}>{h.title}</Text>
+                  <Text style={styles.historyMeta}>{h.meta || h.time}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
     </View>
@@ -89,6 +146,10 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.slate[50] },
+  loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptySection: { padding: 24, alignItems: 'center' },
+  emptyHistory: { padding: 24, alignItems: 'center' },
+  emptyText: { fontSize: 14, color: COLORS.slate[500], fontWeight: '600' },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',

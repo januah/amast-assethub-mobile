@@ -11,17 +11,14 @@ const STORAGE_USER = '@assethub/user';
 const API_ROLE_TO_USER_ROLE: Record<string, UserRole> = {
   superadmin: UserRole.SUPERADMIN,
   admin_hospital: UserRole.ADMIN_HOSPITAL,
-  approver: UserRole.HOSPITAL_APPROVER,
-  hospital_approver: UserRole.HOSPITAL_APPROVER,
-  head_of_mechanic: UserRole.HEAD_MECHANIC,
+  approver: UserRole.APPROVER,
+  head_mechanic: UserRole.HEAD_MECHANIC,
   mechanic: UserRole.MECHANIC,
-  driver_ambulance: UserRole.AMBULANCE_DRIVER,
-  ambulance_driver: UserRole.AMBULANCE_DRIVER,
-  installer: UserRole.INSTALLER,
-  biomedical_engineer: UserRole.BIOMEDICAL_ENGINEER,
+  driver_ambulance: UserRole.DRIVER_AMBULANCE,
+  biomed_engineer: UserRole.BIOMED_ENGINEER,
+  biomedical_engineer: UserRole.BIOMED_ENGINEER,
   tow_truck: UserRole.TOW_TRUCK,
-  medical_officer: UserRole.MEDICAL_OFFICER,
-  viewer: UserRole.VIEWER
+  medical_officer: UserRole.MEDICAL_OFFICER
 };
 
 function resolveRole(user: { role?: string; roles?: string[]; permissions?: string[] } | null): UserRole {
@@ -33,12 +30,13 @@ function resolveRole(user: { role?: string; roles?: string[]; permissions?: stri
   const p = new Set((user?.permissions || []).map((x) => String(x).toLowerCase()));
   if (p.has('admin') || p.has('superadmin')) return UserRole.SUPERADMIN;
   if (p.has('admin_hospital') || p.has('hospital_admin')) return UserRole.ADMIN_HOSPITAL;
-  if (p.has('approver') || p.has('hospital_approver')) return UserRole.HOSPITAL_APPROVER;
-  if (p.has('mechanic') || p.has('head_mechanic')) return UserRole.HEAD_MECHANIC;
-  if (p.has('driver') || p.has('ambulance')) return UserRole.AMBULANCE_DRIVER;
-  if (p.has('installer')) return UserRole.INSTALLER;
-  if (p.has('biomedical') || p.has('tow_truck')) return UserRole.BIOMEDICAL_ENGINEER;
-  if (p.has('medical_officer') || p.has('viewer')) return UserRole.MEDICAL_OFFICER;
+  if (p.has('approver')) return UserRole.APPROVER;
+  if (p.has('head_mechanic')) return UserRole.HEAD_MECHANIC;
+  if (p.has('mechanic')) return UserRole.MECHANIC;
+  if (p.has('driver_ambulance') || p.has('ambulance')) return UserRole.DRIVER_AMBULANCE;
+  if (p.has('biomed_engineer') || p.has('biomedical')) return UserRole.BIOMED_ENGINEER;
+  if (p.has('tow_truck')) return UserRole.TOW_TRUCK;
+  if (p.has('medical_officer')) return UserRole.MEDICAL_OFFICER;
   return UserRole.MEDICAL_OFFICER;
 }
 

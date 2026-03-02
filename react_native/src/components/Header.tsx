@@ -30,7 +30,7 @@ export function Header({
             <Ionicons name="chevron-back" size={24} color={COLORS.slate[500]} />
           </TouchableOpacity>
         )}
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
       </View>
@@ -72,10 +72,10 @@ const styles = StyleSheet.create({
   right: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   backBtn: { padding: 4, marginRight: 4 },
   title: {
+    flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.slate[900],
-    maxWidth: 200
+    color: COLORS.slate[900]
   },
   iconBtn: { position: 'relative', padding: 4 },
   badge: {

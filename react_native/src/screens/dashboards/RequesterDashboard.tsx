@@ -70,7 +70,7 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
   return (
     <View style={styles.container}>
       <Header
-        title="Mybaiki Dashboard"
+        title="Dashboard"
         showRightIcons
         onNotificationClick={() => onAction('notifications')}
         onAvatarPress={() => onAction('profile')}
@@ -174,15 +174,16 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 16 },
   banner: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: COLORS.primary,
     borderRadius: 16,
     padding: 16,
     overflow: 'hidden'
   },
-  bannerContent: { flex: 1, maxWidth: '75%' },
+  bannerContent: { flex: 1, maxWidth: '75%', justifyContent: 'center' },
   bannerTitle: { fontSize: 14, fontWeight: '700', color: COLORS.white, marginBottom: 4 },
   bannerDesc: { fontSize: 10, color: 'rgba(255,255,255,0.85)', marginBottom: 12 },
   bannerBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, backgroundColor: COLORS.white, borderRadius: 8 },
   bannerBtnText: { fontSize: 10, fontWeight: '700', color: COLORS.primary },
-  bannerIcon: { padding: 8, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12 }
+  bannerIcon: { padding: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 12 }
 });

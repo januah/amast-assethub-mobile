@@ -76,6 +76,18 @@ export const REPLACEMENT_STATUS_COLORS: Record<string, { bg: string; text: strin
   'OVERDUE': { bg: '#ffe4e6', text: '#e11d48' },
 };
 
+export const PPM_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  PROPOSED: { bg: '#dbeafe', text: '#1d4ed8' },
+  SCHEDULED: { bg: '#e0f2fe', text: '#0284c7' },
+  PENDING_CONFIRMATION: { bg: '#ede9fe', text: '#6d28d9' },
+  CONFIRMED: { bg: '#d1fae5', text: '#047857' },
+  RESCHEDULE_REQUESTED: { bg: '#fef3c7', text: '#b45309' },
+  ACTIVE: { bg: '#d1fae5', text: '#047857' },
+  OPEN: { bg: '#dbeafe', text: '#1d4ed8' },
+  CANCELLED: { bg: '#f1f5f9', text: '#64748b' },
+  COMPLETED: { bg: '#f1f5f9', text: '#475569' },
+};
+
 export const INSTALL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   'assigned': { bg: '#dbeafe', text: '#1d4ed8' },
   'in_progress': { bg: '#fef3c7', text: '#b45309' },

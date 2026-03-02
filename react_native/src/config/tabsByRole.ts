@@ -21,13 +21,13 @@ export function getTabsForRole(role: UserRole, unreadCount?: number): TabItem[] 
     badge: unreadCount ?? 0
   };
 
-  if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC || role === UserRole.INSTALLER) {
+  if (role === UserRole.MECHANIC || role === UserRole.HEAD_MECHANIC) {
     return [TAB_JOBS, TAB_HISTORY, alertsWithBadge, TAB_PROFILE];
   }
   if (role === UserRole.ADMIN_HOSPITAL || role === UserRole.SUPERADMIN) {
     return [TAB_DASHBOARD, TAB_USERS, TAB_INVENTORY, TAB_HISTORY, TAB_PROFILE];
   }
-  if (role === UserRole.HOSPITAL_APPROVER) {
+  if (role === UserRole.APPROVER) {
     return [TAB_DASHBOARD, TAB_PENDING, TAB_RECORDS, TAB_PROFILE];
   }
   return [TAB_HOME, TAB_ASSETS, TAB_RECORDS, TAB_PROFILE];

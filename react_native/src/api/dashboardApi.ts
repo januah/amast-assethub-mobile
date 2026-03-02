@@ -36,3 +36,26 @@ export async function getAdminDashboardSummary() {
 export async function getRequesterDashboardSummary() {
   return apiClient.get<RequesterDashboardSummary>('/dashboard/requester-summary');
 }
+
+export interface ApproverDashboardSummary {
+  hospitalName: string;
+  pendingCount: number;
+  priorityItems: {
+    id: string;
+    asset: string;
+    desc: string;
+    cost: string | null;
+    priority: string;
+    status: string;
+  }[];
+  approvalHistory: {
+    id: string;
+    title: string;
+    meta: string;
+    time: string;
+  }[];
+}
+
+export async function getApproverDashboardSummary() {
+  return apiClient.get<ApproverDashboardSummary>('/dashboard/approver-summary');
+}

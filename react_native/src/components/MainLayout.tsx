@@ -16,10 +16,11 @@ import { InventoryScreen } from '../screens/inventory';
 import { HistoryScreen } from '../screens/history';
 import { BreakdownFlowScreen } from '../screens/flows/BreakdownFlowScreen';
 import { ReplacementsScreen } from '../screens/ReplacementsScreen';
+import { PPMListScreen } from '../screens/PPMListScreen';
 import { COLORS } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
-type CurrentFlow = 'breakdown_flow' | 'replacement_list' | null;
+type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | null;
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -110,6 +111,9 @@ export function MainLayout({
         )}
         {currentFlow === 'replacement_list' && (
           <ReplacementsScreen onBack={onFlowComplete ?? (() => {})} />
+        )}
+        {currentFlow === 'ppm_list' && (
+          <PPMListScreen onBack={onFlowComplete ?? (() => {})} />
         )}
         {!currentFlow && profileSubPage === 'edit_profile' && (
           <EditProfileScreen onBack={() => setProfileSubPage(null)} />
