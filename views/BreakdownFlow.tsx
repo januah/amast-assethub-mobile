@@ -107,9 +107,8 @@ export const BreakdownFlow: React.FC<{
     setPhotos(photos.filter((_, i) => i !== index));
   };
 
-  const handleScanSuccess = () => {
-    const scannedAsset = assetOptions[0];
-    setSelectedAsset(scannedAsset);
+  const handleScanSuccess = (asset: { id: string; name: string }) => {
+    setSelectedAsset(asset);
     setIsScanning(false);
     setStep(1);
   };

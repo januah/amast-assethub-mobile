@@ -17,7 +17,8 @@ class ApiClient {
   }
 
   setBaseUrl(baseUrl: string) {
-    this.baseUrl = `${baseUrl.replace(/\/$/, '')}${API_MOBILE_PREFIX}`;
+    const base = (baseUrl ?? '').replace(/\/$/, '') || DEFAULT_BASE_URL;
+    this.baseUrl = `${base}${API_MOBILE_PREFIX}`;
   }
 
   setAccessToken(token: string | null) {

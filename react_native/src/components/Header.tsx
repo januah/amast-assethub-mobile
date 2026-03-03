@@ -11,6 +11,7 @@ interface HeaderProps {
   onNotificationClick?: () => void;
   onAvatarPress?: () => void;
   unreadCount?: number;
+  compact?: boolean;
 }
 
 export function Header({
@@ -20,10 +21,11 @@ export function Header({
   showRightIcons = false,
   onNotificationClick,
   onAvatarPress,
-  unreadCount = 0
+  unreadCount = 0,
+  compact = false
 }: HeaderProps) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, compact && styles.containerCompact]}>
       <View style={styles.left}>
         {showBack && onBack && (
           <TouchableOpacity onPress={onBack} style={styles.backBtn}>
@@ -67,6 +69,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate[200]
+  },
+  containerCompact: {
+    paddingVertical: 8
   },
   left: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   right: { flexDirection: 'row', alignItems: 'center', gap: 8 },

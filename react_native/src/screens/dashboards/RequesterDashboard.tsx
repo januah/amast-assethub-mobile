@@ -5,8 +5,15 @@ import { Header } from '../../components/Header';
 import { ActionButton, Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getRequesterDashboardSummary } from '../../api/dashboardApi';
+import { UserRole } from '../../types';
+
+function formatRole(role: UserRole): string {
+  if (role === UserRole.AUTH) return '—';
+  return String(role).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 interface RequesterDashboardProps {
+  role?: UserRole;
   onAction: (flow: string) => void;
   onLogout?: () => void;
   unreadCount?: number;
@@ -23,7 +30,7 @@ function badgeStatus(status: string): string {
   return status;
 }
 
-export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: RequesterDashboardProps) {
+export function RequesterDashboard({ role, onAction, onLogout, unreadCount = 0 }: RequesterDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
     fullName: string;
@@ -62,7 +69,6 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
   }
 
   const welcomeName = data?.fullName ? `Hello, ${data.fullName}` : 'Hello';
-  const welcomeSub = [data?.hospitalName, data?.departmentName].filter(Boolean).join(data?.hospitalName && data?.departmentName ? ', ' : '') || '';
   const totalAssets = data?.totalAssets ?? 0;
   const activeJobs = data?.activeJobsCount ?? 0;
   const recentRequests = data?.recentRequests ?? [];
@@ -77,11 +83,30 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
         unreadCount={unreadCount}
       />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.welcome}>
-          <Text style={styles.welcomeTitle}>{welcomeName}</Text>
-          {welcomeSub ? <Text style={styles.welcomeSub}>{welcomeSub}</Text> : null}
+        <View style={styles.hero}>
+          <View style={styles.heroTop}>
+            <Text style={styles.heroGreeting}>Welcome back</Text>
+            <Text style={styles.heroName}>{data?.fullName ?? 'User'}</Text>
+          </View>
+          <View style={styles.heroMeta}>
+            <View style={styles.heroMetaItem}>
+              <Ionicons name="business-outline" size={14} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.heroMetaLabel}>{data?.hospitalName ?? '—'}</Text>
+            </View>
+            <View style={styles.heroMetaItem}>
+              <Ionicons name="location-outline" size={14} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.heroMetaLabel}>{data?.departmentName ?? '—'}</Text>
+            </View>
+            <View style={styles.heroMetaItem}>
+              <Ionicons name="person-outline" size={14} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.heroMetaLabel}>{role ? formatRole(role) : '—'}</Text>
+            </View>
+          </View>
         </View>
 
+        <View style={styles.actionFull}>
+          <ActionButton label="PPM Schedule" icon="Calendar" sublabel="Maintenance cycles" onPress={() => onAction('ppm_list')} />
+        </View>
         <View style={styles.actionsRow}>
           <View style={styles.actionHalf}>
             <ActionButton label="Report Breakdown" icon="Breakdown" sublabel="Device malfunctioning" onPress={() => onAction('breakdown_flow')} />
@@ -128,17 +153,8 @@ export function RequesterDashboard({ onAction, onLogout, unreadCount = 0 }: Requ
         )}
 
         <SectionHeader title="What's New" />
-        <View style={styles.banner}>
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>New PPM Schedule for 2024</Text>
-            <Text style={styles.bannerDesc}>View the updated maintenance cycles for all medical devices in Ward 4B.</Text>
-            <TouchableOpacity style={styles.bannerBtn} onPress={() => onAction('ppm_list')}>
-              <Text style={styles.bannerBtnText}>Check Now</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.bannerIcon}>
-            <Ionicons name="calendar-outline" size={24} color="rgba(255,255,255,0.9)" />
-          </View>
+        <View style={styles.bannerPlaceholder}>
+          <Text style={styles.bannerPlaceholderText}>Ads or promotional banners go here</Text>
         </View>
       </ScrollView>
     </View>
@@ -149,9 +165,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.white },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
-  welcome: { marginBottom: 24 },
-  welcomeTitle: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900] },
-  welcomeSub: { fontSize: 14, color: COLORS.slate[500], marginTop: 4 },
+  hero: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  heroTop: { marginBottom: 16 },
+  heroGreeting: { fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.75)', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 },
+  heroName: { fontSize: 22, fontWeight: '800', color: COLORS.white, letterSpacing: -0.5 },
+  heroMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  heroMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  heroMetaLabel: { fontSize: 12, fontWeight: '600', color: COLORS.white },
+  actionFull: { marginBottom: 16 },
   actionsRow: { flexDirection: 'row', gap: 16 },
   actionHalf: { flex: 1 },
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 24 },
@@ -172,18 +199,15 @@ const styles = StyleSheet.create({
   requestDate: { fontSize: 10, color: COLORS.slate[400] },
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
   emptyText: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 16 },
-  banner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.primary,
+  bannerPlaceholder: {
     borderRadius: 16,
-    padding: 16,
-    overflow: 'hidden'
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: COLORS.slate[200],
+    backgroundColor: COLORS.slate[50],
+    paddingVertical: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  bannerContent: { flex: 1, maxWidth: '75%', justifyContent: 'center' },
-  bannerTitle: { fontSize: 14, fontWeight: '700', color: COLORS.white, marginBottom: 4 },
-  bannerDesc: { fontSize: 10, color: 'rgba(255,255,255,0.85)', marginBottom: 12 },
-  bannerBtn: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, backgroundColor: COLORS.white, borderRadius: 8 },
-  bannerBtnText: { fontSize: 10, fontWeight: '700', color: COLORS.primary },
-  bannerIcon: { padding: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 12 }
+  bannerPlaceholderText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[400] },
 });

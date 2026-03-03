@@ -5,29 +5,55 @@ import { Header } from '../../components/Header';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getApproverDashboardSummary } from '../../api/dashboardApi';
+import { getPendingApprovals, type PendingApprovalItem } from '../../api/pendingApprovalsApi';
+import { getServiceRequests } from '../../api/serviceRequestApi';
+
+const PENDING_PREVIEW_LIMIT = 3;
+const APPROVAL_HISTORY_LIMIT = 10;
 
 interface ApproverDashboardProps {
   onAction: (flow: string) => void;
   onLogout?: () => void;
 }
 
+function formatApprovalTime(s: string | undefined): string {
+  if (!s) return '';
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? s : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps) {
-  const [data, setData] = useState<{
-    hospitalName: string;
-    pendingCount: number;
-    priorityItems: { id: string; asset: string; desc: string; cost: string | null; priority: string; status: string }[];
-    approvalHistory: { id: string; title: string; meta: string; time: string }[];
-  } | null>(null);
+  const [hospitalName, setHospitalName] = useState('');
+  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingItems, setPendingItems] = useState<PendingApprovalItem[]>([]);
+  const [approvalHistory, setApprovalHistory] = useState<{ id: string; title: string; meta: string; time: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
-    const res = await getApproverDashboardSummary();
-    if (res.success && res.data) {
-      setData(res.data);
+    const [summaryRes, pendingRes, approvedRes] = await Promise.all([
+      getApproverDashboardSummary(),
+      getPendingApprovals({ type: 'all', page: 1, limit: PENDING_PREVIEW_LIMIT }),
+      getServiceRequests({ status: 'APPROVED', page: 1, limit: APPROVAL_HISTORY_LIMIT }),
+    ]);
+    if (summaryRes.success && summaryRes.data) {
+      setHospitalName(summaryRes.data.hospitalName ?? '');
     }
+    const pendingData = pendingRes as { data?: PendingApprovalItem[]; meta?: { totalItems?: number } };
+    setPendingCount(pendingData?.meta?.totalItems ?? 0);
+    setPendingItems(pendingData?.data ?? []);
+    const approvedData = approvedRes as { data?: { request_id: string; Asset?: { name?: string }; description?: string; requester?: { full_name?: string }; created_at?: string }[] };
+    const list = approvedData?.data ?? [];
+    setApprovalHistory(
+      list.map((r) => ({
+        id: r.request_id,
+        title: r.Asset?.name ?? r.request_id,
+        meta: r.requester?.full_name ?? r.description ?? '',
+        time: formatApprovalTime(r.created_at),
+      }))
+    );
     setLoading(false);
     setRefreshing(false);
   }, []);
@@ -36,7 +62,7 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
     fetchData();
   }, [fetchData]);
 
-  if (loading && !data) {
+  if (loading && hospitalName === '' && pendingItems.length === 0 && approvalHistory.length === 0) {
     return (
       <View style={styles.container}>
         <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
@@ -46,11 +72,6 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
       </View>
     );
   }
-
-  const hospitalName = data?.hospitalName || '';
-  const pendingCount = data?.pendingCount ?? 0;
-  const priorityItems = data?.priorityItems ?? [];
-  const approvalHistory = data?.approvalHistory ?? [];
 
   return (
     <View style={styles.container}>
@@ -88,27 +109,48 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
               <Text style={styles.reviewBtnText}>Review All</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.kpiIconBg}>
+          <View style={styles.kpiIconBg} pointerEvents="none">
             <Ionicons name="checkmark-circle" size={120} color="rgba(255,255,255,0.1)" />
           </View>
         </View>
 
-        <SectionHeader title="Priority Review" onSeeAll={() => onAction('admin_approval_list')} />
-        {priorityItems.length === 0 ? (
+        <SectionHeader title="Pending Approvals" onSeeAll={() => onAction('admin_approval_list')} />
+        {pendingItems.length === 0 ? (
           <View style={styles.emptySection}>
             <Text style={styles.emptyText}>No pending approvals</Text>
           </View>
         ) : (
-          priorityItems.map((req) => (
-            <Card key={req.id} onPress={() => onAction('admin_review')} leftBorder={COLORS.danger} style={styles.priorityCard}>
+          pendingItems.map((item) => (
+            <Card
+              key={`${item.id}-${item.type}`}
+              onPress={() => onAction('admin_approval_list')}
+              style={[
+                styles.priorityCard,
+                { borderLeftWidth: 4, borderLeftColor: item.type === 'Quotation' ? COLORS.emerald[600] : COLORS.amber[600] },
+              ]}
+            >
               <View style={styles.priorityHeader}>
-                <Text style={styles.priorityId}>{req.id} - {req.priority}</Text>
+                <View style={styles.priorityHeaderLeft}>
+                  <View style={[styles.typePill, item.type === 'Quotation' ? styles.typePillQuotation : styles.typePillRemoval]}>
+                    <Ionicons
+                      name={item.type === 'Quotation' ? 'cash-outline' : 'car-outline'}
+                      size={12}
+                      color={item.type === 'Quotation' ? COLORS.emerald[700] : COLORS.amber[700]}
+                    />
+                    <Text style={[styles.typePillText, item.type === 'Quotation' ? styles.typePillTextQuotation : styles.typePillTextRemoval]}>
+                      {item.type}
+                    </Text>
+                  </View>
+                  <Text style={styles.priorityId}>{item.id} - {item.priority}</Text>
+                </View>
                 <StatusBadge status="Pending" />
               </View>
-              <Text style={styles.priorityAsset}>{req.asset}</Text>
-              <Text style={styles.priorityDesc}>{req.desc}</Text>
+              <Text style={styles.priorityAsset}>{item.asset}</Text>
+              {item.description ? <Text style={styles.priorityDesc} numberOfLines={2}>{item.description}</Text> : null}
               <View style={styles.priorityFooter}>
-                {req.cost ? <Text style={styles.priorityCost}>{req.cost}</Text> : <View />}
+                <Text style={styles.priorityCost}>
+                  {item.type === 'Removal' ? 'Removal (No Cost)' : (item.cost ?? '—')}
+                </Text>
                 <View style={styles.reviewLink}>
                   <Text style={styles.reviewLinkText}>Review</Text>
                   <Ionicons name="chevron-forward" size={12} color={COLORS.primary} />
@@ -132,9 +174,9 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
                 </View>
                 <View style={styles.historyContent}>
                   <Text style={styles.historyTitle}>{h.title}</Text>
-                  <Text style={styles.historyMeta}>{h.meta || h.time}</Text>
+                  <Text style={styles.historyMeta}>{h.meta}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color={COLORS.slate[300]} />
+                <Text style={styles.historyTime}>{h.time}</Text>
               </TouchableOpacity>
             ))
           )}
@@ -183,6 +225,13 @@ const styles = StyleSheet.create({
   kpiIconBg: { position: 'absolute', bottom: -16, right: -16 },
   priorityCard: { marginBottom: 16 },
   priorityHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
+  priorityHeaderLeft: { flex: 1, gap: 6 },
+  typePill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  typePillQuotation: { backgroundColor: COLORS.emerald[100] },
+  typePillRemoval: { backgroundColor: COLORS.amber[100] },
+  typePillText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase' },
+  typePillTextQuotation: { color: COLORS.emerald[700] },
+  typePillTextRemoval: { color: COLORS.amber[700] },
   priorityId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
   priorityAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 4 },
   priorityDesc: { fontSize: 10, color: COLORS.slate[500], marginBottom: 16 },
@@ -195,5 +244,6 @@ const styles = StyleSheet.create({
   historyIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: COLORS.emerald[50], alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   historyContent: { flex: 1 },
   historyTitle: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
-  historyMeta: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 }
+  historyMeta: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
+  historyTime: { fontSize: 10, color: COLORS.slate[400], marginLeft: 8 }
 });

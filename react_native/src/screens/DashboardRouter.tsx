@@ -78,6 +78,10 @@ export function DashboardRouter({
   }, [fetchUnread]);
 
   const handleAction = (flow: string, payload?: ActionPayload) => {
+    if (flow === 'open_scan') {
+      setCurrentFlow(null);
+      return;
+    }
     if (flow === 'breakdown_flow') {
       setBreakdownInitialAsset(payload?.asset ?? null);
       setCurrentFlow('breakdown_flow');
@@ -114,7 +118,7 @@ export function DashboardRouter({
 
   if (role === UserRole.MEDICAL_OFFICER) {
     return wrapWithLayout(
-      <RequesterDashboard onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
+      <RequesterDashboard role={role} onAction={handleAction} onLogout={onLogout} unreadCount={count} />,
       role,
       count,
       onAction,

@@ -56,7 +56,7 @@ interface PendingApprovalsScreenProps {
 }
 
 export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) {
-  const [filter, setFilter] = useState<'All' | 'Quotation' | 'Removal'>('Quotation');
+  const [filter, setFilter] = useState<'All' | 'Quotation' | 'Removal'>('All');
   const [items, setItems] = useState<PendingApprovalItem[]>([]);
   const [totalAmount, setTotalAmount] = useState('0.00');
   const [currentPage, setCurrentPage] = useState(1);

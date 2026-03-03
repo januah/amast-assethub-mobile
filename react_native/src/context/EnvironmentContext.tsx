@@ -20,13 +20,11 @@ export function EnvironmentProvider({ children }: { children: React.ReactNode })
   const loadStored = useCallback(async () => {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_BASE_URL);
-      if (stored) {
-        setBaseUrlState(stored);
-        apiClient.setBaseUrl(stored);
-      } else {
-        apiClient.setBaseUrl(DEFAULT_BASE_URL);
-      }
+      const url = (stored && stored.trim()) ? stored.trim() : DEFAULT_BASE_URL;
+      setBaseUrlState(url);
+      apiClient.setBaseUrl(url);
     } catch {
+      setBaseUrlState(DEFAULT_BASE_URL);
       apiClient.setBaseUrl(DEFAULT_BASE_URL);
     } finally {
       setLoaded(true);

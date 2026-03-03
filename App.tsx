@@ -196,7 +196,16 @@ const App: React.FC = () => {
     if (currentFlow === 'removal') return <RemovalFlow onComplete={() => setCurrentFlow(null)} />;
     if (currentFlow === 'quotation') return <QuotationForm onComplete={() => setCurrentFlow(null)} />;
 
-    if (activeTab === 'scan') return <Scanner onScan={() => handleAction('assets')} onCancel={() => handleAction('home')} />;
+    if (activeTab === 'scan') return (
+      <Scanner
+        onScan={(asset) => {
+          setReportAsset(asset);
+          setCurrentFlow('breakdown_flow');
+          setActiveTab('home');
+        }}
+        onCancel={() => handleAction('home')}
+      />
+    );
     if (activeTab === 'assets') return (
       <AssetList 
         role={role} 

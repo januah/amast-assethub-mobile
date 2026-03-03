@@ -17,7 +17,8 @@ interface EnvironmentScreenProps {
 }
 
 export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
-  const { baseUrl, availableUrls, setBaseUrl } = useEnvironment();
+  const { baseUrl: rawBaseUrl, availableUrls, setBaseUrl } = useEnvironment();
+  const baseUrl = rawBaseUrl ?? '';
   const [customUrl, setCustomUrl] = useState('');
 
   const handleSelect = async (url: string) => {
@@ -43,10 +44,10 @@ export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <Text style={styles.sectionLabel}>Backend URL</Text>
-        <Text style={styles.currentLabel}>Current: {baseUrl.replace(/\/api\/mobile\/v1$/, '')}</Text>
+        <Text style={styles.currentLabel}>Current: {(baseUrl || '').replace(/\/api\/mobile\/v1$/, '') || '—'}</Text>
         <Text style={styles.sectionLabel}>Select URL</Text>
-        {availableUrls.map((url) => {
-          const displayUrl = url.replace(/\/$/, '');
+        {(availableUrls ?? []).map((url) => {
+          const displayUrl = (url ?? '').replace(/\/$/, '');
           const isSelected = baseUrl.startsWith(displayUrl);
           return (
             <TouchableOpacity

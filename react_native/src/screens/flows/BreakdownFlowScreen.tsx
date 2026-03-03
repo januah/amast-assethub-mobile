@@ -17,6 +17,7 @@ interface BreakdownFlowScreenProps {
   onComplete: () => void;
   onCancel: () => void;
   initialAsset?: AssetOption | null;
+  onScanQR?: () => void;
 }
 
 const STEPS = ['Select Asset', 'Problem', 'Location', 'Review'];
@@ -44,7 +45,7 @@ const HOSPITAL_LOCATIONS = [
   'Central Lab'
 ];
 
-export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: BreakdownFlowScreenProps) {
+export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset, onScanQR }: BreakdownFlowScreenProps) {
   const [step, setStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedRequestId, setSubmittedRequestId] = useState<string | null>(null);
@@ -220,7 +221,7 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset }: Brea
             ) : (
               <Text style={styles.emptyText}>No assets found matching your search.</Text>
             )}
-            <TouchableOpacity style={styles.scanButton} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.scanButton} onPress={() => onScanQR?.()} activeOpacity={0.8}>
               <Ionicons name="qr-code-outline" size={40} color={COLORS.slate[400]} />
               <Text style={styles.scanButtonText}>Scan QR Code</Text>
             </TouchableOpacity>

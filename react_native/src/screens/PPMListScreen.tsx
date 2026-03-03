@@ -600,23 +600,24 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Header title="PPM Schedules" showBack onBack={onBack} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll}>
-        <View style={styles.tabs}>
-          {PPM_FILTER_STATUSES.map((t) => (
-            <TouchableOpacity
-              key={t}
-              style={[styles.tab, activeTab === t && styles.tabActive]}
-              onPress={() => setActiveTab(t)}
-            >
-              <Text style={[styles.tabText, activeTab === t && styles.tabTextActive]}>
-                {t === 'All' ? 'All' : t.replace(/_/g, ' ')}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-      <View style={styles.searchWrap}>
+      <Header title="PPM Schedules" showBack onBack={onBack} compact />
+      <View style={styles.toolbar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabsScrollContent}>
+          <View style={styles.tabs}>
+            {PPM_FILTER_STATUSES.map((t) => (
+              <TouchableOpacity
+                key={t}
+                style={[styles.tab, activeTab === t && styles.tabActive]}
+                onPress={() => setActiveTab(t)}
+              >
+                <Text style={[styles.tabText, activeTab === t && styles.tabTextActive]}>
+                  {t === 'All' ? 'All' : t.replace(/_/g, ' ')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+        <View style={styles.searchWrap}>
         <Ionicons name="search-outline" size={16} color={COLORS.slate[400]} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
@@ -625,6 +626,7 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
           value={search}
           onChangeText={setSearch}
         />
+        </View>
       </View>
       {loading && !refreshing ? (
         <View style={styles.loading}>
@@ -709,13 +711,15 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32 },
   contentFlex: { flex: 1 },
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-  tabsScroll: { backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
-  tabs: { flexDirection: 'row', padding: 4, gap: 4 },
-  tab: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center' },
-  tabActive: { backgroundColor: COLORS.sky[600], shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  tabText: { fontSize: 10, fontWeight: '700', letterSpacing: 2, color: COLORS.slate[400] },
+  toolbar: { backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
+  tabsScroll: { backgroundColor: 'transparent', height: 36 },
+  tabsScrollContent: { flexGrow: 0, paddingVertical: 0, minHeight: 0, alignSelf: 'center' },
+  tabs: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 4, gap: 6, alignItems: 'center' },
+  tab: { paddingVertical: 5, paddingHorizontal: 14, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.slate[100] },
+  tabActive: { backgroundColor: COLORS.sky[600], borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  tabText: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: COLORS.slate[500] },
   tabTextActive: { color: COLORS.white },
-  searchWrap: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
+  searchWrap: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8, backgroundColor: 'transparent' },
   searchIcon: { position: 'absolute', left: 28, zIndex: 1 },
   searchInput: { flex: 1, paddingLeft: 40, paddingRight: 16, paddingVertical: 10, backgroundColor: COLORS.slate[50], borderRadius: 12, fontSize: 14 },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },

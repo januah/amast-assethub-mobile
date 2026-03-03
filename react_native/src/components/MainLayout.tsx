@@ -18,6 +18,7 @@ import { ReplacementsScreen } from '../screens/ReplacementsScreen';
 import { PPMListScreen } from '../screens/PPMListScreen';
 import { AssignedTasksScreen } from '../screens/AssignedTasksScreen';
 import { JobExecutionScreen } from '../screens/JobExecutionScreen';
+import { ScanScreen } from '../screens/ScanScreen';
 import { COLORS } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
@@ -65,6 +66,12 @@ export function MainLayout({
     if (flow === 'notifications') {
       setShowNotificationList(true);
       setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
+      return;
+    }
+    if (flow === 'open_scan') {
+      setProfileSubPage(null);
+      setActiveTab('scan');
+      onAction?.(flow);
       return;
     }
     if (flow === 'add_staff') {
@@ -122,6 +129,7 @@ export function MainLayout({
             onComplete={onFlowComplete ?? (() => {})}
             onCancel={onFlowComplete ?? (() => {})}
             initialAsset={breakdownInitialAsset}
+            onScanQR={() => handleAction('open_scan')}
           />
         )}
         {currentFlow === 'replacement_list' && (
@@ -152,6 +160,15 @@ export function MainLayout({
             onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
             onAddStaff={() => handleAction('add_staff')}
             onSelectStaff={(id) => onAction?.('staff_detail')}
+          />
+        )}
+        {!currentFlow && !profileSubPage && activeTab === 'scan' && (
+          <ScanScreen
+            onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
+            onAssetScanned={(asset) => {
+              onAction?.('breakdown_flow', { asset });
+              setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
+            }}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'inventory' && (

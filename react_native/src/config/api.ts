@@ -7,6 +7,7 @@ const getDefaultBaseUrl = () => {
   return 'http://localhost:3001';
 };
 
+export const DEFAULT_BASE_URL = getDefaultBaseUrl();
 
 export const AVAILABLE_BASE_URLS: string[] = [
   'http://10.0.2.2:3001',
