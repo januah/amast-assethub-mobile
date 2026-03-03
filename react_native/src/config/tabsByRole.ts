@@ -14,7 +14,7 @@ const TAB_RECORDS: TabItem = { id: 'history', label: 'Records', iconOutline: 'do
 const TAB_PROFILE: TabItem = { id: 'profile', label: 'Profile', iconOutline: 'person-outline', iconFilled: 'person' };
 const TAB_PENDING: TabItem = { id: 'pending', label: 'Pending', iconOutline: 'checkmark-circle-outline', iconFilled: 'checkmark-circle' };
 const TAB_ALERTS: TabItem = { id: 'alerts', label: 'Alerts', iconOutline: 'notifications-outline', iconFilled: 'notifications' };
-const TAB_SCAN: TabItem = { id: 'scan', label: 'Scan', iconOutline: 'qr-code-outline', iconFilled: 'qr-code' };
+const TAB_SCAN: TabItem = { id: 'scan', label: 'Scan', iconOutline: 'qr-code-outline', iconFilled: 'qr-code', special: true };
 
 export function getTabsForRole(role: UserRole, unreadCount?: number): TabItem[] {
   const alertsWithBadge = {

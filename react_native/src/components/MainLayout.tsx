@@ -18,11 +18,12 @@ import { ReplacementsScreen } from '../screens/ReplacementsScreen';
 import { PPMListScreen } from '../screens/PPMListScreen';
 import { AssignedTasksScreen } from '../screens/AssignedTasksScreen';
 import { JobExecutionScreen } from '../screens/JobExecutionScreen';
+import { RemovalFlowScreen } from '../screens/RemovalFlowScreen';
 import { ScanScreen } from '../screens/ScanScreen';
 import { COLORS } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
-type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | null;
+type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'removal_flow' | null;
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -147,6 +148,9 @@ export function MainLayout({
             onBack={onFlowComplete ?? (() => {})}
             onComplete={onFlowComplete}
           />
+        )}
+        {currentFlow === 'removal_flow' && (
+          <RemovalFlowScreen onComplete={onFlowComplete ?? (() => {})} onCancel={onFlowComplete ?? (() => {})} />
         )}
         {!currentFlow && profileSubPage === 'edit_profile' && (
           <EditProfileScreen onBack={() => setProfileSubPage(null)} />

@@ -18,7 +18,7 @@ interface DashboardRouterProps {
   unreadCount?: number;
 }
 
-type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | null;
+type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'removal_flow' | null;
 
 type ActionPayload = { asset?: { id: string; name: string }; jobId?: string };
 
@@ -94,6 +94,8 @@ export function DashboardRouter({
     } else if (flow === 'job_detail' && payload?.jobId) {
       setJobDetailRequestId(payload.jobId);
       setCurrentFlow('job_detail');
+    } else if (flow === 'removal') {
+      setCurrentFlow('removal_flow');
     } else {
       onAction(flow);
     }

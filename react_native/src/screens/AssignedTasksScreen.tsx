@@ -171,7 +171,12 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
                 </View>
                 <TouchableOpacity style={styles.startBtn} onPress={() => onSelectTask?.(task.id)}>
                   <Text style={styles.startBtnText}>
-                    {(task.status || '').toUpperCase() === 'COMPLETED' ? 'View Job' : 'Start Job'}
+                    {(() => {
+                      const s = (task.status || '').toUpperCase().replace(/\s/g, '_');
+                      if (s === 'COMPLETED') return 'View Job';
+                      if (s === 'IN_PROGRESS' || s === 'WAITING') return 'Continue Job';
+                      return 'Start Job';
+                    })()}
                   </Text>
                   <Ionicons name="chevron-forward" size={14} color={COLORS.white} />
                 </TouchableOpacity>

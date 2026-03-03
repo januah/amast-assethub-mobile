@@ -12,6 +12,7 @@ export interface TabItem {
   iconOutline: string;
   iconFilled: string;
   badge?: number;
+  special?: boolean;
 }
 
 export const BOTTOM_TABS: TabItem[] = [
@@ -45,6 +46,27 @@ export function BottomTabBar({
           const isActive = activeTab === tab.id;
           const iconName = isActive ? tab.iconFilled : tab.iconOutline;
           const count = tab.badge ?? 0;
+
+          if (tab.special) {
+            return (
+              <View key={tab.id} style={styles.tab}>
+                <TouchableOpacity
+                  style={[styles.floatingBtn, isActive && styles.floatingBtnActive]}
+                  onPress={() => onTabPress(tab.id)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons
+                    name={iconName as React.ComponentProps<typeof Ionicons>['name']}
+                    size={28}
+                    color={COLORS.white}
+                  />
+                </TouchableOpacity>
+                <Text style={[styles.label, styles.labelFloating]} numberOfLines={1}>
+                  {tab.label}
+                </Text>
+              </View>
+            );
+          }
 
           return (
             <TouchableOpacity
@@ -129,5 +151,30 @@ const styles = StyleSheet.create({
   },
   labelActive: {
     color: COLORS.primary
+  },
+  floatingBtn: {
+    position: 'absolute',
+    top: -22,
+    alignSelf: 'center',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: COLORS.white,
+    ...Platform.select({
+      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
+      android: { elevation: 8 }
+    })
+  },
+  floatingBtnActive: {
+    backgroundColor: COLORS.sky[800]
+  },
+  labelFloating: {
+    marginTop: 38,
+    // color: COLORS.sky[600],
+    fontWeight: '700'
   }
 });
