@@ -128,7 +128,7 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
               </View>
             </View>
             <View style={styles.headerText}>
-              <Text style={styles.title}>Mybaiki</Text>
+              <Text style={styles.title}>AssetHub</Text>
               <Text style={styles.subtitle}>Asset maintenance, simplified.</Text>
             </View>
           </View>

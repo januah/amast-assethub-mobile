@@ -13,6 +13,7 @@ export interface ApiAssetDepartment {
 
 export interface ApiAssetCategory {
   name?: string;
+  code?: string;
 }
 
 export interface ApiAsset {
@@ -57,4 +58,24 @@ export async function getAssets(params?: {
 
 export async function getAssetById(assetId: string) {
   return apiClient.get<ApiAsset>(`/assets/${encodeURIComponent(assetId)}`);
+}
+
+export interface AssignedVehicle {
+  asset_id: string;
+  name: string;
+  serial_number?: string;
+  manufacturer?: string;
+  model?: string;
+  status: string;
+  location_id?: string;
+  created_at?: string;
+  Category?: ApiAssetCategory;
+}
+
+export interface GetAssignedVehiclesResponse {
+  assignedVehicles: AssignedVehicle[];
+}
+
+export async function getAssignedVehicles() {
+  return apiClient.get<GetAssignedVehiclesResponse>('/assets/assigned-vehicles');
 }

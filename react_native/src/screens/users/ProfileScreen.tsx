@@ -4,13 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
-import { UserRole } from '../../types';
-
-function roleLabel(role: UserRole): string {
-  const s = String(role).replace(/_/g, ' ');
-  return s.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 interface ProfileScreenProps {
   onAction?: (flow: string) => void;
   onEditProfile?: () => void;
@@ -27,7 +20,10 @@ export function ProfileScreen({
   unreadCount = 0
 }: ProfileScreenProps) {
   const { user, role } = useAuth();
-  const displayName = user?.full_name || user?.username || 'User';
+  const userId = user?.id ?? '';
+  const fullName = user?.full_name ?? '';
+  const username = user?.username ?? '';
+  const avatarInitials = (fullName || username || 'U').substring(0, 2);
 
   return (
     <View style={styles.container}>
@@ -37,14 +33,30 @@ export function ProfileScreen({
         unreadCount={unreadCount}
       />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {(displayName || 'U').substring(0, 2).toUpperCase()}
-            </Text>
+        <View style={styles.hero}>
+          <View style={styles.heroTop}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{avatarInitials}</Text>
+            </View>
+            <View style={styles.heroTitleBlock}>
+              <Text style={styles.heroLabel}>Name</Text>
+              <Text style={styles.heroName} numberOfLines={2}>{fullName || '—'}</Text>
+            </View>
           </View>
-          <Text style={styles.name}>{displayName}</Text>
-          <Text style={styles.role}>{roleLabel(role)}</Text>
+          <View style={styles.heroRows}>
+            <View style={styles.heroRow}>
+              <Text style={styles.heroRowLabel}>User ID</Text>
+              <Text style={styles.heroRowValue} numberOfLines={1}>{userId || '—'}</Text>
+            </View>
+            <View style={styles.heroRow}>
+              <Text style={styles.heroRowLabel}>Username</Text>
+              <Text style={styles.heroRowValue} numberOfLines={1}>{username || '—'}</Text>
+            </View>
+            <View style={styles.heroRow}>
+              <Text style={styles.heroRowLabel}>Role</Text>
+              <Text style={styles.heroRowValue} numberOfLines={1}>{role || '—'}</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.menu}>
@@ -92,36 +104,73 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 48
   },
-  avatarSection: {
+  hero: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.slate[200],
+    padding: 20,
+    marginBottom: 24
+  },
+  heroTop: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32
+    gap: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate[100]
   },
   avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 24,
+    width: 72,
+    height: 72,
+    borderRadius: 20,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16
+    justifyContent: 'center'
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '800',
     color: COLORS.white
   },
-  name: {
-    fontSize: 20,
+  heroTitleBlock: {
+    flex: 1,
+    minWidth: 0
+  },
+  heroLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.slate[500],
+    letterSpacing: 0.5,
+    marginBottom: 4
+  },
+  heroName: {
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.slate[900]
   },
-  role: {
+  heroRows: {
+    gap: 12,
+    paddingTop: 12
+  },
+  heroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 24
+  },
+  heroRowLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginTop: 4
+    marginRight: 12
+  },
+  heroRowValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.slate[800],
+    flex: 1,
+    textAlign: 'right'
   },
   menu: {
     gap: 12
