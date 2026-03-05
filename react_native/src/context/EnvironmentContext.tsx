@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '../api/client';
 import { AVAILABLE_BASE_URLS, DEFAULT_BASE_URL } from '../config/api';
@@ -36,10 +37,21 @@ export function EnvironmentProvider({ children }: { children: React.ReactNode })
   }, [loadStored]);
 
   const setBaseUrl = useCallback(async (url: string) => {
-    await AsyncStorage.setItem(STORAGE_BASE_URL, url);
-    setBaseUrlState(url);
-    apiClient.setBaseUrl(url);
-  }, []);
+    const normalized = (url ?? '').trim().replace(/\/$/, '') || DEFAULT_BASE_URL;
+    const prev = baseUrl.replace(/\/api\/mobile\/v1$/, '').replace(/\/$/, '');
+    const next = normalized.replace(/\/api\/mobile\/v1$/, '').replace(/\/$/, '');
+    const changed = prev !== next;
+    await AsyncStorage.setItem(STORAGE_BASE_URL, normalized);
+    setBaseUrlState(normalized);
+    apiClient.setBaseUrl(normalized);
+    if (changed) {
+      Alert.alert(
+        'Restart required',
+        'Environment URL has been changed. Please restart the app for the change to take effect.',
+        [{ text: 'OK' }]
+      );
+    }
+  }, [baseUrl]);
 
   if (!loaded) return null;
 

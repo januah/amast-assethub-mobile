@@ -115,6 +115,7 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
     <View style={styles.container}>
       <Camera
         style={StyleSheet.absoluteFill}
+        ratio="4:3"
         barCodeScannerSettings={{ barCodeTypes: ['qr'] }}
         onBarCodeScanned={scanning && !lookingUp ? handleBarCodeScanned : undefined}
       />

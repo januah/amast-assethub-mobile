@@ -10,6 +10,7 @@ const getDefaultBaseUrl = () => {
 export const DEFAULT_BASE_URL = getDefaultBaseUrl();
 
 export const AVAILABLE_BASE_URLS: string[] = [
+  'https://tassethub-api.amastsales-sandbox.com',
   'http://10.0.2.2:5001',
   'http://localhost:5001',
 ];

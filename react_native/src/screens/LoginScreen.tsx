@@ -11,6 +11,8 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -105,27 +107,32 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
     setError(res.message || 'Login failed');
   };
 
+  const { height: windowHeight } = Dimensions.get('window');
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ImageBackground source={require('../../assets/bg_blue_2.png')} style={styles.bgImage} resizeMode="cover">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+    <View style={[styles.root, { minHeight: windowHeight }]}>
+      <ImageBackground
+        source={require('../../assets/bg_blue_2.png')}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.keyboardView}
         >
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <View style={styles.logoIconWrap}>
-                <Ionicons name="cube-outline" size={32} color={COLORS.primary} />
-                <View style={styles.logoBadge}>
-                  <Ionicons name="checkmark-done" size={14} color={COLORS.white} />
-                </View>
-              </View>
+              <Image
+                source={require('../../assets/adaptive-icon.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
             <View style={styles.headerText}>
               <Text style={styles.title}>AssetHub</Text>
@@ -235,19 +242,18 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
               </View>
             )}
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-      </ImageBackground>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
-    backgroundColor: COLORS.white,
   },
-  bgImage: {
+  safeArea: {
     flex: 1,
   },
   loginRow: {
@@ -302,27 +308,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
     shadowColor: COLORS.slate[900],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 12,
     elevation: 6
   },
-  logoIconWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative'
-  },
-  logoBadge: {
-    position: 'absolute',
-    bottom: -2,
-    right: -8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: COLORS.emerald[500],
-    alignItems: 'center',
-    justifyContent: 'center'
+  logoImage: {
+    width: 72,
+    height: 72
   },
   title: {
     fontSize: 28,
