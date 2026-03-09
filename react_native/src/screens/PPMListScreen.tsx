@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { Card, SectionHeader, PPMStatusBadge } from '../components/Shared';
 import { COLORS } from '../constants/theme';
 import {
@@ -318,7 +319,7 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
 
     if (successAction) {
       return (
-        <View style={styles.container}>
+        <AnimatedScreen style={styles.container}>
           <Header title="PPM Schedule" showBack onBack={goBackToList} />
           <View style={styles.successWrap}>
             <View style={styles.successIcon}>
@@ -336,12 +337,12 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
               <Text style={styles.successBtnText}>Back to List</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </AnimatedScreen>
       );
     }
 
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="PPM Schedule Detail" showBack onBack={goBackToList} />
         {detailLoading ? (
           <View style={styles.loading}>
@@ -403,13 +404,13 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
             {actionError ? <Text style={styles.actionError}>{actionError}</Text> : null}
           </ScrollView>
         )}
-      </View>
+      </AnimatedScreen>
     );
   }
 
   if (view === 'request_dates') {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Request Different Time" showBack onBack={() => setView('detail')} />
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <Text style={styles.formTitle}>Propose Alternative Slot</Text>
@@ -594,12 +595,12 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
             )}
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="PPM Schedules" showBack onBack={onBack} compact />
       <View style={styles.toolbar}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabsScrollContent}>
@@ -701,7 +702,7 @@ export function PPMListScreen({ onBack }: PPMListScreenProps) {
           )}
         </ScrollView>
       )}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -717,7 +718,7 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 4, gap: 6, alignItems: 'center' },
   tab: { paddingVertical: 5, paddingHorizontal: 14, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.slate[100] },
   tabActive: { backgroundColor: COLORS.sky[600], borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  tabText: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: COLORS.slate[500] },
+  tabText: { fontSize: 10, fontWeight: '600', letterSpacing: 1, color: COLORS.slate[500] },
   tabTextActive: { color: COLORS.white },
   searchWrap: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8, backgroundColor: 'transparent' },
   searchIcon: { position: 'absolute', left: 28, zIndex: 1 },
@@ -726,8 +727,8 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: COLORS.slate[500], marginTop: 16, fontStyle: 'italic' },
   listCard: { marginBottom: 16 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  cardId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
-  cardTitle: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 8 },
+  cardId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
+  cardTitle: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 8 },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   cardMetaText: { fontSize: 10, color: COLORS.slate[400] },
@@ -739,23 +740,23 @@ const styles = StyleSheet.create({
   pageInfo: { fontSize: 12, color: COLORS.slate[600] },
   detailCard: { marginBottom: 24 },
   detailHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  detailId: { fontSize: 10, fontWeight: '800', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
-  detailTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900] },
+  detailId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
+  detailTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900] },
   gridRow: { flexDirection: 'row', gap: 12 },
   gridCard: { flex: 1, padding: 12, borderWidth: 1, borderColor: COLORS.slate[100], borderRadius: 12, marginBottom: 12 },
-  gridLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
-  gridValue: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  gridLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
+  gridValue: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   detailActions: { gap: 12 },
   actionBtnPrimary: { paddingVertical: 14, backgroundColor: COLORS.sky[600], borderRadius: 12, alignItems: 'center' },
-  actionBtnPrimaryText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  actionBtnPrimaryText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   actionBtnOutline: { paddingVertical: 14, backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.sky[600], borderRadius: 12, alignItems: 'center' },
-  actionBtnOutlineText: { fontSize: 14, fontWeight: '700', color: COLORS.sky[600] },
+  actionBtnOutlineText: { fontSize: 14, fontWeight: '600', color: COLORS.sky[600] },
   actionBtnDisabled: { opacity: 0.7 },
   actionError: { fontSize: 12, color: COLORS.danger, marginTop: 12 },
-  formTitle: { fontSize: 16, fontWeight: '700', color: COLORS.slate[900], marginBottom: 4 },
+  formTitle: { fontSize: 16, fontWeight: '600', color: COLORS.slate[900], marginBottom: 4 },
   formDesc: { fontSize: 13, color: COLORS.slate[500], marginBottom: 20 },
   fieldWrap: { marginBottom: 16 },
-  fieldLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' },
+  fieldLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' },
   fieldError: { fontSize: 12, color: COLORS.danger, marginBottom: 6 },
   inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12 },
   inputRowError: { borderColor: COLORS.danger },
@@ -768,11 +769,11 @@ const styles = StyleSheet.create({
   dateModalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 },
   dateModalContent: { backgroundColor: COLORS.white, borderRadius: 16, padding: 20 },
   dateModalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
-  dateModalTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900] },
+  dateModalTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900] },
   dateModalClose: { marginTop: 16, paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   dateModalCloseText: { fontSize: 14, fontWeight: '600', color: COLORS.sky[600] },
   calendarWeekdays: { flexDirection: 'row', marginBottom: 8 },
-  calendarWeekday: { flex: 1, textAlign: 'center', fontSize: 10, fontWeight: '700', color: COLORS.slate[500], textTransform: 'uppercase' },
+  calendarWeekday: { flex: 1, textAlign: 'center', fontSize: 10, fontWeight: '600', color: COLORS.slate[500], textTransform: 'uppercase' },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   calendarDay: { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   calendarDayEmpty: { width: '14.28%', aspectRatio: 1 },
@@ -781,10 +782,10 @@ const styles = StyleSheet.create({
   calendarDayTextSelected: { color: COLORS.white },
   calendarDayDisabled: { opacity: 0.4 },
   calendarDayTextDisabled: { color: COLORS.slate[400] },
-  timeModalTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900], marginBottom: 16, textAlign: 'center' },
+  timeModalTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900], marginBottom: 16, textAlign: 'center' },
   timePickerRow: { flexDirection: 'row', gap: 16 },
   timePickerCol: { flex: 1, alignItems: 'center' },
-  timePickerLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], marginBottom: 8, textTransform: 'uppercase' },
+  timePickerLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], marginBottom: 8, textTransform: 'uppercase' },
   timePickerScroll: { maxHeight: 140 },
   timePickerItem: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, marginBottom: 4 },
   timePickerItemSelected: { backgroundColor: COLORS.sky[600] },
@@ -801,11 +802,11 @@ const styles = StyleSheet.create({
   warningText: { flex: 1, fontSize: 11, color: COLORS.amber[800], lineHeight: 16 },
   footer: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   submitBtn: { paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
-  submitBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  submitBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   successWrap: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
   successIcon: { marginBottom: 24 },
-  successTitle: { fontSize: 22, fontWeight: '800', color: COLORS.slate[900], marginBottom: 12, textAlign: 'center' },
+  successTitle: { fontSize: 22, fontWeight: '600', color: COLORS.slate[900], marginBottom: 12, textAlign: 'center' },
   successDesc: { fontSize: 14, color: COLORS.slate[500], textAlign: 'center', marginBottom: 32 },
   successBtn: { paddingHorizontal: 32, paddingVertical: 16, backgroundColor: COLORS.slate[900], borderRadius: 16 },
-  successBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  successBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
 });

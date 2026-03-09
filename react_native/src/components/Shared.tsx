@@ -135,7 +135,7 @@ const stepperStyles = StyleSheet.create({
     justifyContent: 'center'
   },
   dotActive: { backgroundColor: COLORS.primary },
-  dotText: { fontSize: 11, fontWeight: '700', color: COLORS.slate[400] },
+  dotText: { fontSize: 11, fontWeight: '600', color: COLORS.slate[400] },
   dotTextActive: { color: COLORS.white },
   label: { fontSize: 9, fontWeight: '600', color: COLORS.slate[400], marginTop: 4 },
   labelActive: { color: COLORS.primary },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800]
   },
   actionSublabel: {
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[900]
   },
   seeAll: {

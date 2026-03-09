@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import {
@@ -132,7 +133,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
   if (view === 'detail' && selectedRequest) {
     const isCompleted = selectedRequest.status === 'COMPLETED';
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Request Details" showBack onBack={() => { setView('list'); setSelectedRequest(null); }} />
         {detailLoading ? (
           <View style={styles.loading}>
@@ -225,12 +226,12 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
             <Text style={styles.contactBtnText}>Contact Support</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Records & History" showBack onBack={onBack} />
       <View style={styles.tabBar}>
         <TouchableOpacity
@@ -339,7 +340,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
           </View>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -388,7 +389,7 @@ const styles = StyleSheet.create({
   },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12, },
   tabActive: { backgroundColor: COLORS.primary },
-  tabText: { fontSize: 12, fontWeight: '700', color: COLORS.slate[400] },
+  tabText: { fontSize: 12, fontWeight: '600', color: COLORS.slate[400] },
   tabTextActive: { color: COLORS.white },
 
   filterScroll: { maxHeight: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[200] },
@@ -400,11 +401,11 @@ const styles = StyleSheet.create({
 
   card: { marginBottom: 12 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  cardId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400] },
-  cardAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 12 },
+  cardId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400] },
+  cardAsset: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 12 },
   cardActions: { flexDirection: 'row', gap: 8 },
   detailsBtn: { flex: 1, paddingVertical: 8, backgroundColor: COLORS.slate[100], borderRadius: 12, alignItems: 'center' },
-  detailsBtnText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[600] },
+  detailsBtnText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[600] },
 
   detailContent: { padding: 16, paddingBottom: 24 },
   detailCard: {
@@ -416,16 +417,16 @@ const styles = StyleSheet.create({
     borderColor: COLORS.slate[200]
   },
   detailHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  detailId: { fontSize: 10, fontWeight: '800', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 2 },
-  detailAsset: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900], marginBottom: 4 },
+  detailId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 2 },
+  detailAsset: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900], marginBottom: 4 },
   detailMeta: { fontSize: 12, color: COLORS.slate[500] },
 
   reportCard: { marginBottom: 24, backgroundColor: COLORS.primary, borderWidth: 0 },
   reportCardContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 },
-  reportCardTitle: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  reportCardTitle: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   reportCardSub: { fontSize: 10, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
   reportBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: COLORS.white, borderRadius: 12 },
-  reportBtnText: { fontSize: 10, fontWeight: '800', color: COLORS.primary, textTransform: 'uppercase' },
+  reportBtnText: { fontSize: 10, fontWeight: '600', color: COLORS.primary, textTransform: 'uppercase' },
 
   timelineCard: {
     backgroundColor: COLORS.white,
@@ -458,15 +459,15 @@ const styles = StyleSheet.create({
   },
   timelineDotDone: { backgroundColor: COLORS.emerald[500], borderColor: COLORS.emerald[500] },
   timelineContent: { marginLeft: 16 },
-  timelineLabel: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  timelineLabel: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   timelineNotFound: { fontSize: 14, color: COLORS.slate[500], fontStyle: 'italic', paddingVertical: 16 },
   timelineLabelMuted: { color: COLORS.slate[400] },
   timelineTime: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
 
   infoCard: { marginBottom: 24 },
   infoRow: { marginBottom: 16 },
-  infoLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
-  infoValue: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
+  infoLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
+  infoValue: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   infoGrid: { flexDirection: 'row', gap: 24 },
   infoCell: { flex: 1 },
 
@@ -480,12 +481,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.slate[900],
     borderRadius: 24
   },
-  contactBtnText: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  contactBtnText: { fontSize: 16, fontWeight: '600', color: COLORS.white },
 
   pagination: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 24 },
   pageBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: COLORS.primary, borderRadius: 12 },
   pageBtnDisabled: { backgroundColor: COLORS.slate[300], opacity: 0.7 },
-  pageBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  pageBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   pageInfo: { fontSize: 12, color: COLORS.slate[600] },
 
   docsPlaceholder: { paddingBottom: 80 },

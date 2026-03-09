@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { COLORS } from '../../constants/theme';
 import { getRoles, createStaff } from '../../api/teamApi';
 
@@ -97,7 +98,7 @@ export function AddStaffScreen({ onBack, onSuccess }: AddStaffScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Add Staff Member" showBack onBack={onBack} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.form}>
@@ -212,7 +213,7 @@ export function AddStaffScreen({ onBack, onSuccess }: AddStaffScreenProps) {
           </View>
         </Pressable>
       </Modal>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
   form: { gap: 12 },
   label: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     textTransform: 'uppercase',
     marginLeft: 4,
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   saveButtonDisabled: { opacity: 0.7 },
-  saveButtonText: { color: COLORS.white, fontSize: 16, fontWeight: '700' },
+  saveButtonText: { color: COLORS.white, fontSize: 16, fontWeight: '600' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800],
     padding: 16,
     borderBottomWidth: 1,

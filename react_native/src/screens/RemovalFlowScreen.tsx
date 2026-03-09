@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { Card, StatusBadge } from '../components/Shared';
 import { COLORS } from '../constants/theme';
 import { submitRemovalRequest } from '../api/removalApi';
@@ -123,7 +124,7 @@ export function RemovalFlowScreen({ onComplete, onCancel, initialAsset }: Remova
 
   if (submitted) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Asset Removal" showBack onBack={onCancel} />
         <View style={styles.successWrap}>
           <View style={styles.successIconWrap}>
@@ -137,12 +138,12 @@ export function RemovalFlowScreen({ onComplete, onCancel, initialAsset }: Remova
             <Text style={styles.successBtnText}>Done</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Asset Removal" showBack onBack={onCancel} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.cardRow}>
@@ -310,7 +311,7 @@ export function RemovalFlowScreen({ onComplete, onCancel, initialAsset }: Remova
           </Pressable>
         </Pressable>
       </Modal>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -330,10 +331,10 @@ const styles = StyleSheet.create({
   },
   iconWrap: { width: 56, height: 56, borderRadius: 16, backgroundColor: COLORS.amber[50], alignItems: 'center', justifyContent: 'center', marginRight: 16 },
   cardRight: { flex: 1 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900], marginBottom: 4 },
+  cardTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900], marginBottom: 4 },
   cardAsset: { fontSize: 12, color: COLORS.slate[500] },
   fieldBlock: { marginBottom: 24 },
-  label: { fontSize: 10, fontWeight: '800', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, marginLeft: 4 },
+  label: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, marginLeft: 4 },
   selectBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.slate[200],
   },
-  selectBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
+  selectBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   selectBtnPlaceholder: { color: COLORS.slate[400] },
   signCardWrap: { marginBottom: 16 },
   signCard: { padding: 24 },
@@ -362,10 +363,10 @@ const styles = StyleSheet.create({
   },
   signZoneSigned: { borderColor: COLORS.emerald[200], backgroundColor: 'rgba(209, 250, 229, 0.3)' },
   signPlaceholder: { alignItems: 'center', gap: 8 },
-  signPlaceholderText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[300], textTransform: 'uppercase', letterSpacing: 1 },
+  signPlaceholderText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[300], textTransform: 'uppercase', letterSpacing: 1 },
   signedContent: { alignItems: 'center' },
   signedLine: { width: 120, height: 24, backgroundColor: COLORS.slate[300], opacity: 0.5, borderRadius: 2, marginBottom: 8 },
-  signedLabel: { fontSize: 8, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
+  signedLabel: { fontSize: 8, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
   errorText: { fontSize: 12, color: COLORS.danger, marginTop: 8, textAlign: 'center' },
   footer: { padding: 16, paddingBottom: 24, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   submitBtn: {
@@ -378,11 +379,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   submitBtnDisabled: { backgroundColor: COLORS.slate[200] },
-  submitBtnText: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  submitBtnText: { fontSize: 16, fontWeight: '600', color: COLORS.white },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 24 },
   modalContent: { backgroundColor: COLORS.white, borderRadius: 20, padding: 20, maxHeight: '80%' },
   assetListScroll: { maxHeight: 320 },
-  modalTitle: { fontSize: 14, fontWeight: '800', color: COLORS.slate[700], marginBottom: 16 },
+  modalTitle: { fontSize: 14, fontWeight: '600', color: COLORS.slate[700], marginBottom: 16 },
   modalOption: { paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   modalOptionText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   modalOptionSub: { fontSize: 11, color: COLORS.slate[500], marginTop: 2 },
@@ -390,8 +391,8 @@ const styles = StyleSheet.create({
   modalLoader: { marginVertical: 24 },
   successWrap: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   successIconWrap: { marginBottom: 20 },
-  successTitle: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900], marginBottom: 8, textAlign: 'center' },
+  successTitle: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900], marginBottom: 8, textAlign: 'center' },
   successSub: { fontSize: 14, color: COLORS.slate[600], textAlign: 'center', marginBottom: 32 },
   successBtn: { backgroundColor: COLORS.sky[600], paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12 },
-  successBtnText: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  successBtnText: { fontSize: 16, fontWeight: '600', color: COLORS.white },
 });

@@ -1,9 +1,15 @@
+import './src/patchStyleSheet';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold
+} from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Text, TextInput } from 'react-native';
 import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
@@ -72,14 +78,20 @@ function AppWithGesture() {
   );
 }
 
+const defaultFontStyle = { fontFamily: 'PlusJakartaSans_400Regular' };
+
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
-    NotoSerif_400Regular: require('./assets/fonts/NotoSerif/NotoSerif_400Regular.ttf')
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold
   });
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
+      Text.defaultProps = { ...Text.defaultProps, style: defaultFontStyle };
+      TextInput.defaultProps = { ...TextInput.defaultProps, style: defaultFontStyle };
     }
   }, [fontsLoaded, fontError]);
 

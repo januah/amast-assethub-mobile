@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card } from '../../components/Shared';
 import {
   getNotifications,
@@ -123,7 +124,7 @@ export function NotificationListScreen({
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Notifications" showBack={showBack} onBack={onBack} />
       <ScrollView
         style={styles.scroll}
@@ -211,7 +212,7 @@ export function NotificationListScreen({
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16
   },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: COLORS.slate[800] },
+  emptyTitle: { fontSize: 16, fontWeight: '600', color: COLORS.slate[800] },
   emptyDesc: {
     fontSize: 14,
     color: COLORS.slate[500],
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
   },
   body: { flex: 1, minWidth: 0 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  title: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], flex: 1 },
+  title: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], flex: 1 },
   titleRead: { color: COLORS.slate[600] },
   time: { fontSize: 10, color: COLORS.slate[400] },
   desc: { fontSize: 12, color: COLORS.slate[500], lineHeight: 18 },
@@ -280,6 +281,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   footerBtnDisabled: { opacity: 0.5 },
-  footerBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.sky[600], letterSpacing: 2 },
+  footerBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.sky[600], letterSpacing: 2 },
   footerBtnTextDisabled: { color: COLORS.slate[400] }
 });

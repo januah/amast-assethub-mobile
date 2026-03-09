@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Stepper, Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { createBreakdownRequest } from '../../api/serviceRequestApi';
@@ -156,7 +157,7 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset, onScan
 
   if (isSubmitted) {
     return (
-      <View style={styles.successContainer}>
+      <AnimatedScreen style={styles.successContainer}>
         <View style={styles.successIcon}>
           <Ionicons name="checkmark-circle" size={48} color={COLORS.emerald[600]} />
         </View>
@@ -172,12 +173,12 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset, onScan
         <TouchableOpacity style={styles.doneButton} onPress={onComplete} activeOpacity={0.8}>
           <Text style={styles.doneButtonText}>Return to Dashboard</Text>
         </TouchableOpacity>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Report Breakdown" showBack onBack={handleBack} />
       <Stepper steps={STEPS} current={step} />
 
@@ -382,7 +383,7 @@ export function BreakdownFlowScreen({ onComplete, onCancel, initialAsset, onScan
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 24 },
   stepContent: { gap: 16 },
-  stepTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900] },
+  stepTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900] },
   searchWrap: { position: 'relative' },
   searchIcon: { position: 'absolute', left: 12, top: 14, zIndex: 1 },
   searchInput: {
@@ -427,7 +428,7 @@ const styles = StyleSheet.create({
   radioSelected: { borderColor: COLORS.primary, backgroundColor: COLORS.primary },
   radioInner: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.white },
   assetOptionText: { flex: 1 },
-  assetOptionName: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
+  assetOptionName: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   assetOptionId: { fontSize: 10, color: COLORS.slate[400], textTransform: 'uppercase', marginTop: 2 },
   loadingAssets: { paddingVertical: 32, alignItems: 'center' },
   emptyText: { textAlign: 'center', paddingVertical: 32, color: COLORS.slate[400], fontSize: 14, fontStyle: 'italic' },
@@ -440,7 +441,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.5)'
   },
-  scanButtonText: { fontSize: 12, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase', marginTop: 8 },
+  scanButtonText: { fontSize: 12, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', marginTop: 8 },
   assetChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -451,7 +452,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.sky[100]
   },
-  assetChipText: { fontSize: 12, fontWeight: '700', color: COLORS.sky[800], flex: 1 },
+  assetChipText: { fontSize: 12, fontWeight: '600', color: COLORS.sky[800], flex: 1 },
   textArea: {
     padding: 16,
     backgroundColor: COLORS.white,
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: 'top'
   },
-  optionalLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], textTransform: 'uppercase', marginTop: 8 },
+  optionalLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], textTransform: 'uppercase', marginTop: 8 },
   addPhotoButton: {
     width: 80,
     height: 80,
@@ -474,7 +475,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  addPhotoText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], marginTop: 4 },
+  addPhotoText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], marginTop: 4 },
   locationList: { maxHeight: 220 },
   locationOption: {
     flexDirection: 'row',
@@ -488,9 +489,9 @@ const styles = StyleSheet.create({
     marginBottom: 8
   },
   locationOptionSelected: { borderColor: COLORS.primary, backgroundColor: COLORS.sky[50] },
-  locationText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[500], flex: 1 },
+  locationText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[500], flex: 1 },
   locationTextSelected: { color: COLORS.primary },
-  priorityLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], textTransform: 'uppercase', marginTop: 8 },
+  priorityLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], textTransform: 'uppercase', marginTop: 8 },
   priorityRow: { flexDirection: 'row', gap: 12 },
   priorityOption: {
     flex: 1,
@@ -504,7 +505,7 @@ const styles = StyleSheet.create({
   priorityOptionNormal: { borderColor: COLORS.primary, backgroundColor: COLORS.sky[50] },
   priorityOptionUrgent: { borderColor: COLORS.amber[500], backgroundColor: COLORS.amber[50] },
   priorityOptionCritical: { borderColor: COLORS.danger, backgroundColor: '#fef2f2' },
-  priorityText: { fontSize: 12, fontWeight: '700', color: COLORS.slate[400] },
+  priorityText: { fontSize: 12, fontWeight: '600', color: COLORS.slate[400] },
   priorityTextActive: { color: COLORS.primary },
   summaryCard: {
     backgroundColor: COLORS.white,
@@ -514,12 +515,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: COLORS.slate[50], borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
-  summaryLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  summaryAssetName: { fontSize: 18, fontWeight: '800', color: COLORS.slate[900], padding: 16, paddingBottom: 4 },
+  summaryLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  summaryAssetName: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900], padding: 16, paddingBottom: 4 },
   summaryAssetId: { fontSize: 12, color: COLORS.slate[500], paddingHorizontal: 16 },
   summaryRow: { flexDirection: 'row', gap: 24, padding: 16 },
-  summaryMetaLabel: { fontSize: 10, color: COLORS.slate[400], fontWeight: '700', textTransform: 'uppercase', marginBottom: 4 },
-  summaryMetaValue: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800] },
+  summaryMetaLabel: { fontSize: 10, color: COLORS.slate[400], fontWeight: '600', textTransform: 'uppercase', marginBottom: 4 },
+  summaryMetaValue: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   problemSection: {
     marginHorizontal: 16,
     marginBottom: 16,
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
     borderLeftColor: COLORS.amber[500]
   },
   problemTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  problemTitle: { fontSize: 13, fontWeight: '800', color: COLORS.slate[800], textTransform: 'uppercase', letterSpacing: 0.5 },
+  problemTitle: { fontSize: 13, fontWeight: '600', color: COLORS.slate[800], textTransform: 'uppercase', letterSpacing: 0.5 },
   problemDesc: { fontSize: 14, color: COLORS.slate[700], lineHeight: 22 },
   tipBox: {
     flexDirection: 'row',
@@ -542,20 +543,20 @@ const styles = StyleSheet.create({
     borderColor: COLORS.amber[100]
   },
   tipText: { flex: 1, fontSize: 10, color: COLORS.amber[800], lineHeight: 16 },
-  tipTextBold: { fontWeight: '800' },
+  tipTextBold: { fontWeight: '600' },
   footer: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   nextButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.primary, paddingVertical: 16, borderRadius: 16 },
   nextButtonDisabled: { backgroundColor: COLORS.slate[200] },
-  nextButtonText: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  nextButtonText: { fontSize: 16, fontWeight: '600', color: COLORS.white },
   nextButtonTextDisabled: { color: COLORS.slate[400] },
   successContainer: { flex: 1, backgroundColor: COLORS.white, alignItems: 'center', justifyContent: 'center', padding: 32 },
   successIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.emerald[100], alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
-  successTitle: { fontSize: 24, fontWeight: '800', color: COLORS.slate[900], marginBottom: 8 },
+  successTitle: { fontSize: 24, fontWeight: '600', color: COLORS.slate[900], marginBottom: 8 },
   successDesc: { fontSize: 14, color: COLORS.slate[500], textAlign: 'center', marginBottom: 32 },
-  successBold: { fontWeight: '700', color: COLORS.slate[800] },
+  successBold: { fontWeight: '600', color: COLORS.slate[800] },
   refBox: { width: '100%', padding: 16, backgroundColor: COLORS.emerald[50], borderRadius: 16, borderWidth: 1, borderColor: COLORS.emerald[100], marginBottom: 32 },
-  refLabel: { fontSize: 10, fontWeight: '700', color: COLORS.emerald[600], textTransform: 'uppercase', marginBottom: 4 },
-  refValue: { fontSize: 20, fontWeight: '800', color: COLORS.slate[900] },
+  refLabel: { fontSize: 10, fontWeight: '600', color: COLORS.emerald[600], textTransform: 'uppercase', marginBottom: 4 },
+  refValue: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900] },
   doneButton: { width: '100%', backgroundColor: COLORS.slate[900], paddingVertical: 16, borderRadius: 16, alignItems: 'center' },
-  doneButtonText: { fontSize: 16, fontWeight: '700', color: COLORS.white }
+  doneButtonText: { fontSize: 16, fontWeight: '600', color: COLORS.white }
 });

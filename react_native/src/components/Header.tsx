@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600' ,
     color: COLORS.slate[900]
   },
   iconBtn: { position: 'relative', padding: 4 },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.white,
     fontSize: 8,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   avatar: {
     width: 32,

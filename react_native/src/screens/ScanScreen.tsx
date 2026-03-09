@@ -10,6 +10,7 @@ import {
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { COLORS } from '../constants/theme';
 import { getAssetById, ApiAsset } from '../api/assetsApi';
 
@@ -77,7 +78,7 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
 
   if (!permission) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={12}>
             <Ionicons name="chevron-back" size={24} color={COLORS.slate[600]} />
@@ -88,13 +89,13 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.message}>Checking camera access...</Text>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   if (!permission.granted) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={12}>
             <Ionicons name="chevron-back" size={24} color={COLORS.slate[600]} />
@@ -107,12 +108,12 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
             <Text style={styles.permBtnText}>Grant Permission</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Camera
         style={StyleSheet.absoluteFill}
         ratio="4:3"
@@ -140,7 +141,7 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
           <Text style={styles.loadingText}>Looking up asset...</Text>
         </View>
       )}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderRadius: 12,
   },
-  permBtnText: { color: COLORS.white, fontWeight: '700', fontSize: 15 },
+  permBtnText: { color: COLORS.white, fontWeight: '600', fontSize: 15 },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',

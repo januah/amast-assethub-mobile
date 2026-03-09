@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
 interface ProfileScreenProps {
@@ -26,7 +27,7 @@ export function ProfileScreen({
   const avatarInitials = (fullName || username || 'U').substring(0, 2);
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header
         title="My Profile"
         onNotificationClick={() => onAction?.('notifications')}
@@ -90,7 +91,7 @@ export function ProfileScreen({
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '600',
     color: COLORS.white
   },
   heroTitleBlock: {
@@ -139,14 +140,14 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     letterSpacing: 0.5,
     marginBottom: 4
   },
   heroName: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[900]
   },
   heroRows: {
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   menuLabel: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800]
   },
   logoutItem: {

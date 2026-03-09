@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { Card, StatusBadge, Stepper } from '../components/Shared';
 import { COLORS } from '../constants/theme';
 import {
@@ -158,29 +159,29 @@ export function JobExecutionScreen({ requestId, onBack, onComplete }: JobExecuti
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Job Execution" showBack onBack={onBack} />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   if (error && !job) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Job Execution" showBack onBack={onBack} />
         <View style={styles.errorWrap}>
           <Ionicons name="alert-circle-outline" size={40} color={COLORS.slate[400]} />
           <Text style={styles.errorText}>{error}</Text>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Job Execution" showBack onBack={onBack} />
       <Stepper steps={statusSteps} current={statusStepIndex} />
       <ScrollView
@@ -287,7 +288,7 @@ export function JobExecutionScreen({ requestId, onBack, onComplete }: JobExecuti
 
         {error ? <Text style={styles.errorInline}>{error}</Text> : null}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -301,13 +302,13 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32 },
   card: { marginBottom: 16 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
-  requestId: { fontSize: 12, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  title: { fontSize: 16, fontWeight: '700', color: COLORS.slate[800], marginBottom: 12 },
+  requestId: { fontSize: 12, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  title: { fontSize: 16, fontWeight: '600', color: COLORS.slate[800], marginBottom: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   rowText: { fontSize: 12, color: COLORS.slate[600] },
-  priorityText: { fontSize: 12, fontWeight: '700' },
+  priorityText: { fontSize: 12, fontWeight: '600' },
   meta: { fontSize: 10, color: COLORS.slate[400], marginTop: 8 },
-  sectionTitle: { fontSize: 12, fontWeight: '700', color: COLORS.slate[600], marginBottom: 8 },
+  sectionTitle: { fontSize: 12, fontWeight: '600', color: COLORS.slate[600], marginBottom: 8 },
   notesInput: {
     borderWidth: 1,
     borderColor: COLORS.slate[200],
@@ -322,12 +323,12 @@ const styles = StyleSheet.create({
   actionBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   startBtn: { backgroundColor: COLORS.primary },
   completeBtn: { backgroundColor: COLORS.emerald[600] },
-  actionBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  actionBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   historyLoading: { paddingVertical: 16 },
   historyItem: { marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   historyItemLast: { marginBottom: 0, paddingBottom: 0, borderBottomWidth: 0 },
   historyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  historyStatus: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800], flex: 1 },
+  historyStatus: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800], flex: 1 },
   historyDate: { fontSize: 10, color: COLORS.slate[400] },
   historyBy: { fontSize: 10, color: COLORS.slate[500], marginBottom: 4 },
   historyNotes: { fontSize: 12, color: COLORS.slate[600], marginTop: 4, fontStyle: 'italic' },

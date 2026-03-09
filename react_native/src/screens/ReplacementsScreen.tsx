@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { Card, ReplacementStatusBadge, SectionHeader, Stepper } from '../components/Shared';
 import { COLORS } from '../constants/theme';
 import { getReplacements, getReplacementById, acknowledgeReplacement, createReplacement, getEligibleServiceRequests, getAvailableLoanerAssets, type Replacement, type EligibleServiceRequest, type AvailableLoanerAsset } from '../api/replacementApi';
@@ -248,7 +249,7 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
     const canAckOriginalInstalled = hasAckReceived && !hasOriginalInstalled;
 
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Replacement Detail" showBack onBack={goBackToList} />
         {detailLoading ? (
           <View style={styles.loading}>
@@ -415,14 +416,14 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
             </Pressable>
           </Modal>
         )}
-      </View>
+      </AnimatedScreen>
     );
   }
 
   if (view === 'wizard') {
     const steps = ['Select Request', 'Select Loaner', 'Issue To'];
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Issue Replacement" showBack onBack={closeWizard} />
         <Stepper steps={steps} current={wizardStep} />
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -556,12 +557,12 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
             )}
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Temporary Replacements" showBack onBack={onBack} />
       <View style={styles.tabs}>
         {(['Active', 'History'] as const).map((t) => (
@@ -659,7 +660,7 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -671,7 +672,7 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', padding: 4, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   tab: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   tabActive: { backgroundColor: COLORS.sky[600], shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  tabText: { fontSize: 10, fontWeight: '700', letterSpacing: 2, color: COLORS.slate[400] },
+  tabText: { fontSize: 10, fontWeight: '600', letterSpacing: 2, color: COLORS.slate[400] },
   tabTextActive: { color: COLORS.white },
   searchWrap: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   searchIcon: { position: 'absolute', left: 28, zIndex: 1 },
@@ -679,18 +680,18 @@ const styles = StyleSheet.create({
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
   emptyText: { fontSize: 14, color: COLORS.slate[500], marginTop: 16, fontStyle: 'italic' },
   emptyCta: { marginTop: 24, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: COLORS.sky[600], borderRadius: 16 },
-  emptyCtaText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  emptyCtaText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   listCard: { marginBottom: 16 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  cardId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
+  cardId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
   cardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   cardLabel: { fontSize: 12, color: COLORS.slate[500] },
-  cardValue: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
-  cardValueLoaner: { fontSize: 12, fontWeight: '700', color: COLORS.sky[600] },
+  cardValue: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
+  cardValueLoaner: { fontSize: 12, fontWeight: '600', color: COLORS.sky[600] },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.slate[50] },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   cardMetaText: { fontSize: 10, color: COLORS.slate[400] },
-  cardExp: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400] },
+  cardExp: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400] },
   cardExpOverdue: { color: COLORS.danger },
   pagination: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 24 },
   pageBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: COLORS.primary, borderRadius: 8 },
@@ -699,72 +700,72 @@ const styles = StyleSheet.create({
   pageInfo: { fontSize: 12, color: COLORS.slate[600] },
   bottomCta: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   bottomCtaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, backgroundColor: COLORS.slate[900], borderRadius: 16 },
-  bottomCtaText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  bottomCtaText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   detailCard: { marginBottom: 24 },
   detailHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  detailId: { fontSize: 10, fontWeight: '800', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
-  detailTitle: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900] },
+  detailId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 0.5, textTransform: 'uppercase' },
+  detailTitle: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900] },
   linkedRequest: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, backgroundColor: COLORS.slate[50], borderRadius: 12, marginBottom: 12 },
   linkedRequestText: { flex: 1 },
-  linkedRequestLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  linkedRequestValue: { fontSize: 12, fontWeight: '700', color: COLORS.sky[600] },
+  linkedRequestLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  linkedRequestValue: { fontSize: 12, fontWeight: '600', color: COLORS.sky[600] },
   gridRow: { flexDirection: 'row', gap: 12 },
   gridCard: { flex: 1, padding: 12, borderWidth: 1, borderColor: COLORS.slate[100], borderRadius: 12 },
-  gridLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
-  gridValue: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
-  gridSub: { fontSize: 8, fontWeight: '700', color: COLORS.slate[400], marginTop: 2 },
+  gridLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', marginBottom: 4 },
+  gridValue: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
+  gridSub: { fontSize: 8, fontWeight: '600', color: COLORS.slate[400], marginTop: 2 },
   timeline: { paddingLeft: 24 },
   timelineItem: { flexDirection: 'row', marginBottom: 16, position: 'relative' },
   timelineDot: { position: 'absolute', left: -22, top: 6, width: 16, height: 16, borderRadius: 8, backgroundColor: COLORS.white, borderWidth: 4, borderColor: COLORS.sky[500] },
   timelineCard: { flex: 1, padding: 12, backgroundColor: COLORS.white, borderRadius: 16, borderWidth: 1, borderColor: COLORS.slate[200] },
   timelineHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  timelineType: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  timelineType: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   timelineTime: { fontSize: 10, color: COLORS.slate[400] },
   timelineRemark: { fontSize: 11, color: COLORS.slate[500], lineHeight: 18, marginBottom: 6 },
-  timelineBy: { fontSize: 9, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 0.5 },
+  timelineBy: { fontSize: 9, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 0.5 },
   emptyTimeline: { fontSize: 12, color: COLORS.slate[500], fontStyle: 'italic', paddingVertical: 16 },
   detailBottomActions: { padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200], gap: 8 },
   actionRow: { flexDirection: 'row', gap: 8 },
   moActionsStack: { gap: 8 },
   moBtnPrimary: { paddingVertical: 12, backgroundColor: COLORS.sky[600], borderRadius: 12, alignItems: 'center' },
-  moBtnPrimaryText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  moBtnPrimaryText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   moBtnOutline: { paddingVertical: 12, backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.sky[600], borderRadius: 12, alignItems: 'center' },
-  moBtnOutlineText: { fontSize: 12, fontWeight: '700', color: COLORS.sky[600] },
+  moBtnOutlineText: { fontSize: 12, fontWeight: '600', color: COLORS.sky[600] },
   actionBtnOutline: { flex: 1, paddingVertical: 12, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12 },
-  actionBtnOutlineText: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800], textAlign: 'center' },
+  actionBtnOutlineText: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800], textAlign: 'center' },
   actionBtnPrimary: { flex: 1, paddingVertical: 12, backgroundColor: COLORS.emerald[600], borderRadius: 12 },
-  actionBtnPrimaryText: { fontSize: 12, fontWeight: '700', color: COLORS.white, textAlign: 'center' },
+  actionBtnPrimaryText: { fontSize: 12, fontWeight: '600', color: COLORS.white, textAlign: 'center' },
   actionBtnDark: { flex: 1, paddingVertical: 12, backgroundColor: COLORS.slate[900], borderRadius: 12 },
-  actionBtnDarkText: { fontSize: 12, fontWeight: '700', color: COLORS.white, textAlign: 'center' },
+  actionBtnDarkText: { fontSize: 12, fontWeight: '600', color: COLORS.white, textAlign: 'center' },
   actionBtnDisabled: { opacity: 0.5 },
   actionBtnOutlineSky: { flex: 1, paddingVertical: 12, backgroundColor: COLORS.white, borderWidth: 2, borderColor: COLORS.sky[600], borderRadius: 12 },
-  actionBtnOutlineSkyText: { fontSize: 12, fontWeight: '700', color: COLORS.sky[600], textAlign: 'center' },
+  actionBtnOutlineSkyText: { fontSize: 12, fontWeight: '600', color: COLORS.sky[600], textAlign: 'center' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(15,23,42,0.6)', justifyContent: 'center', padding: 24 },
   modalCenter: { width: '100%' },
   modalCard: { backgroundColor: COLORS.white, borderRadius: 24, padding: 24, width: '100%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
   modalIconWrap: { padding: 12, backgroundColor: COLORS.sky[50], borderRadius: 16 },
-  modalTitle: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900], marginBottom: 8 },
+  modalTitle: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900], marginBottom: 8 },
   modalDesc: { fontSize: 14, color: COLORS.slate[500], lineHeight: 22, marginBottom: 24 },
-  modalLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' },
+  modalLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' },
   modalTextArea: { padding: 16, backgroundColor: COLORS.slate[50], borderWidth: 1, borderColor: COLORS.slate[100], borderRadius: 16, fontSize: 14, minHeight: 80, textAlignVertical: 'top', marginBottom: 24 },
   modalConfirm: { paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
   modalConfirmDisabled: { opacity: 0.7 },
-  modalConfirmText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  modalConfirmText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   modalError: { fontSize: 12, color: COLORS.danger, marginBottom: 12 },
   wizardPlaceholder: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 24 },
   wizardFooter: { flexDirection: 'row', gap: 12, padding: 16, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.slate[200] },
   wizardBack: { flex: 1, paddingVertical: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 16, alignItems: 'center' },
-  wizardBackText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[700] },
+  wizardBackText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[700] },
   wizardNext: { flex: 1, paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
   wizardNextFull: { flex: 2 },
-  wizardNextText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  wizardNextText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
   wizardOption: { padding: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12, marginBottom: 12 },
   wizardOptionSelected: { borderColor: COLORS.sky[600], borderWidth: 2, backgroundColor: COLORS.sky[50] },
-  wizardOptionId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], marginBottom: 4 },
+  wizardOptionId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], marginBottom: 4 },
   wizardOptionName: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
   wizardOptionSub: { fontSize: 12, color: COLORS.slate[500], marginTop: 4 },
-  wizardLabel: { fontSize: 12, fontWeight: '700', color: COLORS.slate[600], marginBottom: 8, marginTop: 16 },
+  wizardLabel: { fontSize: 12, fontWeight: '600', color: COLORS.slate[600], marginBottom: 8, marginTop: 16 },
   wizardInput: { padding: 14, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12, fontSize: 14, color: COLORS.slate[800] },
   wizardDateTouch: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   wizardInputText: { fontSize: 14, color: COLORS.slate[800] },

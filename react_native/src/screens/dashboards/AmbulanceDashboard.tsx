@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { ActionButton, Card, SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
@@ -67,9 +68,9 @@ export function AmbulanceDashboard({ onAction, onLogout }: AmbulanceDashboardPro
     : 'No vehicle assigned';
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header
-        title="Ambulance Driver Dashboard"
+        title="Dashboard"
         showRightIcons
         onNotificationClick={() => onAction('notifications')}
         onAvatarPress={() => onAction('profile')}
@@ -171,7 +172,7 @@ export function AmbulanceDashboard({ onAction, onLogout }: AmbulanceDashboardPro
           })
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
   welcome: { marginBottom: 24 },
-  welcomeTitle: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900] },
+  welcomeTitle: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900] },
   welcomeSub: { fontSize: 14, color: COLORS.slate[500], marginTop: 4 },
   welcomeNote: { fontSize: 12, color: COLORS.slate[500], marginTop: 6 },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
@@ -192,10 +193,10 @@ const styles = StyleSheet.create({
   vehicleIcon: { width: 56, height: 56, borderRadius: 12, backgroundColor: COLORS.slate[100], alignItems: 'center', justifyContent: 'center' },
   vehicleInfo: { flex: 1 },
   vehicleHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  vehicleName: { fontSize: 16, fontWeight: '700', color: COLORS.slate[800] },
+  vehicleName: { fontSize: 16, fontWeight: '600', color: COLORS.slate[800] },
   vehicleMeta: { fontSize: 12, color: COLORS.slate[500] },
   badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  badgeText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase' },
+  badgeText: { fontSize: 10, fontWeight: '600', textTransform: 'uppercase' },
   activeReq: {
     backgroundColor: COLORS.primary,
     borderRadius: 16,
@@ -203,13 +204,13 @@ const styles = StyleSheet.create({
     marginBottom: 16
   },
   activeReqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  activeReqTag: { fontSize: 10, fontWeight: '700', color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' },
+  activeReqTag: { fontSize: 10, fontWeight: '600', color: 'rgba(255,255,255,0.8)', letterSpacing: 1, textTransform: 'uppercase' },
   activeReqBadge: { paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 4 },
-  activeReqBadgeText: { fontSize: 10, fontWeight: '700', color: COLORS.white },
-  activeReqTitle: { fontSize: 14, fontWeight: '700', color: COLORS.white, marginBottom: 4 },
+  activeReqBadgeText: { fontSize: 10, fontWeight: '600', color: COLORS.white },
+  activeReqTitle: { fontSize: 14, fontWeight: '600', color: COLORS.white, marginBottom: 4 },
   activeReqLocation: { fontSize: 10, color: 'rgba(255,255,255,0.85)', marginBottom: 16 },
   activeReqActions: { flexDirection: 'row', gap: 8 },
   activeReqBtn: { flex: 1, paddingVertical: 8, backgroundColor: COLORS.white, borderRadius: 8, alignItems: 'center' },
-  activeReqBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
+  activeReqBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.primary },
   activeReqIconBtn: { padding: 8, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 8 }
 });

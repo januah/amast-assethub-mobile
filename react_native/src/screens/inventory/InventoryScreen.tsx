@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getAssets, getAssetById, ApiAsset, GetAssetsResponse } from '../../api/assetsApi';
@@ -96,7 +97,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
 
   if (view === 'detail' && selectedAsset) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Asset Detail" showBack onBack={() => { setView('list'); setSelectedAsset(null); }} />
         {detailLoading ? (
           <View style={styles.loading}>
@@ -155,12 +156,12 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
             <Text style={styles.reportButtonText}>Report New Issue</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Asset Management" showBack onBack={onBack} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterScrollContent}>
         {ASSET_STATUS_OPTIONS.map((opt) => (
@@ -253,7 +254,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
           </TouchableOpacity>
         </View>
       ) : null}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -403,13 +404,13 @@ const styles = StyleSheet.create({
   },
   assetId: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[400],
     textTransform: 'uppercase'
   },
   assetName: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800]
   },
   assetMeta: {
@@ -451,7 +452,7 @@ const styles = StyleSheet.create({
   },
   detailName: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[900]
   },
   detailId: {
@@ -491,6 +492,6 @@ const styles = StyleSheet.create({
   reportButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700'
+    fontWeight: '600'
   }
 });

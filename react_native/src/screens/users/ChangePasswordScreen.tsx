@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { COLORS } from '../../constants/theme';
 import { changePassword } from '../../api/authApi';
 
@@ -49,7 +50,7 @@ export function ChangePasswordScreen({ onBack }: ChangePasswordScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Change Password" showBack onBack={onBack} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.tipBox}>
@@ -109,7 +110,7 @@ export function ChangePasswordScreen({ onBack }: ChangePasswordScreenProps) {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     textTransform: 'uppercase',
     marginLeft: 4,
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
   updateButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   updateButtonTextDisabled: {
     color: COLORS.slate[400]

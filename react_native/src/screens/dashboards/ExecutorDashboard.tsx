@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { ActionButton, Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { UserRole } from '../../types';
@@ -50,9 +51,9 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header
-          title="Portal"
+          title="Dashboard"
           showRightIcons
           onNotificationClick={() => onAction('notifications')}
           onAvatarPress={() => onAction('profile')}
@@ -61,14 +62,14 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header
-        title="Portal"
+        title="Dashboard"
         showRightIcons
         onNotificationClick={() => onAction('notifications')}
         onAvatarPress={() => onAction('profile')}
@@ -170,7 +171,7 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
           </Card>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -186,30 +187,30 @@ const styles = StyleSheet.create({
   },
   heroTop: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 16 },
   heroAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center' },
-  heroAvatarText: { fontSize: 18, fontWeight: '800', color: COLORS.white },
-  heroName: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  heroAvatarText: { fontSize: 18, fontWeight: '600', color: COLORS.white },
+  heroName: { fontSize: 16, fontWeight: '600', color: COLORS.white },
   heroRole: { fontSize: 12, color: COLORS.slate[400], marginTop: 2 },
   heroStats: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.slate[800] },
   heroStat: { flex: 1 },
-  heroStatLabel: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], textTransform: 'uppercase', letterSpacing: 1 },
-  heroStatValue: { fontSize: 18, fontWeight: '700', color: COLORS.white, marginTop: 2 },
-  heroStatValueSky: { fontSize: 18, fontWeight: '700', color: COLORS.sky[400], marginTop: 2 },
+  heroStatLabel: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], textTransform: 'uppercase', letterSpacing: 1 },
+  heroStatValue: { fontSize: 18, fontWeight: '600', color: COLORS.white, marginTop: 2 },
+  heroStatValueSky: { fontSize: 18, fontWeight: '600', color: COLORS.sky[400], marginTop: 2 },
   actionsRow: { flexDirection: 'row', gap: 16, marginBottom: 16 },
   actionHalf: { flex: 1 },
   jobCard: { marginBottom: 8 },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  jobId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  jobTitle: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 4 },
+  jobId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  jobTitle: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 4 },
   jobLocation: { fontSize: 10, color: COLORS.slate[500], marginBottom: 16 },
   jobActions: { flexDirection: 'row', gap: 8 },
   resumeBtn: { flex: 1, paddingVertical: 8, backgroundColor: COLORS.primary, borderRadius: 12, alignItems: 'center' },
-  resumeBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  resumeBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   navBtn: { padding: 8, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12 },
   activityCard: { marginBottom: 12 },
   activityRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   activityIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: COLORS.emerald[50], alignItems: 'center', justifyContent: 'center' },
   activityContent: { flex: 1 },
-  activityTitle: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  activityTitle: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   activityMeta: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
   loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   noActiveJob: { fontSize: 14, color: COLORS.slate[500], padding: 16, textAlign: 'center' },

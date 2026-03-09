@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import {
@@ -185,7 +186,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
 
   if (detailView) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Request Details" showBack onBack={closeDetail} />
         {detailLoading ? (
           <View style={styles.loading}>
@@ -258,12 +259,12 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
             </View>
           </ScrollView>
         )}
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Pending Approvals" showBack onBack={onBack} />
 
       <View style={styles.filterBar}>
@@ -372,7 +373,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
           </View>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -392,7 +393,7 @@ const styles = StyleSheet.create({
     borderRadius: 12
   },
   filterTabActive: { backgroundColor: COLORS.slate[900], shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
-  filterTabText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], letterSpacing: 1 },
+  filterTabText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 1 },
   filterTabTextActive: { color: COLORS.white },
   summaryBar: {
     flexDirection: 'row',
@@ -402,14 +403,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 8
   },
-  summaryCount: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], letterSpacing: 1 },
+  summaryCount: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 1 },
   summaryTotal: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  summaryTotalText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400] },
+  summaryTotalText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400] },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 80 },
   loading: { paddingVertical: 48, alignItems: 'center' },
   empty: { paddingVertical: 48, alignItems: 'center' },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: COLORS.slate[800], marginTop: 12 },
+  emptyTitle: { fontSize: 16, fontWeight: '600', color: COLORS.slate[800], marginTop: 12 },
   emptyText: { fontSize: 12, color: COLORS.slate[500], marginTop: 4 },
   errorWrap: { padding: 16, backgroundColor: '#fef2f2', borderRadius: 12, marginBottom: 12 },
   errorText: { fontSize: 12, color: COLORS.danger },
@@ -419,8 +420,8 @@ const styles = StyleSheet.create({
   typeIcon: { padding: 6, borderRadius: 8 },
   typeIconQuotation: { backgroundColor: COLORS.emerald[50] },
   typeIconRemoval: { backgroundColor: COLORS.amber[50] },
-  cardId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  cardAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 8 },
+  cardId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  cardAsset: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 8 },
   cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 12 },
   cardMeta: { fontSize: 10, color: COLORS.slate[500] },
   cardMetaSpacer: { marginLeft: 12 },
@@ -432,9 +433,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.slate[100]
   },
-  cardCost: { fontSize: 14, fontWeight: '800', color: COLORS.slate[900] },
+  cardCost: { fontSize: 14, fontWeight: '600', color: COLORS.slate[900] },
   reviewLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  reviewLinkText: { fontSize: 10, fontWeight: '700', color: COLORS.primary, textTransform: 'uppercase' },
+  reviewLinkText: { fontSize: 10, fontWeight: '600', color: COLORS.primary, textTransform: 'uppercase' },
   detailContent: { padding: 16, paddingBottom: 80 },
   detailCard: {
     backgroundColor: COLORS.white,
@@ -443,13 +444,13 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4
   },
   detailHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  detailId: { fontSize: 10, fontWeight: '800', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 2 },
-  detailAsset: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900], marginBottom: 8 },
+  detailId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase', letterSpacing: 2 },
+  detailAsset: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900], marginBottom: 8 },
   detailMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
   detailMeta: { fontSize: 12, color: COLORS.slate[500] },
   detailDesc: { fontSize: 12, color: COLORS.slate[600], marginTop: 12, lineHeight: 18 },
   detailCostRow: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.slate[100] },
-  detailCost: { fontSize: 16, fontWeight: '800', color: COLORS.slate[900] },
+  detailCost: { fontSize: 16, fontWeight: '600', color: COLORS.slate[900] },
   rejectInput: {
     marginTop: 16,
     padding: 12,
@@ -464,8 +465,8 @@ const styles = StyleSheet.create({
   actionBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   approveBtn: { backgroundColor: COLORS.emerald[600] },
   rejectBtn: { backgroundColor: COLORS.slate[100], borderWidth: 1, borderColor: COLORS.slate[300] },
-  actionBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
-  rejectBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.danger },
+  actionBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
+  rejectBtnText: { fontSize: 14, fontWeight: '600', color: COLORS.danger },
   pagination: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -475,6 +476,6 @@ const styles = StyleSheet.create({
   },
   pageBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: COLORS.primary, borderRadius: 12 },
   pageBtnDisabled: { backgroundColor: COLORS.slate[300], opacity: 0.7 },
-  pageBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  pageBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   pageInfo: { fontSize: 12, color: COLORS.slate[600] }
 });

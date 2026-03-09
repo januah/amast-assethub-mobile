@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvironment } from '../context/EnvironmentContext';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 import { COLORS } from '../constants/theme';
 
 interface EnvironmentScreenProps {
@@ -38,7 +39,8 @@ export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
   const displayCurrent = (baseUrl || '').replace(/\/api\/mobile\/v1$/, '').replace(/\/$/, '') || '—';
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
+      <AnimatedScreen style={styles.animatedWrap}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={12}>
           <Ionicons name="arrow-back" size={24} color={COLORS.slate[800]} />
@@ -123,12 +125,14 @@ export function EnvironmentScreen({ onBack }: EnvironmentScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      </AnimatedScreen>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.slate[50] },
+  animatedWrap: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.slate[100],
   },
   backBtn: { padding: 4 },
-  title: { fontSize: 18, fontWeight: '700', color: COLORS.slate[900] },
+  title: { fontSize: 18, fontWeight: '600', color: COLORS.slate[900] },
   headerRight: { width: 32 },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 40 },
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
   currentCardBody: { flex: 1, minWidth: 0 },
   currentLabel: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -189,10 +193,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.emerald[500],
     marginRight: 6,
   },
-  currentBadgeText: { fontSize: 11, fontWeight: '700', color: COLORS.emerald[700] },
+  currentBadgeText: { fontSize: 11, fontWeight: '600', color: COLORS.emerald[700] },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800],
     marginBottom: 4,
   },
@@ -265,5 +269,5 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   useBtnDisabled: { backgroundColor: COLORS.slate[300] },
-  useBtnText: { fontSize: 15, fontWeight: '700', color: COLORS.white },
+  useBtnText: { fontSize: 15, fontWeight: '600', color: COLORS.white },
 });

@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.white,
     fontSize: 9,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   label: {
     fontSize: 10,
@@ -175,6 +175,6 @@ const styles = StyleSheet.create({
   labelFloating: {
     marginTop: 38,
     // color: COLORS.sky[600],
-    fontWeight: '700'
+    fontWeight: '600'
   }
 });

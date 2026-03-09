@@ -13,22 +13,24 @@ import {
   ImageBackground,
   Image,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../constants/theme';
+import { COLORS, FONT_FAMILY, FONT_FAMILY_BOLD } from '../constants/theme';
 
 const appConfig = require('../../app.json');
 const APP_VERSION = `v${appConfig?.expo?.version ?? '1.0.0'}`;
 import { useAuth } from '../context/AuthContext';
+import { AnimatedScreen } from '../components/AnimatedScreen';
 
 const DEMO_PASSWORD = 'P@ssw0rd123!';
 
 const DEMO_USERS = {
   hospital: [
+    { username: 'admin', role: 'admin_hospital' },
     { username: 'medoff', role: 'medical_officer' },
-    { username: 'approver', role: 'approver' },
-    { username: 'admin', role: 'admin_hospital' }
+    { username: 'approver', role: 'approver' }
   ],
   service: [
     { username: 'biomed', role: 'biomed_engineer' },
@@ -82,12 +84,13 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showDemoRoles, setShowDemoRoles] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   const handleDemoSelect = (username: string) => {
     setUserId(username);
     setPassword(DEMO_PASSWORD);
     setError('');
+    setShowDemoModal(false);
   };
 
   const handleLogin = async () => {
@@ -116,6 +119,7 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
         resizeMode="cover"
       />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <AnimatedScreen style={styles.animatedWrap}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.keyboardView}
@@ -201,49 +205,67 @@ export function LoginScreen({ onOpenSettings }: LoginScreenProps) {
                 </TouchableOpacity>
               )}
             </View>
-            <Text style={styles.footer}>AMAST SDN BHD | {APP_VERSION}</Text>
+            <Text style={styles.footer}> © AMAST SDN BHD — {APP_VERSION}</Text>
           </View>
 
           <View style={styles.demoSection}>
-            <Pressable
-              style={({ pressed }) => [styles.demoHeader, pressed && styles.demoHeaderPressed]}
-              onPress={() => setShowDemoRoles((v) => !v)}
+            <TouchableOpacity
+              style={styles.demoTriggerBtn}
+              onPress={() => setShowDemoModal(true)}
+              activeOpacity={0.8}
             >
-              <View style={styles.demoDivider}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.demoLabel}>DEMO ROLE SELECTION</Text>
-                <View style={styles.dividerLine} />
-              </View>
-              <View style={styles.demoChevronWrap}>
-                <Ionicons
-                  name={showDemoRoles ? 'chevron-up' : 'chevron-down'}
-                  size={18}
-                  color={COLORS.slate[400]}
-                />
-              </View>
-            </Pressable>
-            {showDemoRoles && (
-              <View style={styles.demoContent}>
-                <DemoUserSection
-                  title="Hospital Staff"
-                  users={DEMO_USERS.hospital}
-                  onSelect={handleDemoSelect}
-                />
-                <DemoUserSection
-                  title="Service & Engineering"
-                  users={DEMO_USERS.service}
-                  onSelect={handleDemoSelect}
-                />
-                <DemoUserSection
-                  title="System & Support"
-                  users={DEMO_USERS.system}
-                  onSelect={handleDemoSelect}
-                />
-              </View>
-            )}
+              <Ionicons name="person-circle-outline" size={20} color={COLORS.slate[600]} />
+              <Text style={styles.demoTriggerText}>Use demo account</Text>
+              <Ionicons name="chevron-forward" size={18} color={COLORS.slate[400]} />
+            </TouchableOpacity>
           </View>
+
+          <Modal
+            visible={showDemoModal}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setShowDemoModal(false)}
+          >
+            <Pressable style={styles.demoModalOverlay} onPress={() => setShowDemoModal(false)}>
+              <Pressable style={styles.demoModalContent} onPress={(e) => e.stopPropagation()}>
+                <View style={styles.demoModalHeader}>
+                  <Text style={styles.demoModalTitle}>Select demo role</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowDemoModal(false)}
+                    style={styles.demoModalClose}
+                    hitSlop={12}
+                  >
+                    <Ionicons name="close" size={24} color={COLORS.slate[600]} />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView
+                  style={styles.demoModalScroll}
+                  contentContainerStyle={styles.demoModalScrollContent}
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  <DemoUserSection
+                    title="Hospital Staff"
+                    users={DEMO_USERS.hospital}
+                    onSelect={handleDemoSelect}
+                  />
+                  <DemoUserSection
+                    title="Service & Engineering"
+                    users={DEMO_USERS.service}
+                    onSelect={handleDemoSelect}
+                  />
+                  <DemoUserSection
+                    title="System & Support"
+                    users={DEMO_USERS.system}
+                    onSelect={handleDemoSelect}
+                  />
+                </ScrollView>
+              </Pressable>
+            </Pressable>
+          </Modal>
           </ScrollView>
         </KeyboardAvoidingView>
+        </AnimatedScreen>
       </SafeAreaView>
     </View>
   );
@@ -254,6 +276,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   safeArea: {
+    flex: 1,
+  },
+  animatedWrap: {
     flex: 1,
   },
   loginRow: {
@@ -286,6 +311,7 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 16,
     fontSize: 12,
+    fontFamily: FONT_FAMILY,
     color: COLORS.slate[400],
     textAlign: 'center',
   },
@@ -316,17 +342,19 @@ const styles = StyleSheet.create({
     elevation: 6
   },
   logoImage: {
-    width: 72,
-    height: 72
+    width: 120,
+    height: 120
   },
   title: {
     fontSize: 28,
+    fontFamily: FONT_FAMILY_BOLD,
     fontWeight: '900',
     color: COLORS.white,
     marginBottom: 4
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY,
     color: COLORS.white
   },
   form: {
@@ -345,7 +373,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FONT_FAMILY_BOLD,
+    fontWeight: '600',
     color: COLORS.slate[500],
     letterSpacing: 1.2,
     textTransform: 'uppercase'
@@ -357,7 +386,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    fontSize: 16
+    fontSize: 16,
+    fontFamily: FONT_FAMILY
   },
   errorWrap: {
     marginTop: 4,
@@ -365,12 +395,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
+    fontFamily: FONT_FAMILY,
     color: COLORS.danger,
     fontWeight: '600'
   },
   forgotLink: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONT_FAMILY_BOLD,
+    fontWeight: '600',
     color: COLORS.primary
   },
   loginButton: {
@@ -386,53 +418,77 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700'
+    fontFamily: FONT_FAMILY_BOLD,
+    fontWeight: '600'
   },
   demoSection: {
-    marginTop: 48,
-    paddingTop: 32,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.slate[100],
+    marginTop: 32,
     width: '100%',
     maxWidth: 380,
     alignSelf: 'center',
   },
-  demoHeader: {
-    paddingVertical: 4,
-  },
-  demoHeaderPressed: {
-    opacity: 0.7,
-  },
-  demoContent: {
-    marginTop: 20,
-    gap: 24,
-  },
-  demoChevronWrap: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  demoDivider: {
+  demoTriggerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.slate[200],
   },
-  dividerLine: {
+  demoTriggerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.slate[700],
+  },
+  demoModalOverlay: {
     flex: 1,
-    height: 1,
-    backgroundColor: COLORS.slate[100]
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    padding: 24,
   },
-  demoLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: COLORS.slate[400],
-    letterSpacing: 2
+  demoModalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    maxHeight: '80%',
+    overflow: 'hidden',
+  },
+  demoModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate[100],
+  },
+  demoModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.slate[900],
+  },
+  demoModalClose: {
+    padding: 4,
+  },
+  demoModalScroll: {
+    maxHeight: 420,
+  },
+  demoModalScrollContent: {
+    padding: 20,
+    paddingBottom: 28,
+    // gap: 24,
   },
   roleSection: {
-    gap: 8
+    gap: 8,
+    marginBottom: 24,
   },
   roleSectionTitle: {
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FONT_FAMILY_BOLD,
+    fontWeight: '600',
     color: COLORS.slate[400],
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -457,6 +513,7 @@ const styles = StyleSheet.create({
   },
   roleChipText: {
     fontSize: 12,
+    fontFamily: FONT_FAMILY,
     fontWeight: '600',
     color: COLORS.slate[700]
   }

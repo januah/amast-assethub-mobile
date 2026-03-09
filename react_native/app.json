@@ -23,10 +23,14 @@
       "navigationBarColor": "#ffffff",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.syukrandevamast.AssetHub"
+      "package": "com.syukrandevamast.AssetHub",
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

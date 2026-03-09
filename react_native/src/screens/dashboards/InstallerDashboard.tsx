@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card } from '../../components/Shared';
 import { COLORS, INSTALL_STATUS_COLORS } from '../../constants/theme';
 
@@ -45,7 +46,7 @@ export function InstallerDashboard({ onSelect, onLogout }: InstallerDashboardPro
   const getStatusStyle = (status: string) => INSTALL_STATUS_COLORS[status] || { bg: COLORS.slate[100], text: COLORS.slate[600] };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="My Installations" />
       <View style={styles.statsBar}>
         <View style={styles.statItem}>
@@ -133,7 +134,7 @@ export function InstallerDashboard({ onSelect, onLogout }: InstallerDashboardPro
           </View>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -147,10 +148,10 @@ const styles = StyleSheet.create({
   },
   statItem: { flex: 1, paddingVertical: 16, alignItems: 'center' },
   statDivider: { borderLeftWidth: 1, borderLeftColor: COLORS.slate[100] },
-  statValue: { fontSize: 20, fontWeight: '800', color: COLORS.slate[900] },
+  statValue: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900] },
   statValueAmber: { color: COLORS.amber[500] },
   statValuePurple: { color: '#7c3aed' },
-  statLabel: { fontSize: 9, fontWeight: '700', color: COLORS.slate[400], marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 },
+  statLabel: { fontSize: 9, fontWeight: '600', color: COLORS.slate[400], marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
   },
   filterBtnText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800],
     textTransform: 'uppercase'
   },
@@ -191,23 +192,23 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32 },
   installCard: { marginBottom: 16 },
   installHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
-  installDocNo: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  installAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginTop: 4 },
+  installDocNo: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  installAsset: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginTop: 4 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  statusBadgeText: { fontSize: 9, fontWeight: '800', textTransform: 'uppercase' },
+  statusBadgeText: { fontSize: 9, fontWeight: '600', textTransform: 'uppercase' },
   installMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   installMetaText: { fontSize: 10, color: COLORS.slate[500] },
-  installDate: { fontWeight: '700', color: COLORS.slate[700] },
+  installDate: { fontWeight: '600', color: COLORS.slate[700] },
   installFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.slate[100] },
   signoffDots: { flexDirection: 'row', alignItems: 'center', gap: -6 },
   signoffDot: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: COLORS.white, alignItems: 'center', justifyContent: 'center' },
   signoffDotSigned: { backgroundColor: COLORS.emerald[500] },
   signoffDotPending: { backgroundColor: COLORS.slate[200] },
-  signoffDotTextSigned: { fontSize: 8, fontWeight: '800', color: COLORS.white },
-  signoffDotTextPending: { fontSize: 8, fontWeight: '800', color: COLORS.slate[400] },
-  signoffLabel: { fontSize: 8, fontWeight: '700', color: COLORS.slate[400], marginLeft: 24, textTransform: 'uppercase' },
+  signoffDotTextSigned: { fontSize: 8, fontWeight: '600', color: COLORS.white },
+  signoffDotTextPending: { fontSize: 8, fontWeight: '600', color: COLORS.slate[400] },
+  signoffLabel: { fontSize: 8, fontWeight: '600', color: COLORS.slate[400], marginLeft: 24, textTransform: 'uppercase' },
   detailLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  detailLinkText: { fontSize: 10, fontWeight: '700', color: COLORS.primary, textTransform: 'uppercase' },
+  detailLinkText: { fontSize: 10, fontWeight: '600', color: COLORS.primary, textTransform: 'uppercase' },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 64 },
-  emptyText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[400], marginTop: 16 }
+  emptyText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[400], marginTop: 16 }
 });

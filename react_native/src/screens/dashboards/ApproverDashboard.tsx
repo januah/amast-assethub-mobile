@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getApproverDashboardSummary } from '../../api/dashboardApi';
@@ -64,18 +65,18 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
 
   if (loading && hospitalName === '' && pendingItems.length === 0 && approvalHistory.length === 0) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
+    <AnimatedScreen style={styles.container}>
+      <Header title="Dashboard" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
       <View style={styles.bar}>
         <Ionicons name="checkmark-circle" size={16} color={COLORS.emerald[600]} />
         <Text style={styles.barText}>{hospitalName || 'Hospital'}</Text>
@@ -182,7 +183,7 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
           )}
         </View>
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -201,11 +202,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate[200]
   },
-  barText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[800], letterSpacing: 1, textTransform: 'uppercase' },
+  barText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[800], letterSpacing: 1, textTransform: 'uppercase' },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
   welcome: { marginBottom: 24 },
-  welcomeTitle: { fontSize: 20, fontWeight: '700', color: COLORS.slate[900] },
+  welcomeTitle: { fontSize: 20, fontWeight: '600', color: COLORS.slate[900] },
   welcomeSub: { fontSize: 14, color: COLORS.slate[500], marginTop: 4 },
   kpi: {
     backgroundColor: COLORS.slate[900],
@@ -215,13 +216,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   kpiHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  kpiLabel: { fontSize: 12, color: COLORS.slate[400], fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
+  kpiLabel: { fontSize: 12, color: COLORS.slate[400], fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
   kpiBadge: { paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(245,158,11,0.2)', borderRadius: 4 },
-  kpiBadgeText: { fontSize: 8, fontWeight: '800', color: COLORS.amber[400], textTransform: 'uppercase' },
+  kpiBadgeText: { fontSize: 8, fontWeight: '600', color: COLORS.amber[400], textTransform: 'uppercase' },
   kpiRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  kpiValue: { fontSize: 28, fontWeight: '800', color: COLORS.white },
+  kpiValue: { fontSize: 28, fontWeight: '600', color: COLORS.white },
   reviewBtn: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: COLORS.primary, borderRadius: 12 },
-  reviewBtnText: { fontSize: 10, fontWeight: '700', color: COLORS.white, textTransform: 'uppercase' },
+  reviewBtnText: { fontSize: 10, fontWeight: '600', color: COLORS.white, textTransform: 'uppercase' },
   kpiIconBg: { position: 'absolute', bottom: -16, right: -16 },
   priorityCard: { marginBottom: 16 },
   priorityHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
@@ -229,21 +230,21 @@ const styles = StyleSheet.create({
   typePill: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   typePillQuotation: { backgroundColor: COLORS.emerald[100] },
   typePillRemoval: { backgroundColor: COLORS.amber[100] },
-  typePillText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase' },
+  typePillText: { fontSize: 10, fontWeight: '600', textTransform: 'uppercase' },
   typePillTextQuotation: { color: COLORS.emerald[700] },
   typePillTextRemoval: { color: COLORS.amber[700] },
-  priorityId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  priorityAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 4 },
+  priorityId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  priorityAsset: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 4 },
   priorityDesc: { fontSize: 10, color: COLORS.slate[500], marginBottom: 16 },
   priorityFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.slate[100] },
-  priorityCost: { fontSize: 14, fontWeight: '800', color: COLORS.danger },
+  priorityCost: { fontSize: 14, fontWeight: '600', color: COLORS.danger },
   reviewLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  reviewLinkText: { fontSize: 10, fontWeight: '700', color: COLORS.primary, textTransform: 'uppercase' },
+  reviewLinkText: { fontSize: 10, fontWeight: '600', color: COLORS.primary, textTransform: 'uppercase' },
   historyList: { backgroundColor: COLORS.white, borderRadius: 16, borderWidth: 1, borderColor: COLORS.slate[200], overflow: 'hidden' },
   historyItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: COLORS.slate[50] },
   historyIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: COLORS.emerald[50], alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   historyContent: { flex: 1 },
-  historyTitle: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  historyTitle: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   historyMeta: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
   historyTime: { fontSize: 10, color: COLORS.slate[400], marginLeft: 8 }
 });

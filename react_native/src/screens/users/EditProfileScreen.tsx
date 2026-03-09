@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
 import { getProfile, updateProfile } from '../../api/profileApi';
@@ -73,17 +74,17 @@ export function EditProfileScreen({ onBack }: EditProfileScreenProps) {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="Edit Profile" showBack onBack={onBack} />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Edit Profile" showBack onBack={onBack} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.avatarSection}>
@@ -161,7 +162,7 @@ export function EditProfileScreen({ onBack }: EditProfileScreenProps) {
           <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   },
   avatarLabel: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[400],
     textTransform: 'uppercase',
     letterSpacing: 1.5,
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   form: { gap: 12 },
   label: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     textTransform: 'uppercase',
     marginLeft: 4,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700'
+    fontWeight: '600'
   },
   saveButtonDisabled: {
     opacity: 0.6

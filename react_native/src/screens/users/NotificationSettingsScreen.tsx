@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getProfile, updateProfile } from '../../api/profileApi';
@@ -62,7 +63,7 @@ export function NotificationSettingsScreen({ onBack }: NotificationSettingsScree
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Notifications" showBack onBack={onBack} />
       {loading ? (
         <View style={styles.loading}>
@@ -109,7 +110,7 @@ export function NotificationSettingsScreen({ onBack }: NotificationSettingsScree
         </View>
       </ScrollView>
       )}
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   toggleText: { flex: 1, marginRight: 16 },
   toggleLabel: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800]
   },
   toggleDesc: {

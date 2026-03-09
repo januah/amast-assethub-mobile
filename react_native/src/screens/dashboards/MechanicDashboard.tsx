@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getExecutorDashboardSummary, getExecutorAssignedTasks, ExecutorAssignedTask } from '../../api/dashboardApi';
@@ -91,17 +92,17 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <AnimatedScreen style={styles.container}>
         <Header title="My Jobs" />
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      </View>
+      </AnimatedScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="My Jobs" />
       <View style={styles.bar}>
         <Ionicons name="briefcase-outline" size={16} color={COLORS.slate[400]} />
@@ -164,7 +165,7 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
           </View>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -179,24 +180,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate[200]
   },
-  barText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[500], letterSpacing: 1, textTransform: 'uppercase' },
+  barText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], letterSpacing: 1, textTransform: 'uppercase' },
   tabs: { flexDirection: 'row', padding: 4, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
   tabActive: { backgroundColor: COLORS.primary },
-  tabText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], letterSpacing: 1, textTransform: 'uppercase' },
+  tabText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 1, textTransform: 'uppercase' },
   tabTextActive: { color: COLORS.white },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
   jobCard: { marginBottom: 16 },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  jobId: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400], textTransform: 'uppercase' },
-  jobAsset: { fontSize: 14, fontWeight: '700', color: COLORS.slate[800], marginBottom: 12 },
+  jobId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], textTransform: 'uppercase' },
+  jobAsset: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], marginBottom: 12 },
   jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   jobMetaText: { fontSize: 10, color: COLORS.slate[500] },
   jobFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.slate[100] },
-  jobPriority: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase' },
+  jobPriority: { fontSize: 10, fontWeight: '600', textTransform: 'uppercase' },
   jobDue: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  jobDueText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[400] },
+  jobDueText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400] },
   viewJobBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -207,8 +208,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.slate[900],
     borderRadius: 12
   },
-  viewJobBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  viewJobBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48 },
-  emptyText: { fontSize: 14, fontWeight: '700', color: COLORS.slate[400], marginTop: 12 },
+  emptyText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[400], marginTop: 12 },
   loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' }
 });

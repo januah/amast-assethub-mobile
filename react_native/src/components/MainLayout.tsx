@@ -20,7 +20,7 @@ import { AssignedTasksScreen } from '../screens/AssignedTasksScreen';
 import { JobExecutionScreen } from '../screens/JobExecutionScreen';
 import { RemovalFlowScreen } from '../screens/RemovalFlowScreen';
 import { ScanScreen } from '../screens/ScanScreen';
-import { COLORS } from '../constants/theme';
+import { COLORS, FONT_FAMILY } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
 type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'removal_flow' | null;
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY,
     fontWeight: '600',
     color: COLORS.slate[500]
   }

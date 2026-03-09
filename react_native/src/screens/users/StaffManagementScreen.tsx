@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getTeamSummary } from '../../api/teamApi';
@@ -45,7 +46,7 @@ export function StaffManagementScreen({
   const summary = data ?? { activeStaff: 0, efficiency: 0, staff: [] };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header title="Staff Management" showBack onBack={onBack} />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
@@ -124,7 +125,7 @@ export function StaffManagementScreen({
           </>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -163,12 +164,12 @@ const styles = StyleSheet.create({
   statSecondary: {},
   statValue: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '600',
     color: COLORS.primary
   },
   statLabel: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[500],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   },
   staffName: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[800]
   },
   staffScoreRow: {
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   },
   staffScore: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '600',
     color: COLORS.primary
   },
   staffMeta: {
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
     color: COLORS.slate[400],
     textTransform: 'uppercase',
     letterSpacing: 1

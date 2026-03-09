@@ -1,3 +1,6 @@
+export const FONT_FAMILY = 'PlusJakartaSans_400Regular';
+export const FONT_FAMILY_BOLD = 'PlusJakartaSans_700Bold';
+
 export const COLORS = {
   primary: '#013ABD',
   primaryDark: '#0369a1',

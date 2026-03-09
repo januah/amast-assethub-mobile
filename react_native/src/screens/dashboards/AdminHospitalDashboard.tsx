@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
+import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { ActionButton, Card, SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getAdminDashboardSummary } from '../../api/dashboardApi';
@@ -70,9 +71,9 @@ export function AdminHospitalDashboard({ onAction, onLogout, unreadCount = 0 }: 
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen style={styles.container}>
       <Header
-        title="Admin Hospital"
+        title="Dashboard"
         showRightIcons
         unreadCount={unreadCount}
         onNotificationClick={() => onAction('notifications')}
@@ -143,7 +144,7 @@ export function AdminHospitalDashboard({ onAction, onLogout, unreadCount = 0 }: 
           </>
         )}
       </ScrollView>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate[200]
   },
-  barText: { fontSize: 10, fontWeight: '700', color: COLORS.slate[800], letterSpacing: 1, textTransform: 'uppercase' },
+  barText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[800], letterSpacing: 1, textTransform: 'uppercase' },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
   loading: { padding: 48, alignItems: 'center', justifyContent: 'center' },
@@ -167,10 +168,10 @@ const styles = StyleSheet.create({
   kpiPrimary: { backgroundColor: COLORS.primary },
   kpiDark: { backgroundColor: COLORS.slate[900] },
   kpiWhite: { backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200] },
-  kpiValue: { fontSize: 24, fontWeight: '800', color: COLORS.white },
+  kpiValue: { fontSize: 24, fontWeight: '600', color: COLORS.white },
   kpiValueAmber: { color: COLORS.amber[500] },
   kpiValueEmerald: { color: COLORS.emerald[500] },
-  kpiLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.8)', marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 },
+  kpiLabel: { fontSize: 8, fontWeight: '600', color: 'rgba(255,255,255,0.8)', marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 },
   kpiLabelDark: { color: COLORS.slate[600] },
   actions: { gap: 12, marginBottom: 8 },
   activityCard: {
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   },
   activityIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: COLORS.slate[50], alignItems: 'center', justifyContent: 'center' },
   activityContent: { flex: 1 },
-  activityTitle: { fontSize: 12, fontWeight: '700', color: COLORS.slate[800] },
+  activityTitle: { fontSize: 12, fontWeight: '600', color: COLORS.slate[800] },
   activityMeta: { fontSize: 10, color: COLORS.slate[400], marginTop: 2 },
-  activityTime: { fontSize: 8, fontWeight: '700', color: COLORS.slate[400] }
+  activityTime: { fontSize: 8, fontWeight: '600', color: COLORS.slate[400] }
 });
