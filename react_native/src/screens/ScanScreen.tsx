@@ -115,8 +115,7 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
   return (
     <AnimatedScreen style={styles.container}>
       <Camera
-        style={StyleSheet.absoluteFill}
-        ratio="4:3"
+        style={StyleSheet.absoluteFillObject}
         barCodeScannerSettings={{ barCodeTypes: ['qr'] }}
         onBarCodeScanned={scanning && !lookingUp ? handleBarCodeScanned : undefined}
       />
@@ -127,7 +126,12 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
         <Text style={[styles.title, styles.titleLight]}>Scan Asset QR</Text>
       </View>
       <View style={styles.overlay}>
-        <View style={styles.frame} />
+        <View
+          style={[
+            styles.frame,
+            { borderColor: scanning && !lookingUp ? COLORS.emerald[500] : COLORS.red[500] },
+          ]}
+        />
         <Text style={styles.hint}>Align the asset QR code within the frame</Text>
       </View>
       <View style={[styles.noteWrap, { paddingBottom: insets.bottom + 12 }]}>
@@ -175,7 +179,6 @@ const styles = StyleSheet.create({
     width: 240,
     height: 240,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.6)',
     borderRadius: 16,
   },
   hint: {
