@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { Card, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { getExecutorDashboardSummary, getExecutorAssignedTasks, ExecutorAssignedTask } from '../../api/dashboardApi';
 
 interface MechanicJob {
@@ -50,10 +52,12 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
-      const [summaryRes, tasksRes] = await Promise.all([
-        getExecutorDashboardSummary(),
-        getExecutorAssignedTasks()
+      const delayPromise = isRefresh ? Promise.resolve() : new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+      const [fetchResult] = await Promise.all([
+        Promise.all([getExecutorDashboardSummary(), getExecutorAssignedTasks()]),
+        delayPromise,
       ]);
+      const [summaryRes, tasksRes] = fetchResult;
       if (summaryRes.success && summaryRes.data) {
         setSummary({
           pendingJobsCount: summaryRes.data.pendingJobsCount ?? 0,
@@ -94,9 +98,9 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
     return (
       <AnimatedScreen style={styles.container}>
         <Header title="My Jobs" />
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <DashboardSkeleton />
+        </ScrollView>
       </AnimatedScreen>
     );
   }
@@ -211,5 +215,4 @@ const styles = StyleSheet.create({
   viewJobBtnText: { fontSize: 12, fontWeight: '600', color: COLORS.white },
   empty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48 },
   emptyText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[400], marginTop: 12 },
-  loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' }
 });

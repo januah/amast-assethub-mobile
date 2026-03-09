@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { ActionButton, Card, SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { getAdminDashboardSummary } from '../../api/dashboardApi';
 
 interface AdminHospitalDashboardProps {
@@ -40,7 +42,8 @@ export function AdminHospitalDashboard({ onAction, onLogout, unreadCount = 0 }: 
 
   useEffect(() => {
     let cancelled = false;
-    getAdminDashboardSummary().then((res) => {
+    const delayPromise = new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+    Promise.all([getAdminDashboardSummary(), delayPromise]).then(([res]) => {
       if (cancelled) return;
       setLoading(false);
       if (res.success && res.data) setData(res.data);
@@ -86,9 +89,7 @@ export function AdminHospitalDashboard({ onAction, onLogout, unreadCount = 0 }: 
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <View style={styles.loading}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          </View>
+          <DashboardSkeleton />
         ) : (
           <>
             <View style={styles.kpiGrid}>
@@ -162,7 +163,6 @@ const styles = StyleSheet.create({
   barText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[800], letterSpacing: 1, textTransform: 'uppercase' },
   scroll: { flex: 1 },
   content: { padding: 16, paddingBottom: 32 },
-  loading: { padding: 48, alignItems: 'center', justifyContent: 'center' },
   kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12,  },
   kpiCard: { width: '47%', padding: 16, borderRadius: 16, alignItems: 'center' },
   kpiPrimary: { backgroundColor: COLORS.primary },

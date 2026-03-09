@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { ActionButton, Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getRequesterDashboardSummary } from '../../api/dashboardApi';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { UserRole } from '../../types';
 
 function formatRole(role: UserRole): string {
@@ -44,8 +46,9 @@ export function RequesterDashboard({ role, onAction, onLogout, unreadCount = 0 }
 
   useEffect(() => {
     let cancelled = false;
-    getRequesterDashboardSummary()
-      .then((res) => {
+    const delay = new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+    Promise.all([getRequesterDashboardSummary(), delay])
+      .then(([res]) => {
         if (cancelled) return;
         setData(res.success && res.data ? res.data : null);
       })
@@ -62,9 +65,9 @@ export function RequesterDashboard({ role, onAction, onLogout, unreadCount = 0 }
     return (
       <AnimatedScreen style={styles.container}>
         <Header title="Dashboard" showRightIcons onNotificationClick={() => onAction('notifications')} onAvatarPress={() => onAction('profile')} unreadCount={unreadCount} />
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <DashboardSkeleton />
+        </ScrollView>
       </AnimatedScreen>
     );
   }

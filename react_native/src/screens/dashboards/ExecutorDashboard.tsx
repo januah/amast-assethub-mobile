@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { ActionButton, Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { UserRole } from '../../types';
 import { getExecutorDashboardSummary, ExecutorDashboardSummary } from '../../api/dashboardApi';
 
@@ -26,7 +28,9 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
-      const res = await getExecutorDashboardSummary();
+      const fetchPromise = getExecutorDashboardSummary();
+      const delayPromise = isRefresh ? Promise.resolve() : new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+      const [res] = await Promise.all([fetchPromise, delayPromise]);
       if (res.success && res.data) setData(res.data);
     } catch {
       setData(null);
@@ -59,9 +63,9 @@ export function ExecutorDashboard({ role, onAction, onLogout, unreadCount = 0 }:
           onAvatarPress={() => onAction('profile')}
           unreadCount={unreadCount}
         />
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <DashboardSkeleton />
+        </ScrollView>
       </AnimatedScreen>
     );
   }

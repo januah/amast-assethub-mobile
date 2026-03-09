@@ -1,0 +1,1 @@
+export const DASHBOARD_SKELETON_MIN_MS = 3000;

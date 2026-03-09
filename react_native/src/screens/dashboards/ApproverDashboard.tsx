@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { getApproverDashboardSummary } from '../../api/dashboardApi';
 import { getPendingApprovals, type PendingApprovalItem } from '../../api/pendingApprovalsApi';
 import { getServiceRequests } from '../../api/serviceRequestApi';
@@ -34,11 +36,16 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
-    const [summaryRes, pendingRes, approvedRes] = await Promise.all([
-      getApproverDashboardSummary(),
-      getPendingApprovals({ type: 'all', page: 1, limit: PENDING_PREVIEW_LIMIT }),
-      getServiceRequests({ status: 'APPROVED', page: 1, limit: APPROVAL_HISTORY_LIMIT }),
+    const delayPromise = isRefresh ? Promise.resolve() : new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+    const [fetchResult] = await Promise.all([
+      Promise.all([
+        getApproverDashboardSummary(),
+        getPendingApprovals({ type: 'all', page: 1, limit: PENDING_PREVIEW_LIMIT }),
+        getServiceRequests({ status: 'APPROVED', page: 1, limit: APPROVAL_HISTORY_LIMIT }),
+      ]),
+      delayPromise,
     ]);
+    const [summaryRes, pendingRes, approvedRes] = fetchResult;
     if (summaryRes.success && summaryRes.data) {
       setHospitalName(summaryRes.data.hospitalName ?? '');
     }
@@ -67,9 +74,9 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
     return (
       <AnimatedScreen style={styles.container}>
         <Header title="Approver" onNotificationClick={() => onAction('notifications')} onAvatarPress={onLogout} />
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <DashboardSkeleton />
+        </ScrollView>
       </AnimatedScreen>
     );
   }

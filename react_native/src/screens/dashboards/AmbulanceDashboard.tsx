@@ -3,8 +3,10 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
+import { DashboardSkeleton } from '../../components/DashboardSkeleton';
 import { ActionButton, Card, SectionHeader } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
+import { DASHBOARD_SKELETON_MIN_MS } from '../../config/dashboard';
 import { useAuth } from '../../context/AuthContext';
 import { getAssignedVehicles, AssignedVehicle, type GetAssignedVehiclesResponse } from '../../api/assetsApi';
 import { getServiceRequests, type ServiceRequestItem, type GetServiceRequestsResponse } from '../../api/serviceRequestApi';
@@ -34,21 +36,25 @@ export function AmbulanceDashboard({ onAction, onLogout }: AmbulanceDashboardPro
   const { user } = useAuth();
   const [assignedVehicles, setAssignedVehicles] = useState<AssignedVehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [activeRequests, setActiveRequests] = useState<ServiceRequestItem[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    getAssignedVehicles()
-      .then((res) => {
+    const delayPromise = new Promise<void>((r) => setTimeout(r, DASHBOARD_SKELETON_MIN_MS));
+    Promise.all([
+      getAssignedVehicles().then((res) => {
         const body = res as unknown as GetAssignedVehiclesResponse;
         if (!cancelled && Array.isArray(body?.assignedVehicles)) setAssignedVehicles(body.assignedVehicles);
-      })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      }),
+      delayPromise,
+    ]).finally(() => { if (!cancelled) setLoading(false); setInitialLoadDone(true); });
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
+    if (!initialLoadDone) return;
     let cancelled = false;
     getServiceRequests({ page: 1, limit: 20 })
       .then((res) => {
@@ -59,13 +65,29 @@ export function AmbulanceDashboard({ onAction, onLogout }: AmbulanceDashboardPro
       })
       .finally(() => { if (!cancelled) setRequestsLoading(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [initialLoadDone]);
 
   const displayName = user?.full_name || user?.username || 'Driver';
   const firstVehicle = assignedVehicles[0];
   const welcomeSub = firstVehicle
     ? `${firstVehicle.name}${firstVehicle.model ? ` (${firstVehicle.model})` : ''}`
     : 'No vehicle assigned';
+
+  if (loading) {
+    return (
+      <AnimatedScreen style={styles.container}>
+        <Header
+          title="Dashboard"
+          showRightIcons
+          onNotificationClick={() => onAction('notifications')}
+          onAvatarPress={() => onAction('profile')}
+        />
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <DashboardSkeleton />
+        </ScrollView>
+      </AnimatedScreen>
+    );
+  }
 
   return (
     <AnimatedScreen style={styles.container}>
