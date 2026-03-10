@@ -39,6 +39,7 @@ export interface GetServiceRequestsParams {
   limit?: number;
   status?: ServiceRequestStatus;
   q?: string;
+  asset_id?: string;
 }
 
 export interface GetServiceRequestsResponse {
@@ -52,6 +53,7 @@ export async function getServiceRequests(params?: GetServiceRequestsParams) {
   if (params?.limit) q.set('limit', String(params.limit));
   if (params?.status) q.set('status', params.status.toUpperCase());
   if (params?.q) q.set('q', params.q);
+  if (params?.asset_id) q.set('asset_id', params.asset_id);
   const query = q.toString();
   return apiClient.get<GetServiceRequestsResponse>(`/service-requests${query ? `?${query}` : ''}`);
 }

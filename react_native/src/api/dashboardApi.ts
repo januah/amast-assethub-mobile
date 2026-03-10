@@ -90,6 +90,7 @@ export interface ExecutorAssignedTask {
   title: string;
   asset: string;
   type: 'PPM' | 'Breakdown';
+  service_mode?: string | null;
   location: string;
   requester: string;
   priority: string;

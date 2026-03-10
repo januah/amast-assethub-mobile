@@ -143,9 +143,10 @@ export function JobExecutionScreen({ requestId, onBack, onComplete }: JobExecuti
 
   const status = (job?.status || '').toUpperCase();
   const isOpen = status === 'OPEN';
+  const isApproved = status === 'APPROVED';
   const isInProgress = ['IN_PROGRESS', 'WAITING'].includes(status);
   const isCompleted = status === 'COMPLETED';
-  const canStart = isOpen;
+  const canStart = isApproved || isOpen;
   const canComplete = isInProgress;
 
   const statusSteps = ['Pending', 'In Progress', 'Completed'];

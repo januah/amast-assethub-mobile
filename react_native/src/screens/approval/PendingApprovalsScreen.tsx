@@ -52,12 +52,16 @@ function getAccentColor(priority: string): string {
   return COLORS.sky[600];
 }
 
+function displayType(type: PendingApprovalType): string {
+  return type === 'Removal' ? 'Replacement' : type;
+}
+
 interface PendingApprovalsScreenProps {
   onBack: () => void;
 }
 
 export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) {
-  const [filter, setFilter] = useState<'All' | 'Quotation' | 'Removal'>('All');
+  const [filter, setFilter] = useState<'All' | 'Quotation' | 'Replacement'>('All');
   const [items, setItems] = useState<PendingApprovalItem[]>([]);
   const [totalAmount, setTotalAmount] = useState('0.00');
   const [currentPage, setCurrentPage] = useState(1);
@@ -196,7 +200,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
           <ScrollView style={styles.scroll} contentContainerStyle={styles.detailContent} showsVerticalScrollIndicator={false}>
             <View style={[styles.detailCard, { borderLeftColor: getAccentColor(detailView.priority) }]}>
               <View style={styles.detailHeader}>
-                <Text style={styles.detailId}>{detailView.id} - {detailView.type}</Text>
+                <Text style={styles.detailId}>{detailView.id} - {displayType(detailView.type)}</Text>
                 <StatusBadge status="Pending" />
               </View>
               <Text style={styles.detailAsset}>{detailView.asset}</Text>
@@ -213,7 +217,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
               ) : null}
               <View style={styles.detailCostRow}>
                 <Text style={styles.detailCost}>
-                  {detailView.type === 'Removal' ? 'Removal (No Cost)' : detailView.cost}
+                  {detailView.type === 'Removal' ? 'Replacement (No Cost)' : detailView.cost}
                 </Text>
               </View>
               {showRejectInput && (
@@ -268,7 +272,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
       <Header title="Pending Approvals" showBack onBack={onBack} />
 
       <View style={styles.filterBar}>
-        {(['All', 'Quotation', 'Removal'] as const).map((t) => (
+        {(['All', 'Quotation', 'Replacement'] as const).map((t) => (
           <TouchableOpacity
             key={t}
             style={[styles.filterTab, filter === t && styles.filterTabActive]}
@@ -290,7 +294,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
       >
         <View style={styles.summaryBar}>
           <Text style={styles.summaryCount}>{items.length} REQUESTS PENDING</Text>
-          {filter !== 'Removal' && (
+          {filter !== 'Replacement' && (
             <View style={styles.summaryTotal}>
               <Ionicons name="cash-outline" size={12} color={COLORS.slate[400]} />
               <Text style={styles.summaryTotalText}>Total: RM {totalAmount}</Text>
@@ -311,7 +315,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
             <Ionicons name="checkmark-done-outline" size={48} color={COLORS.slate[300]} />
             <Text style={styles.emptyTitle}>Clear!</Text>
             <Text style={styles.emptyText}>
-              No {filter !== 'All' ? filter.toLowerCase() : ''} items pending approval.
+              No {filter !== 'All' ? (filter === 'Replacement' ? 'replacement' : filter.toLowerCase()) : ''} items pending approval.
             </Text>
           </View>
         ) : (
@@ -330,7 +334,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
                       color={item.type === 'Quotation' ? COLORS.emerald[600] : COLORS.amber[600]}
                     />
                   </View>
-                  <Text style={styles.cardId}>{item.id} - {item.type}</Text>
+                  <Text style={styles.cardId}>{item.id} - {displayType(item.type)}</Text>
                 </View>
                 <StatusBadge status="Pending" />
               </View>
@@ -343,7 +347,7 @@ export function PendingApprovalsScreen({ onBack }: PendingApprovalsScreenProps) 
               </View>
               <View style={styles.cardFooter}>
                 <Text style={styles.cardCost}>
-                  {item.type === 'Removal' ? 'Removal (No Cost)' : item.cost}
+                  {item.type === 'Removal' ? 'Replacement (No Cost)' : item.cost}
                 </Text>
                 <View style={styles.reviewLink}>
                   <Text style={styles.reviewLinkText}>Review Now</Text>

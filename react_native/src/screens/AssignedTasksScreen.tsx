@@ -98,6 +98,11 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
           </TouchableOpacity>
         ))}
       </View>
+      <View style={styles.serviceModeNote}>
+        <Text style={styles.serviceModeNoteText}>
+          PPM = Preventive Maintenance. Breakdown = REPAIR, INSPEC, INSTALL.
+        </Text>
+      </View>
       {loading ? (
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -117,7 +122,7 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
           }
         >
           <View style={styles.header}>
-            <Text style={styles.queueText}>{queueCount} Jobs in Queue</Text>
+            <Text style={styles.queueText}>{queueCount} Incomplete Jobs in Queue</Text>
           </View>
 
           {filteredTasks.length > 0 ? (
@@ -142,7 +147,14 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
                         color={task.type === 'Breakdown' ? COLORS.danger : COLORS.primary}
                       />
                     </View>
-                    <Text style={styles.taskId}>{task.id}</Text>
+                    <View>
+                      <Text style={styles.taskId}>{task.id}</Text>
+                      <View style={[styles.serviceModeChip, task.type === 'Breakdown' ? styles.serviceModeChipBreakdown : styles.serviceModeChipPpm]}>
+                        <Text style={[styles.serviceModeChipText, task.type === 'Breakdown' ? styles.serviceModeChipTextBreakdown : styles.serviceModeChipTextPpm]}>
+                          {task.service_mode || task.type}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                   <View style={styles.taskBadges}>
                     <View style={[styles.priorityBadge, { backgroundColor: `${getPriorityColor(task.priority)}20` }]}>
@@ -210,6 +222,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.slate[100]
   },
   serviceModeLabel: { fontSize: 12, fontWeight: '600', color: COLORS.slate[600] },
+  serviceModeNote: { paddingHorizontal: 12, paddingVertical: 8, paddingBottom: 12, backgroundColor: COLORS.slate[50], borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
+  serviceModeNoteText: { fontSize: 10, color: COLORS.slate[500], lineHeight: 14 },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 12 },
   tabActive: { backgroundColor: COLORS.primary },
   tabText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], letterSpacing: 1, textTransform: 'uppercase' },
@@ -229,6 +243,12 @@ const styles = StyleSheet.create({
   typeIconBreakdown: { backgroundColor: '#fee2e2' },
   typeIconPpm: { backgroundColor: '#e0f2fe' },
   taskId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400] },
+  serviceModeChip: { alignSelf: 'flex-start', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 4 },
+  serviceModeChipPpm: { backgroundColor: '#e0f2fe' },
+  serviceModeChipBreakdown: { backgroundColor: '#fee2e2' },
+  serviceModeChipText: { fontSize: 9, fontWeight: '600', textTransform: 'uppercase' },
+  serviceModeChipTextPpm: { color: '#0369a1' },
+  serviceModeChipTextBreakdown: { color: '#dc2626' },
   priorityBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
   priorityBadgeText: { fontSize: 8, fontWeight: '600', textTransform: 'uppercase' },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },

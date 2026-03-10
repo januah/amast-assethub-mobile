@@ -18,9 +18,9 @@ interface DashboardRouterProps {
   unreadCount?: number;
 }
 
-type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'removal_flow' | null;
+type FlowState = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'request_detail' | 'removal_flow' | null;
 
-type ActionPayload = { asset?: { id: string; name: string }; jobId?: string };
+type ActionPayload = { asset?: { id: string; name: string }; jobId?: string; requestId?: string };
 
 function wrapWithLayout(
   children: React.ReactNode,
@@ -33,6 +33,7 @@ function wrapWithLayout(
     onFlowComplete: () => void;
     breakdownInitialAsset: { id: string; name: string } | null;
     jobDetailRequestId: string | null;
+    requestDetailId: string | null;
     handleAction: (flow: string, payload?: ActionPayload) => void;
     onNotificationListClose?: () => void;
   }
@@ -47,6 +48,7 @@ function wrapWithLayout(
       onFlowComplete={flowProps.onFlowComplete}
       breakdownInitialAsset={flowProps.breakdownInitialAsset}
       jobDetailRequestId={flowProps.jobDetailRequestId}
+      requestDetailId={flowProps.requestDetailId}
       onNotificationListClose={flowProps.onNotificationListClose}
       tabs={tabs}
     >
@@ -65,6 +67,7 @@ export function DashboardRouter({
   const [currentFlow, setCurrentFlow] = useState<FlowState>(null);
   const [breakdownInitialAsset, setBreakdownInitialAsset] = useState<{ id: string; name: string } | null>(null);
   const [jobDetailRequestId, setJobDetailRequestId] = useState<string | null>(null);
+  const [requestDetailId, setRequestDetailId] = useState<string | null>(null);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(unreadCount ?? 0);
 
   const fetchUnread = useCallback(() => {
@@ -94,6 +97,9 @@ export function DashboardRouter({
     } else if (flow === 'job_detail' && payload?.jobId) {
       setJobDetailRequestId(payload.jobId);
       setCurrentFlow('job_detail');
+    } else if (flow === 'request_detail' && payload?.requestId) {
+      setRequestDetailId(payload.requestId);
+      setCurrentFlow('request_detail');
     } else if (flow === 'removal') {
       setCurrentFlow('removal_flow');
     } else {
@@ -105,6 +111,7 @@ export function DashboardRouter({
     setCurrentFlow(null);
     setBreakdownInitialAsset(null);
     setJobDetailRequestId(null);
+    setRequestDetailId(null);
   };
 
   const flowProps = {
@@ -112,6 +119,7 @@ export function DashboardRouter({
     onFlowComplete: handleFlowComplete,
     breakdownInitialAsset,
     jobDetailRequestId,
+    requestDetailId,
     handleAction,
     onNotificationListClose: fetchUnread
   };

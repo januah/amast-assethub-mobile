@@ -146,7 +146,7 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
                       color={item.type === 'Quotation' ? COLORS.emerald[700] : COLORS.amber[700]}
                     />
                     <Text style={[styles.typePillText, item.type === 'Quotation' ? styles.typePillTextQuotation : styles.typePillTextRemoval]}>
-                      {item.type}
+                      {item.type === 'Removal' ? 'Replacement' : item.type}
                     </Text>
                   </View>
                   <Text style={styles.priorityId}>{item.id} - {item.priority}</Text>
@@ -157,7 +157,7 @@ export function ApproverDashboard({ onAction, onLogout }: ApproverDashboardProps
               {item.description ? <Text style={styles.priorityDesc} numberOfLines={2}>{item.description}</Text> : null}
               <View style={styles.priorityFooter}>
                 <Text style={styles.priorityCost}>
-                  {item.type === 'Removal' ? 'Removal (No Cost)' : (item.cost ?? '—')}
+                  {item.type === 'Removal' ? 'Replacement (No Cost)' : (item.cost ?? '—')}
                 </Text>
                 <View style={styles.reviewLink}>
                   <Text style={styles.reviewLinkText}>Review</Text>

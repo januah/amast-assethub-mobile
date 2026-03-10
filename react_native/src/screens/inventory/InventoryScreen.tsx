@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/Header';
 import { AnimatedScreen } from '../../components/AnimatedScreen';
 import { Card, SectionHeader, StatusBadge } from '../../components/Shared';
 import { COLORS } from '../../constants/theme';
 import { getAssets, getAssetById, ApiAsset, GetAssetsResponse } from '../../api/assetsApi';
+import { getServiceRequests, type ServiceRequestItem, type GetServiceRequestsResponse } from '../../api/serviceRequestApi';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -18,6 +19,13 @@ const ASSET_STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'LOANED', label: 'Loaned' },
   { value: 'DECOMMISSIONED', label: 'Decommissioned' }
 ];
+
+const CAN_REPORT_ISSUE_STATUSES = ['ACTIVE', 'AVAILABLE'];
+
+function canReportNewIssue(status: string | undefined): boolean {
+  const s = (status ?? '').trim().toUpperCase();
+  return CAN_REPORT_ISSUE_STATUSES.includes(s);
+}
 
 function formatDate(s: string | undefined) {
   if (!s) return '-';
@@ -32,9 +40,10 @@ function formatDate(s: string | undefined) {
 interface InventoryScreenProps {
   onBack: () => void;
   onReportIssue?: (asset: { id: string; name: string }) => void;
+  onOpenRequestDetail?: (requestId: string) => void;
 }
 
-export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps) {
+export function InventoryScreen({ onBack, onReportIssue, onOpenRequestDetail }: InventoryScreenProps) {
   const [view, setView] = useState<'list' | 'detail'>('list');
   const [selectedAsset, setSelectedAsset] = useState<ApiAsset | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,6 +56,8 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState('');
+  const [requestHistory, setRequestHistory] = useState<ServiceRequestItem[]>([]);
+  const [requestHistoryLoading, setRequestHistoryLoading] = useState(false);
 
   const fetchAssets = useCallback(async (page: number, search?: string, status?: string) => {
     setLoading(true);
@@ -80,6 +91,7 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
   const openDetail = useCallback(async (asset: ApiAsset) => {
     setView('detail');
     setSelectedAsset(asset);
+    setRequestHistory([]);
     setDetailLoading(true);
     const res = await getAssetById(asset.asset_id);
     setDetailLoading(false);
@@ -89,6 +101,22 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
     }
     setSelectedAsset((res as unknown as ApiAsset) || asset);
   }, []);
+
+  const fetchRequestHistory = useCallback(async (assetId: string) => {
+    setRequestHistoryLoading(true);
+    const res = await getServiceRequests({ asset_id: assetId, limit: 20 });
+    setRequestHistoryLoading(false);
+    const data = res as unknown as GetServiceRequestsResponse;
+    setRequestHistory(Array.isArray(data?.data) ? data.data : []);
+  }, []);
+
+  useEffect(() => {
+    if (view === 'detail' && selectedAsset) {
+      fetchRequestHistory(selectedAsset.asset_id);
+    } else {
+      setRequestHistory([]);
+    }
+  }, [view, selectedAsset?.asset_id, fetchRequestHistory]);
 
   const locationName = (a: ApiAsset) =>
     a.Location?.name || a.Department?.name || a.location_id || '-';
@@ -145,17 +173,47 @@ export function InventoryScreen({ onBack, onReportIssue }: InventoryScreenProps)
                 <Text style={styles.specValue}>{selectedAsset.Category?.name || '-'}</Text>
               </View>
             </Card>
+
+            <SectionHeader title="Service request history" />
+            <Card style={styles.specsCard}>
+              {requestHistoryLoading ? (
+                <ActivityIndicator size="small" color={COLORS.primary} style={styles.historyLoader} />
+              ) : requestHistory.length === 0 ? (
+                <Text style={styles.historyEmpty}>No service requests for this asset</Text>
+              ) : (
+                requestHistory.map((req) => (
+                  <Pressable
+                    key={req.request_id}
+                    style={({ pressed }) => [styles.historyRow, pressed && styles.historyRowPressed]}
+                    onPress={() => onOpenRequestDetail?.(req.request_id)}
+                  >
+                    <View style={styles.historyRowMain}>
+                      <Text style={styles.historyRowId}>{req.request_id}</Text>
+                      <Text style={styles.historyRowDesc} numberOfLines={2}>
+                        {req.description || '-'}
+                      </Text>
+                      <Text style={styles.historyRowMeta}>
+                        {formatDate(req.created_at)} · {(req.status ?? '').replace(/_/g, ' ')}
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color={COLORS.slate[400]} />
+                  </Pressable>
+                ))
+              )}
+            </Card>
           </ScrollView>
         )}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.reportButton}
-            onPress={() => onReportIssue?.({ id: selectedAsset.asset_id, name: selectedAsset.name })}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.reportButtonText}>Report New Issue</Text>
-          </TouchableOpacity>
-        </View>
+        {canReportNewIssue(selectedAsset.status) && onReportIssue ? (
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={styles.reportButton}
+              onPress={() => onReportIssue({ id: selectedAsset.asset_id, name: selectedAsset.name })}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.reportButtonText}>Report New Issue</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </AnimatedScreen>
     );
   }
@@ -493,5 +551,19 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '600'
-  }
+  },
+  historyLoader: { paddingVertical: 24 },
+  historyEmpty: { fontSize: 14, color: COLORS.slate[500], paddingVertical: 16, textAlign: 'center' },
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.slate[100]
+  },
+  historyRowPressed: { backgroundColor: COLORS.slate[50] },
+  historyRowMain: { flex: 1, marginRight: 8 },
+  historyRowId: { fontSize: 12, fontWeight: '600', color: COLORS.slate[700], marginBottom: 2 },
+  historyRowDesc: { fontSize: 13, color: COLORS.slate[600], marginBottom: 4 },
+  historyRowMeta: { fontSize: 11, color: COLORS.slate[400] }
 });

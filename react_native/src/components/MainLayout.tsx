@@ -18,22 +18,24 @@ import { ReplacementsScreen } from '../screens/ReplacementsScreen';
 import { PPMListScreen } from '../screens/PPMListScreen';
 import { AssignedTasksScreen } from '../screens/AssignedTasksScreen';
 import { JobExecutionScreen } from '../screens/JobExecutionScreen';
+import { RequestDetailScreen } from '../screens/history/RequestDetailScreen';
 import { RemovalFlowScreen } from '../screens/RemovalFlowScreen';
 import { ScanScreen } from '../screens/ScanScreen';
 import { COLORS, FONT_FAMILY } from '../constants/theme';
 
 type ProfileSubPage = 'edit_profile' | 'password' | null;
-type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'removal_flow' | null;
+type CurrentFlow = 'breakdown_flow' | 'replacement_list' | 'ppm_list' | 'task_list' | 'job_detail' | 'request_detail' | 'removal_flow' | null;
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  onAction?: (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string }) => void;
+  onAction?: (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string; requestId?: string }) => void;
   onLogout?: () => void;
   unreadCount?: number;
   currentFlow?: CurrentFlow;
   onFlowComplete?: () => void;
   breakdownInitialAsset?: { id: string; name: string } | null;
   jobDetailRequestId?: string | null;
+  requestDetailId?: string | null;
   onNotificationListClose?: () => void;
   tabs?: TabItem[];
 }
@@ -47,6 +49,7 @@ export function MainLayout({
   onFlowComplete,
   breakdownInitialAsset = null,
   jobDetailRequestId = null,
+  requestDetailId = null,
   onNotificationListClose,
   tabs = []
 }: MainLayoutProps) {
@@ -63,7 +66,7 @@ export function MainLayout({
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [showNotificationList, setShowNotificationList] = useState(false);
 
-  const handleAction = (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string }) => {
+  const handleAction = (flow: string, payload?: { asset?: { id: string; name: string }; jobId?: string; requestId?: string }) => {
     if (flow === 'notifications') {
       setShowNotificationList(true);
       setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId);
@@ -149,6 +152,12 @@ export function MainLayout({
             onComplete={onFlowComplete}
           />
         )}
+        {currentFlow === 'request_detail' && requestDetailId && (
+          <RequestDetailScreen
+            requestId={requestDetailId}
+            onBack={onFlowComplete ?? (() => {})}
+          />
+        )}
         {currentFlow === 'removal_flow' && (
           <RemovalFlowScreen onComplete={onFlowComplete ?? (() => {})} onCancel={onFlowComplete ?? (() => {})} />
         )}
@@ -179,6 +188,7 @@ export function MainLayout({
           <InventoryScreen
             onBack={() => setActiveTab((tabs[0]?.id ?? 'dashboard') as TabId)}
             onReportIssue={(asset) => onAction?.('breakdown_flow', { asset })}
+            onOpenRequestDetail={(requestId) => onAction?.('request_detail', { requestId })}
           />
         )}
         {!currentFlow && !profileSubPage && activeTab === 'history' && (
