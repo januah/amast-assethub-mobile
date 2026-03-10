@@ -78,6 +78,7 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
   const [wizardExpectedDate, setWizardExpectedDate] = useState('');
   const [wizardExpectedDateObj, setWizardExpectedDateObj] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPicDropdown, setShowPicDropdown] = useState(false);
   const [wizardNotes, setWizardNotes] = useState('');
   const [wizardLoading, setWizardLoading] = useState(false);
   const [wizardError, setWizardError] = useState('');
@@ -144,6 +145,7 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
     setShowDatePicker(false);
     setWizardNotes('');
     setWizardError('');
+    setShowPicDropdown(false);
   }, []);
 
   const closeWizard = useCallback(() => {
@@ -152,6 +154,7 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
     setWizardSelectedRequest(null);
     setWizardSelectedLoaner(null);
     setWizardSelectedPic(null);
+    setShowPicDropdown(false);
     fetchList(1);
   }, [fetchList]);
 
@@ -422,6 +425,8 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
 
   if (view === 'wizard') {
     const steps = ['Select Request', 'Select Loaner', 'Issue To'];
+    const wizardCanProceed = wizardStep === 0 ? !!wizardSelectedRequest : wizardStep === 1 ? !!wizardSelectedLoaner : !!(wizardSelectedPic && wizardExpectedDate.trim());
+    const wizardNextDisabled = wizardSubmitting || !wizardCanProceed;
     return (
       <AnimatedScreen style={styles.container}>
         <Header title="Issue Replacement" showBack onBack={closeWizard} />
@@ -482,16 +487,16 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
                   {staff.length === 0 ? (
                     <Text style={styles.wizardEmpty}>No staff members found</Text>
                   ) : (
-                    staff.map((s) => (
-                      <TouchableOpacity
-                        key={s.id}
-                        style={[styles.wizardOption, wizardSelectedPic?.id === s.id && styles.wizardOptionSelected]}
-                        onPress={() => setWizardSelectedPic(s)}
-                      >
-                        <Text style={styles.wizardOptionName}>{s.name}</Text>
-                        <Text style={styles.wizardOptionSub}>Role: {s.role}</Text>
-                      </TouchableOpacity>
-                    ))
+                    <TouchableOpacity
+                      style={[styles.wizardInput, styles.wizardDateTouch]}
+                      onPress={() => setShowPicDropdown(true)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.wizardInputText, !wizardSelectedPic && styles.wizardInputPlaceholder]}>
+                        {wizardSelectedPic ? `${wizardSelectedPic.name} (${wizardSelectedPic.role})` : 'Select Responsible PIC'}
+                      </Text>
+                      <Ionicons name="chevron-down" size={20} color={COLORS.slate[400]} />
+                    </TouchableOpacity>
                   )}
                   <Text style={styles.wizardLabel}>Expected Return Date</Text>
                   <TouchableOpacity
@@ -536,6 +541,33 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
             </>
           )}
         </ScrollView>
+        <Modal
+          visible={showPicDropdown}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowPicDropdown(false)}
+        >
+          <Pressable style={styles.picDropdownOverlay} onPress={() => setShowPicDropdown(false)}>
+            <View style={styles.picDropdownContent} onStartShouldSetResponder={() => true}>
+              <Text style={styles.picDropdownTitle}>Select Responsible PIC</Text>
+              <ScrollView style={styles.picDropdownList} keyboardShouldPersistTaps="handled">
+                {staff.map((s) => (
+                  <TouchableOpacity
+                    key={s.id}
+                    style={[styles.picDropdownItem, wizardSelectedPic?.id === s.id && styles.picDropdownItemSelected]}
+                    onPress={() => {
+                      setWizardSelectedPic(s);
+                      setShowPicDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.picDropdownItemName}>{s.name}</Text>
+                    <Text style={styles.picDropdownItemRole}>Role: {s.role}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </Pressable>
+        </Modal>
         <View style={styles.wizardFooter}>
           {wizardStep > 0 ? (
             <TouchableOpacity style={styles.wizardBack} onPress={() => setWizardStep((s) => s - 1)}>
@@ -543,17 +575,23 @@ export function ReplacementsScreen({ onBack }: ReplacementsScreenProps) {
             </TouchableOpacity>
           ) : null}
           <TouchableOpacity
-            style={[styles.wizardNext, wizardStep === 2 && styles.wizardNextFull]}
+            style={[
+              styles.wizardNext,
+              wizardStep === 2 && styles.wizardNextFull,
+              wizardNextDisabled && styles.wizardNextDisabled,
+            ]}
             onPress={() => {
               if (wizardStep >= 2) handleWizardSubmit();
               else setWizardStep((s) => s + 1);
             }}
-            disabled={wizardSubmitting || (wizardStep === 0 && !wizardSelectedRequest) || (wizardStep === 1 && !wizardSelectedLoaner) || (wizardStep === 2 && (!wizardSelectedPic || !wizardExpectedDate.trim()))}
+            disabled={wizardNextDisabled}
           >
             {wizardSubmitting ? (
               <ActivityIndicator size="small" color={COLORS.white} />
             ) : (
-              <Text style={styles.wizardNextText}>{wizardStep >= 2 ? 'Issue Replacement' : 'Continue'}</Text>
+              <Text style={[styles.wizardNextText, wizardNextDisabled && styles.wizardNextTextDisabled]}>
+                {wizardStep >= 2 ? 'Issue Replacement' : 'Continue'}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -759,7 +797,9 @@ const styles = StyleSheet.create({
   wizardBackText: { fontSize: 14, fontWeight: '600', color: COLORS.slate[700] },
   wizardNext: { flex: 1, paddingVertical: 16, backgroundColor: COLORS.sky[600], borderRadius: 16, alignItems: 'center' },
   wizardNextFull: { flex: 2 },
+  wizardNextDisabled: { backgroundColor: COLORS.slate[300], opacity: 0.9 },
   wizardNextText: { fontSize: 14, fontWeight: '600', color: COLORS.white },
+  wizardNextTextDisabled: { color: COLORS.slate[500] },
   wizardOption: { padding: 16, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.slate[200], borderRadius: 12, marginBottom: 12 },
   wizardOptionSelected: { borderColor: COLORS.sky[600], borderWidth: 2, backgroundColor: COLORS.sky[50] },
   wizardOptionId: { fontSize: 10, fontWeight: '600', color: COLORS.slate[400], marginBottom: 4 },
@@ -774,4 +814,12 @@ const styles = StyleSheet.create({
   wizardLoading: { paddingVertical: 32 },
   wizardEmpty: { fontSize: 14, color: COLORS.slate[500], fontStyle: 'italic' },
   wizardError: { fontSize: 12, color: COLORS.danger, marginBottom: 12 },
+  picDropdownOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.5)', justifyContent: 'center', padding: 24 },
+  picDropdownContent: { backgroundColor: COLORS.white, borderRadius: 16, maxHeight: 360 },
+  picDropdownTitle: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800], padding: 16, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
+  picDropdownList: { maxHeight: 280, padding: 12 },
+  picDropdownItem: { padding: 14, borderRadius: 12, marginBottom: 8, borderWidth: 1, borderColor: COLORS.slate[100] },
+  picDropdownItemSelected: { borderColor: COLORS.sky[600], backgroundColor: COLORS.sky[50] },
+  picDropdownItemName: { fontSize: 14, fontWeight: '600', color: COLORS.slate[800] },
+  picDropdownItemRole: { fontSize: 12, color: COLORS.slate[500], marginTop: 2 },
 });
