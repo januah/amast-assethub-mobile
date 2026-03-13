@@ -144,7 +144,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
             <View style={styles.detailCard}>
               <View style={styles.detailHeader}>
                 <Text style={styles.detailId}>{selectedRequest.request_id}</Text>
-                <StatusBadge status={(selectedRequest.status ?? 'OPEN').replace(/_/g, ' ')} />
+                <StatusBadge status={selectedRequest.status ?? 'OPEN'} />
               </View>
               <Text style={styles.detailAsset}>{selectedRequest.Asset?.name || selectedRequest.asset_id || '-'}</Text>
               <Text style={styles.detailMeta}>
@@ -295,7 +295,7 @@ export function HistoryScreen({ onBack, onOpenChecklist }: HistoryScreenProps) {
                 <Card key={item.request_id} style={styles.card}>
                   <View style={styles.cardTop}>
                     <Text style={styles.cardId}>{item.request_id} - {getTypeLabel(item)}</Text>
-                    <StatusBadge status={(item.status ?? 'OPEN').replace(/_/g, ' ')} />
+                    <StatusBadge status={item.status ?? 'OPEN'} />
                   </View>
                   <Text style={styles.cardAsset}>{item.Asset?.name || item.asset_id || '-'}</Text>
                   <View style={styles.cardActions}>

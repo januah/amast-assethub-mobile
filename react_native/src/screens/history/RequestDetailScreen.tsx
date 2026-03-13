@@ -113,7 +113,7 @@ export function RequestDetailScreen({ requestId, onBack, onOpenChecklist }: Requ
         <View style={styles.detailCard}>
           <View style={styles.detailHeader}>
             <Text style={styles.detailId}>{request.request_id}</Text>
-            <StatusBadge status={(request.status ?? 'OPEN').replace(/_/g, ' ')} />
+            <StatusBadge status={request.status ?? 'OPEN'} />
           </View>
           <Text style={styles.detailAsset}>{request.Asset?.name || request.asset_id || '-'}</Text>
           <Text style={styles.detailMeta}>

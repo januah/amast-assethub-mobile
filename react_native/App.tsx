@@ -21,6 +21,26 @@ import { EnvironmentScreen } from './src/screens/EnvironmentScreen';
 import { DashboardRouter } from './src/screens/DashboardRouter';
 import { RequestLogScreen } from './src/screens/RequestLogScreen';
 import { COLORS } from './src/constants/theme';
+import Toast, { BaseToast } from 'react-native-toast-message';
+
+const toastConfig = {
+  success: (props: { text1?: string }) => (
+    <BaseToast
+      {...props}
+      style={{ backgroundColor: COLORS.primary, borderLeftColor: COLORS.primary }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}
+    />
+  ),
+  error: (props: { text1?: string }) => (
+    <BaseToast
+      {...props}
+      style={{ backgroundColor: COLORS.danger, borderLeftColor: COLORS.danger }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}
+    />
+  ),
+};
 
 function AppContent() {
   const { isAuthenticated, isLoading, role, logout } = useAuth();
@@ -107,6 +127,7 @@ export default function App() {
             <RequestLogProvider>
               <AppWithGesture />
               <StatusBar style="dark" />
+              <Toast config={toastConfig} />
             </RequestLogProvider>
           </AuthProvider>
         </EnvironmentProvider>

@@ -93,7 +93,7 @@ export function InstallerDashboard({ onSelect, onLogout }: InstallerDashboardPro
                     <Text style={styles.installAsset}>{item.asset.name}</Text>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-                    <Text style={[styles.statusBadgeText, { color: statusStyle.text }]}>{item.status.replace('_', ' ')}</Text>
+                    <Text style={[styles.statusBadgeText, { color: statusStyle.text }]}>{item.status}</Text>
                   </View>
                 </View>
                 <View style={styles.installMeta}>

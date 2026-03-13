@@ -63,6 +63,7 @@ export async function getApproverDashboardSummary() {
 export interface ExecutorDashboardSummary {
   fullName: string;
   roleLabel: string;
+  tenantName?: string;
   jobsTodayCount: number;
   pendingJobsCount: number;
   ppmTasksThisWeek: number;

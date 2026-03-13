@@ -20,11 +20,11 @@ interface AmbulanceDashboardProps {
 
 const TERMINAL_STATUSES = ['COMPLETED', 'REJECTED', 'CANCELLED'];
 function isActiveRequest(item: ServiceRequestItem) {
-  return item?.status && !TERMINAL_STATUSES.includes(String(item.status).toUpperCase());
+  return item?.status && !TERMINAL_STATUSES.includes(item.status);
 }
 
 function statusBadgeStyle(status: string) {
-  const s = (status || '').toUpperCase();
+  const s = status || '';
   if (s === 'ACTIVE' || s === 'AVAILABLE') return { bg: COLORS.emerald[100], text: COLORS.emerald[700] };
   if (s === 'MAINTENANCE' || s === 'CALIBRATION') return { bg: COLORS.amber[100], text: COLORS.amber[800] };
   if (s === 'LOANED') return { bg: COLORS.sky[100], text: COLORS.sky[800] };

@@ -1,5 +1,6 @@
 import { DEFAULT_BASE_URL, API_MOBILE_PREFIX } from '../config/api';
 import { addRequestLog } from '../store/requestLogStore';
+import { showSuccessToast, showApiErrorToast } from '../utils/toast';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -33,6 +34,7 @@ class ApiClient {
     path: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
+    const method = (options.method || 'GET') as string;
     const url = `${this.baseUrl}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -50,7 +52,7 @@ class ApiClient {
     if (body && typeof body === 'string') {
       try { bodyPayload = JSON.parse(body); } catch { bodyPayload = body; }
     }
-    console.log(`API ${config.method || 'GET'} ${url}`, bodyPayload !== undefined ? { body: bodyPayload } : '');
+    console.log(`API ${method} ${url}`, bodyPayload !== undefined ? { body: bodyPayload } : '');
     try {
       const res = await fetch(url, config);
       const json = await res.json().catch(() => ({}));
@@ -62,11 +64,22 @@ class ApiClient {
         response: json,
       });
       if (!res.ok) {
+        const msg = res.status >= 400 && res.status < 500 && json?.message ? String(json.message) : undefined;
+        showApiErrorToast(msg);
         return {
           success: false,
           message: json.message || `Request failed: ${res.status}`,
           errors: json.errors
         };
+      }
+      if (json && json.success === false) {
+        const msg = json?.message ? String(json.message) : undefined;
+        showApiErrorToast(msg);
+        return json;
+      }
+      const isAuthPath = path.startsWith('/auth/');
+      if (['POST', 'PUT', 'PATCH'].includes(method) && !isAuthPath) {
+        showSuccessToast(undefined, path, method);
       }
       return json;
     } catch (err: any) {
@@ -76,6 +89,7 @@ class ApiClient {
         url,
         error: err?.message || 'Network error',
       });
+      showApiErrorToast();
       return {
         success: false,
         message: err?.message || 'Network error'

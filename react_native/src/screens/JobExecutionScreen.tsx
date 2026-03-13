@@ -141,7 +141,7 @@ export function JobExecutionScreen({ requestId, onBack, onComplete }: JobExecuti
     }
   }, [requestId, notes, onComplete]);
 
-  const status = (job?.status || '').toUpperCase();
+  const status = job?.status || '';
   const isOpen = status === 'OPEN';
   const isApproved = status === 'APPROVED';
   const isInProgress = ['IN_PROGRESS', 'WAITING'].includes(status);
@@ -226,7 +226,7 @@ export function JobExecutionScreen({ requestId, onBack, onComplete }: JobExecuti
                 >
                   <View style={styles.historyRow}>
                     <Text style={styles.historyStatus}>
-                      {String(h.from_status).replace(/_/g, ' ')} → {String(h.to_status).replace(/_/g, ' ')}
+                      {String(h.from_status)} → {String(h.to_status)}
                     </Text>
                     <Text style={styles.historyDate}>{formatDate(h.changed_at)}</Text>
                   </View>

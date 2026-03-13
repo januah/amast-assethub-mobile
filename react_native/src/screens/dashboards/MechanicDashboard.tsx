@@ -17,12 +17,10 @@ interface MechanicJob {
   requester: string;
   priority: string;
   status: string;
-  statusRaw: string;
   dueTime: string;
 }
 
 function mapTaskToMechanicJob(t: ExecutorAssignedTask): MechanicJob {
-  const statusUpper = (t.status || '').toUpperCase();
   return {
     id: t.id,
     type: t.type,
@@ -31,7 +29,6 @@ function mapTaskToMechanicJob(t: ExecutorAssignedTask): MechanicJob {
     requester: t.requester || '-',
     priority: t.priority || 'Normal',
     status: t.status || '-',
-    statusRaw: statusUpper,
     dueTime: t.time || '-'
   };
 }
@@ -46,7 +43,7 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
   const [jobs, setJobs] = useState<MechanicJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [summary, setSummary] = useState<{ pendingJobsCount: number; ppmTasksThisWeek: number } | null>(null);
+  const [summary, setSummary] = useState<{ pendingJobsCount: number; ppmTasksThisWeek: number; tenantName?: string } | null>(null);
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -61,7 +58,8 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
       if (summaryRes.success && summaryRes.data) {
         setSummary({
           pendingJobsCount: summaryRes.data.pendingJobsCount ?? 0,
-          ppmTasksThisWeek: summaryRes.data.ppmTasksThisWeek ?? 0
+          ppmTasksThisWeek: summaryRes.data.ppmTasksThisWeek ?? 0,
+          tenantName: summaryRes.data.tenantName ?? ''
         });
       }
       if (tasksRes.success && Array.isArray(tasksRes.data)) {
@@ -82,15 +80,15 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
   }, [fetchData]);
 
   const filteredJobs = jobs.filter((job) => {
-    if (filter === 'New') return job.statusRaw === 'OPEN';
-    if (filter === 'In Progress') return ['IN_PROGRESS', 'WAITING'].includes(job.statusRaw);
-    return job.statusRaw === 'COMPLETED';
+    if (filter === 'New') return job.status === 'OPEN';
+    if (filter === 'In Progress') return ['IN_PROGRESS', 'WAITING'].includes(job.status);
+    return job.status === 'COMPLETED';
   });
 
   const getPriorityColor = (p: string) => {
-    const pUpper = (p || '').toUpperCase();
-    if (pUpper.includes('CRITICAL')) return COLORS.danger;
-    if (pUpper.includes('URGENT') || pUpper.includes('HIGH')) return COLORS.amber[500];
+    const s = p || '';
+    if (s.includes('CRITICAL')) return COLORS.danger;
+    if (s.includes('URGENT') || s.includes('HIGH')) return COLORS.amber[500];
     return COLORS.primary;
   };
 
@@ -109,8 +107,16 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
     <AnimatedScreen style={styles.container}>
       <Header title="My Jobs" />
       <View style={styles.bar}>
-        <Ionicons name="briefcase-outline" size={16} color={COLORS.slate[400]} />
-        <Text style={styles.barText}>My Assigned Jobs</Text>
+        <View style={styles.barLeft}>
+          <Ionicons name="briefcase-outline" size={16} color={COLORS.slate[400]} />
+          <Text style={styles.barText}>My Assigned Jobs</Text>
+        </View>
+        {summary?.tenantName ? (
+          <View style={styles.hospitalWrap}>
+            <Ionicons name="business-outline" size={14} color={COLORS.slate[500]} />
+            <Text style={styles.tenantText} numberOfLines={1}>{summary.tenantName}</Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.tabs}>
@@ -136,7 +142,7 @@ export function MechanicDashboard({ onSelectJob, onLogout }: MechanicDashboardPr
             <Card key={job.id} onPress={() => onSelectJob(job.id)} leftBorder={COLORS.primary} style={styles.jobCard}>
               <View style={styles.jobHeader}>
                 <Text style={styles.jobId}>{job.id} - {job.type}</Text>
-                <StatusBadge status={job.statusRaw === 'COMPLETED' ? 'Completed' : 'In Progress'} />
+                <StatusBadge status={job.status} />
               </View>
               <Text style={styles.jobAsset}>{job.asset}</Text>
               <View style={styles.jobMeta}>
@@ -178,13 +184,16 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
     padding: 12,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.slate[200]
   },
+  barLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
   barText: { fontSize: 10, fontWeight: '600', color: COLORS.slate[500], letterSpacing: 1, textTransform: 'uppercase' },
+  hospitalWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  tenantText: { fontSize: 11, fontWeight: '600', color: COLORS.slate[600], maxWidth: 120 },
   tabs: { flexDirection: 'row', padding: 4, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.slate[100] },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
   tabActive: { backgroundColor: COLORS.primary },

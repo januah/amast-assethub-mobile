@@ -30,7 +30,7 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
   const [error, setError] = useState('');
 
   const filteredTasks = tasks.filter((t) => !filter || (t.type && t.type === filter));
-  const queueCount = filteredTasks.filter((t) => (t.status || '').toUpperCase() !== 'COMPLETED').length;
+  const queueCount = filteredTasks.filter((t) => (t.status || '') !== 'COMPLETED').length;
 
   const fetchTasks = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -66,22 +66,13 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
   };
 
   const getTypeBorderColor = (type: string | undefined) => {
-    const t = (type || '').toUpperCase();
-    if (t === 'BREAKDOWN') return '#dc2626';
+    const t = type || '';
+    if (t === 'Breakdown' || t === 'BREAKDOWN') return '#dc2626';
     if (t === 'PPM') return '#0ea5e9';
     return '#0ea5e9';
   };
 
-  const getStatusStyle = (s: string) => {
-    const key = (s || '').toUpperCase().replace(/\s/g, '_');
-    return STATUS_COLORS[key] || { bg: COLORS.slate[100], text: COLORS.slate[600] };
-  };
-  const getStatusLabel = (s: string) => {
-    const key = (s || '').toUpperCase().replace(/\s/g, '_');
-    if (key === 'COMPLETED') return 'Completed';
-    if (key === 'IN_PROGRESS' || key === 'WAITING') return 'In Progress';
-    return 'Pending';
-  };
+  const getStatusStyle = (s: string) => STATUS_COLORS[s || ''] || { bg: COLORS.slate[100], text: COLORS.slate[600] };
 
   return (
     <AnimatedScreen style={styles.container}>
@@ -164,7 +155,7 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
                     </View>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusStyle(task.status).bg }]}>
                       <Text style={[styles.statusBadgeText, { color: getStatusStyle(task.status).text }]}>
-                        {getStatusLabel(task.status)}
+                        {task.status || ''}
                       </Text>
                     </View>
                   </View>
@@ -184,12 +175,7 @@ export function AssignedTasksScreen({ onBack, onSelectTask }: AssignedTasksScree
                 </View>
                 <TouchableOpacity style={styles.startBtn} onPress={() => onSelectTask?.(task.id)}>
                   <Text style={styles.startBtnText}>
-                    {(() => {
-                      const s = (task.status || '').toUpperCase().replace(/\s/g, '_');
-                      if (s === 'COMPLETED') return 'View Job';
-                      if (s === 'IN_PROGRESS' || s === 'WAITING') return 'Continue Job';
-                      return 'Start Job';
-                    })()}
+                    {task.status === 'COMPLETED' ? 'View Job' : ['IN_PROGRESS', 'WAITING'].includes(task.status || '') ? 'Continue Job' : 'Start Job'}
                   </Text>
                   <Ionicons name="chevron-forward" size={14} color={COLORS.white} />
                 </TouchableOpacity>

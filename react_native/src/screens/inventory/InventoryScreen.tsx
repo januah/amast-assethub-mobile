@@ -21,10 +21,17 @@ const ASSET_STATUS_OPTIONS: { value: string; label: string }[] = [
 ];
 
 const CAN_REPORT_ISSUE_STATUSES = ['ACTIVE', 'AVAILABLE'];
+const OPEN_REQUEST_STATUSES = ['OPEN', 'IN_PROGRESS', 'WAITING'];
 
-function canReportNewIssue(status: string | undefined): boolean {
-  const s = (status ?? '').trim().toUpperCase();
-  return CAN_REPORT_ISSUE_STATUSES.includes(s);
+function canReportNewIssue(
+  assetStatus: string | undefined,
+  requestHistory: ServiceRequestItem[]
+): boolean {
+  if (!CAN_REPORT_ISSUE_STATUSES.includes(assetStatus ?? '')) return false;
+  const hasOpenRequest = requestHistory.some((r) =>
+    OPEN_REQUEST_STATUSES.includes((r.status ?? '').toUpperCase())
+  );
+  return !hasOpenRequest;
 }
 
 function formatDate(s: string | undefined) {
@@ -138,7 +145,7 @@ export function InventoryScreen({ onBack, onReportIssue, onOpenRequestDetail }: 
                 <View style={styles.detailIcon}>
                   <Ionicons name="medkit-outline" size={32} color={COLORS.primary} />
                 </View>
-                <StatusBadge status={(selectedAsset.status ?? 'ACTIVE').toUpperCase()} />
+                <StatusBadge status={selectedAsset.status ?? 'ACTIVE'} />
               </View>
               <Text style={styles.detailName}>{selectedAsset.name}</Text>
               <Text style={styles.detailId}>{selectedAsset.asset_id}</Text>
@@ -193,7 +200,7 @@ export function InventoryScreen({ onBack, onReportIssue, onOpenRequestDetail }: 
                         {req.description || '-'}
                       </Text>
                       <Text style={styles.historyRowMeta}>
-                        {formatDate(req.created_at)} · {(req.status ?? '').replace(/_/g, ' ')}
+                        {formatDate(req.created_at)} · {req.status ?? ''}
                       </Text>
                     </View>
                     <Ionicons name="chevron-forward" size={18} color={COLORS.slate[400]} />
@@ -203,7 +210,7 @@ export function InventoryScreen({ onBack, onReportIssue, onOpenRequestDetail }: 
             </Card>
           </ScrollView>
         )}
-        {canReportNewIssue(selectedAsset.status) && onReportIssue ? (
+        {!requestHistoryLoading && canReportNewIssue(selectedAsset.status, requestHistory) && onReportIssue ? (
           <View style={styles.footer}>
             <TouchableOpacity
               style={styles.reportButton}
@@ -273,7 +280,7 @@ export function InventoryScreen({ onBack, onReportIssue, onOpenRequestDetail }: 
               <View style={styles.assetInfo}>
                 <View style={styles.assetRow}>
                   <Text style={styles.assetId}>{asset.asset_id}</Text>
-                  <StatusBadge status={(asset.status ?? 'ACTIVE').toUpperCase()} />
+                  <StatusBadge status={asset.status ?? 'ACTIVE'} />
                 </View>
                 <Text style={styles.assetName}>{asset.name}</Text>
                 <View style={styles.assetMeta}>

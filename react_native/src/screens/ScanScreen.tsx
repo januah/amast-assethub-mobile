@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Camera } from 'expo-camera';
@@ -12,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedScreen } from '../components/AnimatedScreen';
 import { COLORS } from '../constants/theme';
+import { showApiErrorToast } from '../utils/toast';
 import { getAssetById, ApiAsset } from '../api/assetsApi';
 
 function parseAssetIdFromQrData(data: string): string {
@@ -54,23 +54,19 @@ export function ScanScreen({ onBack, onAssetScanned }: ScanScreenProps) {
         const res = await getAssetById(assetId);
         setLookingUp(false);
         if ((res as { success?: boolean }).success === false) {
-          const msg = (res as { message?: string }).message || 'Asset not found';
-          Alert.alert('Asset Not Found', msg, [{ text: 'OK', onPress: () => setScanning(true) }]);
+          setScanning(true);
           return;
         }
         const asset = res as unknown as ApiAsset;
         if (!asset?.asset_id) {
-          Alert.alert('Asset Not Found', 'The scanned code did not match a valid asset.', [
-            { text: 'OK', onPress: () => setScanning(true) },
-          ]);
+          setScanning(true);
           return;
         }
         onAssetScanned({ id: asset.asset_id, name: asset.name || asset.asset_id });
       } catch {
         setLookingUp(false);
-        Alert.alert('Error', 'Could not look up asset. Please try again.', [
-          { text: 'OK', onPress: () => setScanning(true) },
-        ]);
+        showApiErrorToast();
+        setScanning(true);
       }
     },
     [lookingUp, onAssetScanned]
